@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="110" id="FKJ-xX-FAe" customClass="QrcodeCell">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="110"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FKJ-xX-FAe" id="ULc-6N-pVF">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="110"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="QmS-8H-yDf">
+                        <rect key="frame" x="8" y="6" width="80" height="80"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="80" id="3BC-cG-pk2"/>
+                            <constraint firstAttribute="height" constant="80" id="CRN-a9-yRs"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y47-ML-E7i">
+                        <rect key="frame" x="96" y="6" width="267" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="18" id="io2-CL-TFc"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.18039214610000001" green="0.18039214610000001" blue="0.18039214610000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XGu-6o-Ouw">
+                        <rect key="frame" x="96" y="30" width="265" height="80"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.68627458809999997" green="0.68627458809999997" blue="0.68627458809999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <gestureRecognizers/>
+                <constraints>
+                    <constraint firstAttribute="trailingMargin" secondItem="XGu-6o-Ouw" secondAttribute="trailing" constant="16" id="1jW-6e-5sR"/>
+                    <constraint firstAttribute="bottom" secondItem="XGu-6o-Ouw" secondAttribute="bottom" id="1l5-Jm-yhp"/>
+                    <constraint firstItem="y47-ML-E7i" firstAttribute="leading" secondItem="QmS-8H-yDf" secondAttribute="trailing" constant="8" id="1rr-ff-rXQ"/>
+                    <constraint firstItem="y47-ML-E7i" firstAttribute="top" secondItem="ULc-6N-pVF" secondAttribute="top" constant="6" id="Xm2-l4-C5F"/>
+                    <constraint firstItem="QmS-8H-yDf" firstAttribute="top" secondItem="y47-ML-E7i" secondAttribute="top" id="ZPn-HD-8Jg"/>
+                    <constraint firstItem="QmS-8H-yDf" firstAttribute="leading" secondItem="ULc-6N-pVF" secondAttribute="leading" constant="8" id="g7X-CN-GKT"/>
+                    <constraint firstItem="XGu-6o-Ouw" firstAttribute="leading" secondItem="y47-ML-E7i" secondAttribute="leading" id="nuC-Ta-fQg"/>
+                    <constraint firstAttribute="trailing" secondItem="y47-ML-E7i" secondAttribute="trailing" constant="30" id="sYt-YB-qL3"/>
+                    <constraint firstItem="XGu-6o-Ouw" firstAttribute="top" secondItem="y47-ML-E7i" secondAttribute="bottom" constant="6" id="wn6-23-mIq"/>
+                </constraints>
+                <connections>
+                    <outletCollection property="gestureRecognizers" destination="HzJ-qw-7PS" appends="YES" id="ba6-5O-km7"/>
+                </connections>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="labContent" destination="XGu-6o-Ouw" id="hlH-21-Khi"/>
+                <outlet property="labTitle" destination="y47-ML-E7i" id="cyZ-sa-Vhf"/>
+                <outlet property="qrImageView" destination="QmS-8H-yDf" id="vxE-D5-vtZ"/>
+            </connections>
+            <point key="canvasLocation" x="52" y="-118.74062968515743"/>
+        </tableViewCell>
+        <tapGestureRecognizer id="HzJ-qw-7PS">
+            <connections>
+                <action selector="tapQrCodeCellAction:" destination="FKJ-xX-FAe" id="5vH-Tm-4EK"/>
+            </connections>
+        </tapGestureRecognizer>
+    </objects>
+</document>

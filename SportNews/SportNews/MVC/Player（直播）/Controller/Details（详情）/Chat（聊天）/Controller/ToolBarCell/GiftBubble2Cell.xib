@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="98" id="FKJ-xX-FAe" customClass="GiftBubble2Cell">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="98"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="FKJ-xX-FAe" id="ULc-6N-pVF">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="98"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fi8-mk-edR">
+                        <rect key="frame" x="8" y="43" width="371" height="56"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="371" id="bgX-ax-Bi5"/>
+                            <constraint firstAttribute="height" constant="56" id="wDH-qO-7MH"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="名字：" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bWu-jF-oYV">
+                        <rect key="frame" x="56" y="13" width="38.5" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.18039214610000001" green="0.18039214610000001" blue="0.18039214610000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="送了一個" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dXS-qx-hMd">
+                        <rect key="frame" x="40" y="62.5" width="313" height="17"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.18039214610000001" green="0.18039214610000001" blue="0.18039214610000001" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <gestureRecognizers/>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="fi8-mk-edR" secondAttribute="bottom" constant="-1" id="EAO-8V-yyG"/>
+                    <constraint firstItem="bWu-jF-oYV" firstAttribute="top" secondItem="ULc-6N-pVF" secondAttribute="top" constant="13" id="OgV-mO-L2K"/>
+                    <constraint firstItem="fi8-mk-edR" firstAttribute="leading" secondItem="dXS-qx-hMd" secondAttribute="leading" constant="-32" id="Pb4-bT-y1B"/>
+                    <constraint firstItem="dXS-qx-hMd" firstAttribute="leading" secondItem="ULc-6N-pVF" secondAttribute="leading" constant="40" id="ivl-tu-MUT"/>
+                    <constraint firstAttribute="trailing" secondItem="dXS-qx-hMd" secondAttribute="trailing" constant="40" id="pkz-HX-gZL"/>
+                    <constraint firstItem="dXS-qx-hMd" firstAttribute="centerY" secondItem="fi8-mk-edR" secondAttribute="centerY" id="qI7-Qz-v1Y"/>
+                    <constraint firstItem="bWu-jF-oYV" firstAttribute="leading" secondItem="ULc-6N-pVF" secondAttribute="leading" constant="56" id="sCj-2T-5c3"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="h" destination="wDH-qO-7MH" id="ira-fW-Dji"/>
+                <outlet property="h2" destination="EAO-8V-yyG" id="1DD-sa-xbd"/>
+                <outlet property="imgView" destination="fi8-mk-edR" id="yuW-Sj-Es2"/>
+                <outlet property="labTitle1" destination="bWu-jF-oYV" id="Xh7-dJ-UJU"/>
+                <outlet property="labTitle2" destination="dXS-qx-hMd" id="zne-i0-Iok"/>
+                <outlet property="w" destination="sCj-2T-5c3" id="v2S-dq-1a3"/>
+                <outlet property="w2" destination="bgX-ax-Bi5" id="vep-ex-vXs"/>
+            </connections>
+            <point key="canvasLocation" x="-31.199999999999999" y="-133.13343328335833"/>
+        </tableViewCell>
+    </objects>
+</document>

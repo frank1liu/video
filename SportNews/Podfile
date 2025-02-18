@@ -1,0 +1,53 @@
+
+platform :ios, '12.0'
+source 'https://github.com/CocoaPods/Specs.git'
+source "https://github.com/aliyun/aliyun-specs.git"
+
+use_frameworks!
+target "SportNews" do
+    inhibit_all_warnings!
+
+    pod 'SDCycleScrollView'
+    pod 'SDWebImage'
+    pod 'TZImagePickerController'
+    pod 'Masonry'
+    pod 'MJRefresh'
+    pod 'MBProgressHUD'
+    pod 'AFNetworking'
+    pod 'MJExtension'
+    pod 'TYCyclePagerView'
+    pod 'JXCategoryView'
+    pod 'QMUIKit'
+    pod 'LookinServer', :configurations => ['Debug']
+    pod 'MRDLNA'
+    pod 'YYText'
+    pod 'MSNetwork'
+    pod 'JCore'
+    pod 'JPush' 
+    pod 'UMCommon'
+    pod 'UMAPM'
+    pod 'UMDevice'
+    pod 'SocketRocket'
+    pod 'HPGrowingTextView', '~> 1.1'
+    pod 'AWRichText', '~> 1.0.1'
+    pod 'MLLabel', '~> 1.8'
+    pod 'JXPagingView/Pager'
+    pod 'SuperPlayer'  
+    pod 'BarrageRenderer'
+    pod 'NIMSDK_LITE'
+    pod 'Bugly'
+    pod 'FLAnimatedImage', '~> 1.0'
+    pod 'Reachability'
+    pod 'AlicloudPDNS'
+    pod 'AlicloudCrash'
+end
+
+post_install do |installer|
+    installer.generated_projects.each do |project|
+        project.targets.each do |target|
+            target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+            end
+        end
+    end
+end

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="SNYinLangHeaderView">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="116"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZK9-sa-kwY">
+                    <rect key="frame" x="20" y="8" width="374" height="100"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="个人中心卡片1" translatesAutoresizingMaskIntoConstraints="NO" id="1CF-R0-6e7">
+                            <rect key="frame" x="0.0" y="0.0" width="374" height="100"/>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cce-uq-Yhe">
+                            <rect key="frame" x="25" y="17" width="17" height="31.5"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="26"/>
+                            <color key="textColor" red="0.14901960780000001" green="0.76862745099999996" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="我的音浪" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KCj-El-hhh">
+                            <rect key="frame" x="20" y="65.5" width="57.5" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="textColor" red="0.14901960780000001" green="0.76862745099999996" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6MP-A0-2ur">
+                            <rect key="frame" x="284" y="19.5" width="70" height="28"/>
+                            <color key="backgroundColor" red="0.14901960780000001" green="0.76862745099999996" blue="0.76078431369999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="28" id="2B8-ky-TGH"/>
+                                <constraint firstAttribute="width" constant="70" id="Mqg-R7-JB4"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="兑换商城">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </state>
+                            <connections>
+                                <action selector="duihuanAction:" destination="iN0-l3-epB" eventType="touchUpInside" id="tpf-Yd-n3j"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="KCj-El-hhh" secondAttribute="bottom" constant="17.5" id="7ka-rL-oWu"/>
+                        <constraint firstAttribute="bottom" secondItem="1CF-R0-6e7" secondAttribute="bottom" id="XKc-r0-mbt"/>
+                        <constraint firstItem="1CF-R0-6e7" firstAttribute="leading" secondItem="ZK9-sa-kwY" secondAttribute="leading" id="ZoG-3B-cU3"/>
+                        <constraint firstItem="cce-uq-Yhe" firstAttribute="top" secondItem="ZK9-sa-kwY" secondAttribute="top" constant="17" id="cpl-hY-tRU"/>
+                        <constraint firstItem="cce-uq-Yhe" firstAttribute="leading" secondItem="ZK9-sa-kwY" secondAttribute="leading" constant="25" id="jTQ-vk-Cb4"/>
+                        <constraint firstItem="6MP-A0-2ur" firstAttribute="top" secondItem="ZK9-sa-kwY" secondAttribute="top" constant="19.5" id="kb3-87-8GL"/>
+                        <constraint firstItem="KCj-El-hhh" firstAttribute="leading" secondItem="ZK9-sa-kwY" secondAttribute="leading" constant="20" id="qiz-pQ-WOC"/>
+                        <constraint firstItem="1CF-R0-6e7" firstAttribute="top" secondItem="ZK9-sa-kwY" secondAttribute="top" id="tzH-RH-nFQ"/>
+                        <constraint firstAttribute="height" constant="100" id="wRL-an-xmz"/>
+                        <constraint firstAttribute="trailing" secondItem="6MP-A0-2ur" secondAttribute="trailing" constant="20" id="z29-7a-yxb"/>
+                        <constraint firstAttribute="trailing" secondItem="1CF-R0-6e7" secondAttribute="trailing" id="zVe-yd-Xsc"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="ZK9-sa-kwY" secondAttribute="bottom" constant="8" id="Pmv-8F-HWO"/>
+                <constraint firstItem="ZK9-sa-kwY" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="QqD-zT-OpK"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="ZK9-sa-kwY" secondAttribute="trailing" constant="20" id="UnK-Cb-rcf"/>
+                <constraint firstItem="ZK9-sa-kwY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="Xs9-Cg-StI"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="duihuanBtn" destination="6MP-A0-2ur" id="kYc-VP-P8o"/>
+                <outlet property="topBackView" destination="ZK9-sa-kwY" id="w6Y-th-s0V"/>
+                <outlet property="yinlangCountLabel" destination="cce-uq-Yhe" id="pzi-7Y-6Gw"/>
+            </connections>
+            <point key="canvasLocation" x="132" y="125"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="个人中心卡片1" width="335" height="100"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
