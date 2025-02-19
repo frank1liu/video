@@ -171,7 +171,10 @@ static CGFloat const animationTime = 0.4;
                 SuggestionViewController *VC = [[SuggestionViewController alloc] init];
                 [weakSelf.navigationController pushViewController:VC animated:YES];
             }else if (index == 3) {
-                LevelViewController *VC = [[LevelViewController alloc] init];
+//                LevelViewController *VC = [[LevelViewController alloc] init];
+//                [weakSelf.navigationController pushViewController:VC animated:YES];
+                SNUserWebViewController *VC = [[SNUserWebViewController alloc] init];
+                VC.url = @"https://kzbbckjl.com/user/level";
                 [weakSelf.navigationController pushViewController:VC animated:YES];
             }
         }
