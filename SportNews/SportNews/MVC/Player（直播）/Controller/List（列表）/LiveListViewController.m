@@ -116,6 +116,7 @@
         _categoryModel = model;
         _type = type;
         _isHot = isHot;
+        _startTime = @"";
     }
     return self;
 }
@@ -472,7 +473,7 @@
             @"isfanye" : @"1",
             @"status" : @"2",
             @"zhuboType" : @"0",
-            @"starttime" : [self getTodayString],
+            @"starttime" : [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
             @"isnew" : @"1"
@@ -486,7 +487,7 @@
             @"pn" : pn,
             @"ps" : ps,
             @"pid" : @"4",
-            @"starttime" : [self getTodayString],
+            @"starttime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
             @"zhuboType" : @"0"
@@ -571,7 +572,8 @@
         [self.tableView reloadData];
         [self.tableView.mj_header endRefreshing];
         [self.tableView.mj_footer endRefreshing];
-        self.pn = [response[@"data"][@"currentPage"] integerValue];
+        self.pn = [response[@"data"][@"currentPage"] integerValue] + 1;
+        self.startTime = response[@"data"][@"starttime"];
         if (self.pn == [response[@"data"][@"totalPage"] integerValue]) {
             [self.tableView.mj_footer endRefreshingWithNoMoreData];
         }
@@ -607,8 +609,7 @@
                 self.isTodayHaveMatch = true;
             }
         }
-        self.pn++;
-        
+        // self.pn++;
     };
     void (^ fail)(NSError *) = ^(NSError * _Nonnull error) {
         [[NSNotificationCenter defaultCenter] postNotificationName:ListRefreshComplete object:nil userInfo:nil];
