@@ -308,6 +308,8 @@
 		8CD9341D264BA8F5003EBEFA /* SNShoppingListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CD9341C264BA8F5003EBEFA /* SNShoppingListCell.swift */; };
 		8CEA9626260E2F2C009BF094 /* SNPlayerDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CEA9625260E2F2C009BF094 /* SNPlayerDetailVC.swift */; };
 		8CF7774725EE6A1300E927B9 /* LoginChoiceCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF7774625EE6A1300E927B9 /* LoginChoiceCodeView.swift */; };
+		B518D1A32D65E47B00A70193 /* TalkBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B518D1A12D65E47B00A70193 /* TalkBaseViewController.m */; };
+		B518D1A42D65E47B00A70193 /* TalkBaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B518D1A22D65E47B00A70193 /* TalkBaseViewController.xib */; };
 		B5222C832D1D950500C60C6D /* LevelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B5222C812D1D950500C60C6D /* LevelViewController.m */; };
 		B5222C842D1D950500C60C6D /* LevelViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5222C822D1D950500C60C6D /* LevelViewController.xib */; };
 		B57106342D351687008EFECC /* ZFUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B57105FF2D351687008EFECC /* ZFUtilities.m */; };
@@ -1083,6 +1085,9 @@
 		8CEA9625260E2F2C009BF094 /* SNPlayerDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNPlayerDetailVC.swift; sourceTree = "<group>"; };
 		8CF7774625EE6A1300E927B9 /* LoginChoiceCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginChoiceCodeView.swift; sourceTree = "<group>"; };
 		9B3F0BA30F619312F3C9B7B3 /* Pods-SportNews.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SportNews.release.xcconfig"; path = "Target Support Files/Pods-SportNews/Pods-SportNews.release.xcconfig"; sourceTree = "<group>"; };
+		B518D1A02D65E47B00A70193 /* TalkBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TalkBaseViewController.h; sourceTree = "<group>"; };
+		B518D1A12D65E47B00A70193 /* TalkBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TalkBaseViewController.m; sourceTree = "<group>"; };
+		B518D1A22D65E47B00A70193 /* TalkBaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TalkBaseViewController.xib; sourceTree = "<group>"; };
 		B5222C802D1D950500C60C6D /* LevelViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LevelViewController.h; sourceTree = "<group>"; };
 		B5222C812D1D950500C60C6D /* LevelViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LevelViewController.m; sourceTree = "<group>"; };
 		B5222C822D1D950500C60C6D /* LevelViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LevelViewController.xib; sourceTree = "<group>"; };
@@ -2041,6 +2046,9 @@
 			children = (
 				4AB7647C260DB80A00B34079 /* LiveDetailController.h */,
 				4AB7647D260DB80A00B34079 /* LiveDetailController.m */,
+				B518D1A02D65E47B00A70193 /* TalkBaseViewController.h */,
+				B518D1A12D65E47B00A70193 /* TalkBaseViewController.m */,
+				B518D1A22D65E47B00A70193 /* TalkBaseViewController.xib */,
 				8C4B1359264446E000186A9C /* OtherLiveDetailVC.h */,
 				8C4B135A264446E000186A9C /* OtherLiveDetailVC.m */,
 				4AB76480260DB80A00B34079 /* LivePlayerPingVC.swift */,
@@ -3431,6 +3439,7 @@
 				DA6F841C25C9A4C3004A845F /* f_static_082@2x.png in Resources */,
 				4ACCBD662613FEAE003CE422 /* LiveListTheEndTableViewCell.xib in Resources */,
 				DA6F840325C9A4C3004A845F /* f_static_077@2x.png in Resources */,
+				B518D1A42D65E47B00A70193 /* TalkBaseViewController.xib in Resources */,
 				DA6F836325C9895F004A845F /* backFace@2x.png in Resources */,
 				4AAFF8C8264616AB00710AD2 /* living.gif in Resources */,
 				DA6F842C25C9A4C3004A845F /* f_static_074@2x.png in Resources */,
@@ -3796,6 +3805,7 @@
 				B571063E2D351687008EFECC /* ZFPlayerLogManager.m in Sources */,
 				B571063F2D351687008EFECC /* ZFNetworkSpeedMonitor.m in Sources */,
 				B57106402D351687008EFECC /* ZFIJKPlayerManager.m in Sources */,
+				B518D1A32D65E47B00A70193 /* TalkBaseViewController.m in Sources */,
 				B57106412D351687008EFECC /* ZFPersentInteractiveTransition.m in Sources */,
 				B57106422D351687008EFECC /* ZFPlayerNotification.m in Sources */,
 				B57106432D351687008EFECC /* UIViewController+ZFPlayerRotation.m in Sources */,

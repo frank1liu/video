@@ -6,7 +6,7 @@
 //
 
 #import "LiveDetailController.h"
-#import <Superplayer/SuperPlayer.h> 
+#import <Superplayer/SuperPlayer.h>
 
 #import "ZFAVPlayerManager.h"
 #import "ZFPlayerControlView.h"
@@ -16,7 +16,7 @@
 #import <JXPagingView/JXPagerView.h>
 #import "JXPagerView.h"
 #import "LiveCartoonModel.h"
-#import "LiveContentView.h" 
+#import "LiveContentView.h"
 #import "LiveTextListViewController.h"
 #import "LiveStatisticalViewController.h"
 #import "LiveChatRoomViewController.h"
@@ -48,8 +48,8 @@
 #import "SNMatchSeasonButton.h"
 #import "SNVSFloatView.h"
 #import "JCHATChatModel.h"
-#import "BarrageManager.h" 
-#import "SNZFPlayerWindow.h" 
+#import "BarrageManager.h"
+#import "SNZFPlayerWindow.h"
 #import <CallKit/CallKit.h>
 
 
@@ -159,6 +159,9 @@
 @property (nonatomic , strong) UILabel *downloadReportLabel;
 @property (nonatomic , strong) UIView *downloadBaseView;
 @property (nonatomic , strong) UIButton *downloadReportButton;
+@property (nonatomic , assign) BOOL isTalkBaseViewShow;
+@property (nonatomic, strong) JXCategoryIndicatorLineView *lineView;
+
 
 @end
 
@@ -244,7 +247,7 @@
             }
         }
     }
-    
+
     if (self.chatVc) {
         [self.chatVc isLoginOut];
     }
@@ -258,26 +261,28 @@
 }
 
 - (void)viewDidLoad {
-    
+
     [super viewDidLoad];
-    
+
     [self setupParams];
-    
+
     [self calculateBottomHeight];
-    
+
     [self configureLiveData];
-    
+
     [self setupTopHeaderView];
-    
+
     //头部视频播放view
     [self setupLiveHeaderView];
-    
+
     [self getDatas];
-    
+
     [self notificationAndBlock];
-    
+
     //添加来电监测
     [self setupCallObserver];
+
+    self.isTalkBaseViewShow = NO;
 
 }
 
@@ -293,7 +298,7 @@
             }
         }
     }
-    
+
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
 }
@@ -328,21 +333,21 @@
         if (i == cartoonArray.count - 1) {
             currentBottom = currentBottom + 30;
         }
-  
+
      }
     SNGlobalShared.contentBottomHeight = currentBottom + 35;
 }
 
 - (void)notificationAndBlock {
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pagingViewSetOffset) name:@"datasSectionBtnSelected" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(AppWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setupTouPing) name:@"toupingNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setupXiaoPing) name:@"xiaochuangkouNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerViewPlayFailed) name:@"ZFPlayerPlayStatePlayFailed" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerViewPlayAutoPause) name:@"ZFPlayerPlayStatePlayAutoPause" object:nil];
-    
+
     WeakSelf
     ZFPlayerWindowShared.backHandler = ^{
         //点击小视频 跳转到相应的详情页
@@ -360,7 +365,7 @@
             }
         }
     };
-    
+
     if (self.model.type.intValue == 1) {
         [self.view addSubview:self.questionFloatBtn];
         [self.view addSubview:self.questionFloatView];
@@ -368,12 +373,12 @@
     [self.view addSubview:self.vsBtn];
     [self.view addSubview:self.vsfloatView];
     [self.view addSubview:self.seasonView];
-    
-    
+
+
     self.vsfloatView.closeBlock = ^{
         [weakSelf closeVsFloatView];
     };
-    
+
     self.vsfloatView.clickedItemBlock = ^(LiveListModel * _Nonnull model) {
         weakSelf.isClickPop = YES;
         if (weakSelf.PlayStatus == PlayingStatusLive) {
@@ -382,22 +387,22 @@
         [[SocketRocketUtility instance] qiangzhiSRWebSocketClose];
         [weakSelf.timer invalidate];
         weakSelf.timer = nil;
-        
+
         LiveDetailController *liveDetailVc = [[LiveDetailController alloc]init];
         liveDetailVc.isPushByVs = YES;
         liveDetailVc.model = model;
         [weakSelf.navigationController pushViewController:liveDetailVc animated:YES];
     };
-    
-    
+
+
 }
 
 - (void)setupTopHeaderView {
-    
+
     self.categoryFatherView = [[UIView alloc] init];
     self.categoryFatherView.backgroundColor = [UIColor whiteColor];
     self.categoryFatherView.frame = CGRectMake(0, 0, kScreenWidth, 41);
-    
+
     self.topHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kContentHeight)];
     self.pagingView = [[JXPagerView alloc] initWithDelegate:self];
     if (self.PlayStatus == PlayingStatusLive) {
@@ -408,7 +413,7 @@
     self.pagingView.mainTableView.bounces = NO;
     self.pagingView.isListHorizontalScrollEnabled = NO;
     [self.view addSubview:self.pagingView];
-    
+
     self.naviView = [[SNLiveDetailNaviView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, NavHeight)];
     self.naviView.autoresizingMask = UIViewAutoresizingNone;
     if (!self.model.comeFromNotice) {
@@ -438,16 +443,15 @@
             [weakSelf shareMethod];
         }
     };
-    
 }
 
 - (void)setupLiveHeaderView{
-    
+
     [self.topHeaderView addSubview:self.bottomView];
     [self.topHeaderView addSubview:self.contentView];
     [self.topHeaderView addSubview:self.playerFatherView];
     [self.topHeaderView addSubview:self.animationWebView];
-    
+
     [self.bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.equalTo(self.topHeaderView);
         make.bottom.equalTo(self.topHeaderView);
@@ -470,10 +474,10 @@
         make.left.right.equalTo(self.topHeaderView);
         make.height.mas_equalTo(kContentHeight-StatusBarHeight);
     }];
-    
+
     [self.playerFatherView addSubview:self.systemPlayerView];
     self.systemPlayerView.fatherView = self.playerFatherView;
-    
+
     self.tBackgroundView = [self setupEmptyViewWithFrame:CGRectMake(0, kContentHeight + 110 +(self.PlayStatus == PlayingStatusLive ? kBottomHeight:0), kScreenWidth, 180) title:@"数据加载中..."];
     [self.view addSubview:self.tBackgroundView];
 
@@ -520,16 +524,25 @@
     self.categoryView.titleColor = [UIColor colorWithHexString:@"#666666"];
     self.categoryView.titleSelectedColor = [UIColor colorWithHexString:@"#27C5C3"];
     //下划线
-    JXCategoryIndicatorLineView *lineView = [[JXCategoryIndicatorLineView alloc] init];
-    lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
-    lineView.verticalMargin = 3;
-    lineView.indicatorHeight = 3;
-    self.categoryView.indicators = @[lineView];
+    self.lineView = [[JXCategoryIndicatorLineView alloc] init];
+    self.lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
+    self.lineView.verticalMargin = 3;
+    self.lineView.indicatorHeight = 3;
+    self.lineView.tag = 1022;
+    self.categoryView.indicators = @[self.lineView];
 
     CGFloat x = (kScreenWidth - self.categoryTitles.count*30)/(self.categoryTitles.count+1)/2;
-    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2, 41); // title上移
+    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-100, 41); // title上移
     [self.categoryFatherView addSubview:self.categoryView];
     // [self setupDownloadView];       // 下載元友
+
+    UIButton *talkButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [talkButton addTarget:self action:@selector(talkButtonDidClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [talkButton setTitle:@"點擊我" forState:UIControlStateNormal];
+    talkButton.backgroundColor = UIColor.redColor;
+    [talkButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
+    talkButton.frame = CGRectMake(self.categoryView.bounds.size.width-40, -10, 90, 41);
+    [self.categoryFatherView addSubview:talkButton];
 
     self.categoryView.listContainer = (id<JXCategoryViewListContainer>)self.pagingView.listContainerView;
     self.navigationController.interactivePopGestureRecognizer.enabled = (self.categoryView.selectedIndex == 0);
@@ -556,44 +569,30 @@
             }
         }
     }
-
 }
 
-- (void) setupDownloadView {
-    [self.categoryFatherView addSubview:self.downloadBaseView];
+- (void)talkButtonDidClicked:(UIButton *)button {
+    if (self.isTalkBaseViewShow) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowTalkBaseView" object:nil userInfo:nil];
+    }
+    [self setIndicatorColor:self.isTalkBaseViewShow];
+    self.isTalkBaseViewShow = !self.isTalkBaseViewShow;
+}
 
-    [self.downloadBaseView addSubview: self.downloadReportBaseView];
-
-    [self.downloadBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.categoryFatherView).offset(-4);
-        make.right.equalTo(self.categoryFatherView).offset(-16);
-        make.width.mas_equalTo(120);
-        make.height.mas_equalTo(30);
-    }];
-
-    [self.downloadReportBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.downloadBaseView).offset(4);
-        make.right.equalTo(self.downloadBaseView).offset(-4);
-        make.width.mas_equalTo(120);
-        make.bottom.equalTo(self.downloadBaseView).offset(-4);
-    }];
-
-    [self.downloadReportImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.downloadReportBaseView).offset(1);
-        make.left.equalTo(self.downloadReportBaseView).offset(8);
-        make.width.height.mas_equalTo(20);
-    }];
-
-    [self.downloadReportLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.downloadReportBaseView).offset(1);
-        make.left.equalTo(self.downloadReportBaseView).offset(20+12);
-        make.width.mas_equalTo(100);
-        make.height.mas_equalTo(20);
-    }];
-
-    [self.downloadReportButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.top.bottom.equalTo(self.downloadReportBaseView);
-    }];
+- (void)setIndicatorColor:(BOOL)set {
+    if (set) {
+        self.lineView = nil;
+        self.lineView = [[JXCategoryIndicatorLineView alloc] init];
+        self.lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
+        self.lineView.verticalMargin = 3;
+        self.lineView.indicatorHeight = 3;
+        self.categoryView.indicators = @[self.lineView];
+        [self.categoryView reloadData];
+    } else {
+        self.categoryView.indicators = nil;
+    }
 }
 
 - (void)setupAnimateLoadingView {
@@ -624,7 +623,7 @@
         make.right.equalTo(loadingBtn.mas_left).offset(-8);
         make.width.height.equalTo(@22);
     }];
-    
+
 }
 
 - (void)configureLiveData {
@@ -662,16 +661,16 @@
             }
         }
     }
-    
+
     playModel.videoURL = videoURL? videoURL:firstModel.url;
     self.playModel = playModel;
     [self refreshFBL];
-    
+
     if ([self.model.selectCartoonModel.name containsString:@"动画"] && ![self.model.selectCartoonModel.url containsString:@".m3u8"]) {
         [self animatedWay];
         return;
     }
-    
+
     if (videoURL) {
         [self playerVideo:self.playModel];
         self.cartoonModel = self.model.selectCartoonModel;
@@ -686,7 +685,7 @@
 
 //点击分享
 - (void)shareMethod {
-    
+
     NSDictionary *param = @{
         @"pid" : @"4"
     };
@@ -715,7 +714,7 @@
         activityVC.completionWithItemsHandler = itemsBlock;
         // 4、调用控制器
         [self presentViewController:activityVC animated:YES completion:nil];
-        
+
     } failure:^(NSError * _Nonnull error) {
     }];
 }
@@ -736,7 +735,7 @@
     self.contentView.hidden = self.animationWebView.hidden = YES;
     self.playerFatherView.hidden = NO;
     self.PlayStatus = PlayingStatusLive;
-    
+
     self.topHeaderView.height = kContentHeight+kBottomHeight;
     self.bottomView.hidden = NO;
     if (self.model.status.intValue == 0) {
@@ -779,7 +778,7 @@
     self.contentView.hidden = NO;
     self.bottomView.hidden = YES;
     self.topHeaderView.height = kContentHeight;
-    
+
     self.PlayStatus = PlayingStatusNone;
     if (!self.isSelectChatVc) {
         self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
@@ -793,7 +792,7 @@
         [self.chatVc scrollToBottom:NO];
     }
     [SNGlobalShared invalideVideoTimer];
-    
+
 }
 
 //动画播放
@@ -814,18 +813,18 @@
 
 //点击取消动画
 - (void)cancelAnimated {
-    
+
     self.webUrl = @"";
     self.contentView.hidden = NO;
     self.animationWebView.hidden = self.playerFatherView.hidden = YES;
-    
+
     self.PlayStatus = PlayingStatusNone;
     if (!self.isSelectChatVc) {
         self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
     }else {
         self.pagingView.pinSectionHeaderVerticalOffset = kContentHeight;
     }
-    
+
     [self.pagingView.mainTableView reloadData];
     [self.topHeaderView bringSubviewToFront:self.contentView];
     if (self.animateLoadIngView.superview) {
@@ -854,7 +853,7 @@
 }
 
 - (void)getDatas {
-    
+
     NSMutableDictionary *param = @{
         @"isnew": @"1",
         @"mid"  : self.model.ID,
@@ -873,7 +872,7 @@
     self.remindLabel.text = @"数据加载中...";
     WeakSelf
     [KYApiHttpTool GET:URL_MATCH_DETAIL withParams:param success:^(NSDictionary * _Nonnull response) {
-        
+
         LiveListModel *model = [LiveListModel mj_objectWithKeyValues:response[@"data"][@"matchinfo"]];
         model.online_num = [response[@"data"][@"online_num"] intValue];
         model.live_type = weakSelf.model.live_type;
@@ -890,7 +889,7 @@
         weakSelf.liveUserName = response[@"data"][@"matchinfo"][@"mirror_live_urls"][0][@"live_user_name"];
         weakSelf.matchType = response[@"data"][@"matchinfo"][@"type"];
         [weakSelf setupCategoryView];
-        
+
         if ([CommonTools isBlankString:weakSelf.playModel.videoURL]) {
             [weakSelf setupPlayModel];
         }
@@ -918,7 +917,7 @@
         }
         // 加载指数
         [weakSelf getExponentData];
-        
+
         NSString *token = response[@"data"][@"token"];
         weakSelf.token = token;
         //正在比赛才有长链接
@@ -927,14 +926,14 @@
         }
         [weakSelf setupSocket];
         weakSelf.systemPlayerView.controlView.portraitControlView.fullScreenBtn.enabled = true;
-        
+
     } failure:^(NSError * _Nonnull error) {
         [MBProgressHUD hideHUDForView:weakSelf.view];
         weakSelf.remindLabel.text = @"加载失败，点击重新加载";
         [weakSelf.view addSubview:weakSelf.tBackgroundView];
         weakSelf.systemPlayerView.controlView.portraitControlView.fullScreenBtn.enabled = true;
     }];
-    
+
 }
 
 - (void)reloadGetData {
@@ -974,22 +973,22 @@
                 self.listVc.resultBasketObj = self.resultBasketObj;
             }
         }
-        
+
     } failure:^(NSError * _Nonnull error) {
         [self.listVc loadDataFailure];
     }];
 }
- 
+
 
 //加载篮球统计数据--新接口
 - (void)getNewStatisticalDatas {
-    
+
     NSDictionary *param1 = @{
         @"mid" : self.model.ID,
         @"type" : self.model.type
     };
     [KYApiHttpTool GET:URL_Detail_Count withParams:param1 success:^(NSDictionary * _Nonnull response) {
-        
+
         SNStatisticalModel *statisticalModel = [SNStatisticalModel mj_objectWithKeyValues:response[@"data"]];
         self.statisticalModel = statisticalModel;
         if (self.statisVc) {
@@ -1004,14 +1003,14 @@
 
 //加载篮球统计数据--老接口
 - (void)getOldStatisticalDatas {
-    
+
     NSDictionary *param1 = @{
         @"mid" : self.model.ID,
         @"type" : self.model.type,
         @"tabtype" : @2
     };
     [KYApiHttpTool GET:URL_Detail_Tabs withParams:param1 success:^(NSDictionary * _Nonnull response) {
-        
+
         SNStatisticalModel *statisticalModel = [SNStatisticalModel mj_objectWithKeyValues:response[@"data"]];
         self.statisticalModel = statisticalModel;
         if (self.statisVc) {
@@ -1031,14 +1030,14 @@
 
 //加载数据的数据
 - (void)getDatasData {
-    
+
     NSDictionary *param1 = @{
         @"mid" : self.model.ID,
         @"type" : self.model.type,
         @"tabtype" : @3
     };
     [KYApiHttpTool GET:URL_Detail_Tabs withParams:param1 success:^(NSDictionary * _Nonnull response) {
-        
+
         SNDatasModel *datasModel = [SNDatasModel mj_objectWithKeyValues:response[@"data"]];
         self.datasModel = datasModel;
         if (self.datasVc) {
@@ -1059,7 +1058,7 @@
         @"tabtype" : @6
     };
     [KYApiHttpTool GET:URL_Detail_Tabs withParams:param1 success:^(NSDictionary * _Nonnull response) {
-        
+
         SNExponentModel *exponentModel = [SNExponentModel mj_objectWithKeyValues:response[@"data"]];
         self.exponentModel = exponentModel;
         if (self.exponentVc) {
@@ -1159,7 +1158,7 @@
     }else {
         NSString *data =[NSString stringWithFormat:@"1-%@",self.model.ID] ;
         [[SocketRocketUtility instance] sendData:data];
-        
+
     }
     //在统计的时候 需要自动刷新
     if (self.hascount && [self.currentTitle isEqualToString:@"统计"]) {
@@ -1224,7 +1223,7 @@
             }
             [self getStatisticalDatas];
         }
-        
+
         NSString *score = dic[@"score"];
         NSString *score2 = @"";
         if ([score isKindOfClass:[NSDictionary class]]) {
@@ -1352,12 +1351,15 @@
 
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
     NSString *categoryStr = self.categoryTitles[index];
-    if ([self.currentTitle isEqualToString:categoryStr]) {
+    if ([self.currentTitle isEqualToString:categoryStr] && self.isTalkBaseViewShow == NO) {
         return;
     }
     self.currentTitle = categoryStr;
     self.isSelectChatVc = NO;
     if ([categoryStr isEqualToString:@"聊天"]) {
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         self.isSelectChatVc = YES;
         self.pagingView.mainTableView.contentOffset = CGPointMake(0, 0);
         if (self.PlayStatus == PlayingStatusLive) {
@@ -1378,7 +1380,7 @@
     if (self.datasVc) {
         [self.datasVc hideScreenView:![categoryStr isEqualToString:@"数据"]];
     }
-    
+
     if ([categoryStr isEqualToString:@"直播"]) {
         self.vsfloatView.hidden = NO;
         if (self.vsfloatView.dataSource.count) {
@@ -1393,7 +1395,7 @@
     }else {
         self.vsBtn.hidden = self.vsfloatView.hidden = YES;
     }
-    
+
     if ([categoryStr isEqualToString:@"直播"] || [categoryStr isEqualToString:@"阵容"]) {
         self.questionFloatView.hidden = self.questionFloatBtn.hidden = NO;
         if ([categoryStr isEqualToString:@"直播"]) {
@@ -1404,13 +1406,13 @@
     }else {
         self.questionFloatView.hidden = self.questionFloatBtn.hidden = YES;
     }
-    
+
     //    if ([categoryStr isEqualToString:@"榜单"]) {
     //        self.seasonView.hidden = NO;
     //    }else {
     //        self.seasonView.hidden = YES;
     //    }
-    
+
     if ([categoryStr isEqualToString:@"数据"]) {
         [self getDatasData];
     }else if ([categoryStr isEqualToString:@"统计"]) {
@@ -1823,7 +1825,7 @@
 
 - (void)vsBtnAction{
     self.vsBtn.hidden = self.questionFloatBtn.hidden = YES;
-    
+
     [UIView animateWithDuration:0.5 animations:^{
         CGRect frame = self.vsfloatView.frame;
         frame.origin.x = 0;
@@ -1833,7 +1835,7 @@
 
 
 - (void)closeFloatBall{
-    
+
     [UIView animateWithDuration:0.5 animations:^{
         CGRect frame = self.questionFloatView.frame;
         frame.origin.x = kScreenWidth;
@@ -1847,7 +1849,7 @@
 }
 
 - (void)closeVsFloatView{
-    
+
     [UIView animateWithDuration:0.5 animations:^{
         CGRect frame = self.vsfloatView.frame;
         frame.origin.x = kScreenWidth;
@@ -1931,7 +1933,7 @@
         _playerFatherView = [[UIView alloc] init];
         _playerFatherView.backgroundColor = SRGB(26);
         _playerFatherView.hidden = YES;
-        
+
     }
     return _playerFatherView;
 }
@@ -2135,3 +2137,4 @@
 
 
 @end
+

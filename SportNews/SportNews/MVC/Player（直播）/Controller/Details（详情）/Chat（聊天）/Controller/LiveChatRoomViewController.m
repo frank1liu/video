@@ -20,6 +20,7 @@
 #import "GiftBubbleCell.h"
 #import "GiftBubble2Cell.h"
 #import "SWNinePatchImageFactory.h"
+#import "TalkBaseViewController.h"
 #import <MLLabel/NSString+MLExpression.h>
 
 #define maxOnlineCount 1000
@@ -65,6 +66,8 @@
 @property (nonatomic,strong) UILabel *labAddressIos;
 @property(nonatomic, assign) BOOL hasQrcodeData;
 @property (nonatomic, strong) NSUserDefaults *df;
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
 
 @end
 
@@ -85,6 +88,11 @@ static NSString *cellIdentifier = @"MessageCell";
  
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
 
     self.hasQrcodeData = YES;
 
@@ -111,6 +119,27 @@ static NSString *cellIdentifier = @"MessageCell";
 //    self.bannerImageView.image = [UIImage imageNamed:@"card"];
 //    self.bannerImageView.contentMode = UIViewContentModeScaleToFill;
 //    [self.view addSubview:self.bannerImageView];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)showTalkBaseView {
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkBaseVC];
+    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkBaseVC willMoveToParentViewController:nil];
+    [self.talkBaseVC.view removeFromSuperview];
+    [self.talkBaseVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
 }
 
 - (void)getQRcodeInfo {
@@ -1266,6 +1295,9 @@ static NSString *cellIdentifier = @"MessageCell";
         if (@available(iOS 11.0, *)) {
             _messageTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
+        CGRect frame = _messageTableView.bounds;
+        frame.size.height += 82+28;
+        self.talkBaseView.frame = frame;
     }
     return _messageTableView;
 }
