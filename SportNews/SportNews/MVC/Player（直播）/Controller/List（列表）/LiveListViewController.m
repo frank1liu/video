@@ -21,6 +21,8 @@
 #import "HomeWSManager.h"
 #import "SNZFPlayerWindow.h"
 
+NSInteger gCategoryType = 0;
+
 @interface LiveListViewController ()
 
 @property (nonatomic,strong) LXCalendarView *calenderView;
@@ -462,6 +464,8 @@
         ps = @"100";
     }
     NSMutableDictionary *param = nil;
+    gCategoryType = type.integerValue;
+    
     if ([type intValue] == 3) {
         param = @{
             @"type" : @"4",
@@ -537,7 +541,7 @@
         NSMutableArray *dataList = [NSMutableArray arrayWithArray:topList];
         [dataList addObjectsFromArray:notopList];
         [dataList addObjectsFromArray:tmpList];
-        
+
         if (isRefresh) {
             // self.topListArray = [self sortDataListAgain2:topList];
             // self.noTopListArray = [self sortDataListAgain2:notopList];

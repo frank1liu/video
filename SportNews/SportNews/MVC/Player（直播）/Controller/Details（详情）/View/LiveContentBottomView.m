@@ -7,6 +7,8 @@
 
 #import "LiveContentBottomView.h"
 
+extern NSInteger gCategoryType;
+
 @interface LiveContentBottomView()
 
 @property (nonatomic, strong) UIButton          *lastSelectBtn;
@@ -190,58 +192,116 @@
         [btn removeFromSuperview];
     }
     [self.buttonArray removeAllObjects];
-    for (int i = 0; i < cartoonArray.count; i++) {
-        LiveCartoonModel *cartoonModel = cartoonArray[i];
-        // UIButton *Btn = [UIButton buttonWithType:UIButtonTypeCustom];
-        UIButton *Btn = [[UIButton alloc]init];
-        Btn.enabled = cartoonModel.status;
-        Btn.tag = i;
-        [Btn addTarget:self action:@selector(btnClickAction:) forControlEvents:UIControlEventTouchUpInside];
-        // [buttonArray addObject:Btn];
-        Btn.frame = CGRectMake(currentRight + originX, currentBottom + 5, 110, 32);
-        // 计算字体长度
-        CGSize size = [cartoonModel.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-        // 更新btn的右边
-        currentRight = currentRight + size.width + imageWidth + magin;
-        // 判断是否换行
-        if (i < cartoonArray.count - 1) {
-            LiveCartoonModel *cartoonModel1 = cartoonArray[i + 1];
+
+    if (gCategoryType == 3) {
+        for (int i = 0; i < 1; i++) {
+            LiveCartoonModel *cartoonModel = cartoonArray[i];
+            // UIButton *Btn = [UIButton buttonWithType:UIButtonTypeCustom];
+            UIButton *Btn = [[UIButton alloc]init];
+            Btn.enabled = cartoonModel.status;
+            Btn.tag = i;
+            [Btn addTarget:self action:@selector(btnClickAction:) forControlEvents:UIControlEventTouchUpInside];
+            // [buttonArray addObject:Btn];
+            Btn.frame = CGRectMake(currentRight + originX, currentBottom + 5, 110, 32);
             // 计算字体长度
-            CGSize size = [cartoonModel1.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
-            if (currentRight + size.width > totalWidth - originX*2 - magin) {
-                [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
-                currentRight = 0;
-                currentBottom = currentBottom + 30;
+            CGSize size = [cartoonModel.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+            // 更新btn的右边
+            currentRight = currentRight + size.width + imageWidth + magin;
+            // 判断是否换行
+            if (i < cartoonArray.count - 1) {
+                LiveCartoonModel *cartoonModel1 = cartoonArray[i + 1];
+                // 计算字体长度
+                CGSize size = [cartoonModel1.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+                if (currentRight + size.width > totalWidth - originX*2 - magin) {
+                    [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
+                    currentRight = 0;
+                    currentBottom = currentBottom + 30;
+                }
             }
+            //最后一个
+            if (i == cartoonArray.count - 1) {
+                currentBottom = currentBottom + 30;
+                [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
+            }
+            // 更新每个Btn的frame
+            CGRect frame = CGRectMake(Btn.frame.origin.x+4*i, Btn.frame.origin.y, size.width + imageWidth+10, size.height + 5+3);
+            Btn.frame = frame;
+            // 设置btn的属性
+            Btn.titleLabel.font = font;
+            if (i == 0) {
+                Btn.backgroundColor = Blue_Color;
+                [Btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            } else {
+                Btn.backgroundColor = Blue_Light_Color;
+                [Btn setTitleColor:Blue_Color forState:UIControlStateNormal];
+            }
+            [Btn setTitle:cartoonModel.name forState:UIControlStateNormal];
+            Btn.titleLabel.adjustsFontSizeToFitWidth = YES;
+            Btn.layer.cornerRadius = Btn.height/2;
+    //        Btn.layer.borderColor = UIColor.clearColor.CGColor;
+    //        Btn.layer.borderWidth = 1;
+            [self.liveBtnsScrollView addSubview:Btn];
+            [self.buttonArray addObject:Btn];
+            totalSize += Btn.frame.size.width;
         }
-        //最后一个
-        if (i == cartoonArray.count - 1) {
-            currentBottom = currentBottom + 30;
-            [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
+        if (cartoonArray.count > 0) {
+            [self.liveBtnsScrollView setContentSize:CGSizeMake(totalSize + 8*cartoonArray.count + 30, 35)];
         }
-        // 更新每个Btn的frame
-        CGRect frame = CGRectMake(Btn.frame.origin.x+4*i, Btn.frame.origin.y, size.width + imageWidth+10, size.height + 5+3);
-        Btn.frame = frame;
-        // 设置btn的属性
-        Btn.titleLabel.font = font;
-        if (i == 0) {
-            Btn.backgroundColor = Blue_Color;
-            [Btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        } else {
-            Btn.backgroundColor = Blue_Light_Color;
-            [Btn setTitleColor:Blue_Color forState:UIControlStateNormal];
+        self.liveBtnsScrollView.scrollEnabled = NO;
+    } else {
+        for (int i = 0; i < cartoonArray.count; i++) {
+            LiveCartoonModel *cartoonModel = cartoonArray[i];
+            // UIButton *Btn = [UIButton buttonWithType:UIButtonTypeCustom];
+            UIButton *Btn = [[UIButton alloc]init];
+            Btn.enabled = cartoonModel.status;
+            Btn.tag = i;
+            [Btn addTarget:self action:@selector(btnClickAction:) forControlEvents:UIControlEventTouchUpInside];
+            // [buttonArray addObject:Btn];
+            Btn.frame = CGRectMake(currentRight + originX, currentBottom + 5, 110, 32);
+            // 计算字体长度
+            CGSize size = [cartoonModel.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+            // 更新btn的右边
+            currentRight = currentRight + size.width + imageWidth + magin;
+            // 判断是否换行
+            if (i < cartoonArray.count - 1) {
+                LiveCartoonModel *cartoonModel1 = cartoonArray[i + 1];
+                // 计算字体长度
+                CGSize size = [cartoonModel1.name boundingRectWithSize:CGSizeMake(totalWidth, 30000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:font} context:nil].size;
+                if (currentRight + size.width > totalWidth - originX*2 - magin) {
+                    [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
+                    currentRight = 0;
+                    currentBottom = currentBottom + 30;
+                }
+            }
+            //最后一个
+            if (i == cartoonArray.count - 1) {
+                currentBottom = currentBottom + 30;
+                [btnMaxArray addObject:[NSString stringWithFormat:@"%f",totalWidth - currentRight]];
+            }
+            // 更新每个Btn的frame
+            CGRect frame = CGRectMake(Btn.frame.origin.x+4*i, Btn.frame.origin.y, size.width + imageWidth+10, size.height + 5+3);
+            Btn.frame = frame;
+            // 设置btn的属性
+            Btn.titleLabel.font = font;
+            if (i == 0) {
+                Btn.backgroundColor = Blue_Color;
+                [Btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            } else {
+                Btn.backgroundColor = Blue_Light_Color;
+                [Btn setTitleColor:Blue_Color forState:UIControlStateNormal];
+            }
+            [Btn setTitle:cartoonModel.name forState:UIControlStateNormal];
+            Btn.titleLabel.adjustsFontSizeToFitWidth = YES;
+            Btn.layer.cornerRadius = Btn.height/2;
+    //        Btn.layer.borderColor = UIColor.clearColor.CGColor;
+    //        Btn.layer.borderWidth = 1;
+            [self.liveBtnsScrollView addSubview:Btn];
+            [self.buttonArray addObject:Btn];
+            totalSize += Btn.frame.size.width;
         }
-        [Btn setTitle:cartoonModel.name forState:UIControlStateNormal];
-        Btn.titleLabel.adjustsFontSizeToFitWidth = YES;
-        Btn.layer.cornerRadius = Btn.height/2;
-//        Btn.layer.borderColor = UIColor.clearColor.CGColor;
-//        Btn.layer.borderWidth = 1;
-        [self.liveBtnsScrollView addSubview:Btn];
-        [self.buttonArray addObject:Btn];
-        totalSize += Btn.frame.size.width;
-    }
-    if (cartoonArray.count > 0) {
-        [self.liveBtnsScrollView setContentSize:CGSizeMake(totalSize + 8*cartoonArray.count + 30, 35)];
+        if (cartoonArray.count > 0) {
+            [self.liveBtnsScrollView setContentSize:CGSizeMake(totalSize + 8*cartoonArray.count + 30, 35)];
+        }
     }
 }
 
