@@ -163,6 +163,66 @@
         self.statusLabel.text = @"比赛结束";
     }
 
+    if (model.type.intValue == 1) {     // 足球
+        if (model.status_up == 1) {
+            self.statusLabel.text = @"未开赛";
+        } else if (model.status_up == 2) {
+            self.statusLabel.text = @"上半场";
+        } else if (model.status_up == 3) {
+            self.statusLabel.text = @"中场";
+        } else if (model.status_up == 4) {
+            self.statusLabel.text = @"下半场";
+        } else if (model.status_up == 5) {
+            self.statusLabel.text = @"加时赛";
+        } else if (model.status_up == 7) {
+            self.statusLabel.text = @"点球决战";
+        } else if (model.status_up == 8) {
+            self.statusLabel.text = @"完场";
+        } else if (model.status_up == 9) {
+            self.statusLabel.text = @"推迟";
+        } else if (model.status_up == 10) {
+            self.statusLabel.text = @"中断";
+        } else if (model.status_up == 11) {
+            self.statusLabel.text = @"腰斩";
+        } else if (model.status_up == 12) {
+            self.statusLabel.text = @"取消";
+        } else if (model.status_up == 13) {
+            self.statusLabel.text = @"待定";
+        }
+    } else if (model.type.intValue == 2) {  // 籃球
+        if (model.status_up == 1) {
+            self.statusLabel.text = @"未开赛";
+        } else if (model.status_up == 2) {
+            self.statusLabel.text = @"第一节";
+        } else if (model.status_up == 3) {
+            self.statusLabel.text = @"第一节完";
+        } else if (model.status_up == 4) {
+            self.statusLabel.text = @"第二节";
+        } else if (model.status_up == 5) {
+            self.statusLabel.text = @"第二节完";
+        } else if (model.status_up == 6) {
+            self.statusLabel.text = @"第三节";
+        } else if (model.status_up == 7) {
+            self.statusLabel.text = @"第三节完";
+        } else if (model.status_up == 8) {
+            self.statusLabel.text = @"第四节";
+        } else if (model.status_up == 9) {
+            self.statusLabel.text = @"加时";
+        } else if (model.status_up == 10) {
+            self.statusLabel.text = @"完场";
+        } else if (model.status_up == 11) {
+            self.statusLabel.text = @"中断";
+        } else if (model.status_up == 12) {
+            self.statusLabel.text = @"取消";
+        } else if (model.status_up == 13) {
+            self.statusLabel.text = @"延期";
+        } else if (model.status_up == 14) {
+            self.statusLabel.text = @"腰斩";
+        } else if (model.status_up == 15) {
+            self.statusLabel.text = @"待定";
+        }
+    }
+
     self.statusRight.constant = -10;
     //比赛状态：0 开赛中  1 未开赛  2 比赛结束 3 比赛推迟 4 未确定的 5 已取消的
     NSInteger status = model.status.integerValue;
@@ -185,15 +245,15 @@
                 self.banchangLabelRight.constant = 10;
             }
         }else {
-            self.statusLabel.text = @"";
+            // self.statusLabel.text = @"";
             self.timeLabel.text = @"";
             self.banchangLabel.hidden = YES;
             self.jiaoLabel.hidden = YES;
             self.dianLabel.hidden = YES;
-            BOOL f = [self validateString:model.status_up_name withPattern:@"^[0-9]+$"];
-            if (f == NO) {
-                self.statusLabel.text = [NSString stringWithFormat:@"%@ %@",model.status_up_name,model.time];
-            }
+            // BOOL f = [self validateString:model.status_up_name withPattern:@"^[0-9]+$"];
+            // if (f == NO) {
+            self.statusLabel.text = [NSString stringWithFormat:@"%@ %@",self.statusLabel.text, model.time];
+            // }
             self.statusRight.constant = -10;
         }
     }else {

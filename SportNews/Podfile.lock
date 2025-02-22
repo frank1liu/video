@@ -403,9 +403,9 @@ PODS:
   - Reachability (3.7.6)
   - SDCycleScrollView (1.82):
     - SDWebImage (>= 5.0.0)
-  - SDWebImage (5.10.4):
-    - SDWebImage/Core (= 5.10.4)
-  - SDWebImage/Core (5.10.4)
+  - SDWebImage (5.20.0):
+    - SDWebImage/Core (= 5.20.0)
+  - SDWebImage/Core (5.20.0)
   - SocketRocket (0.5.1)
   - SuperPlayer (3.3.8):
     - AFNetworking
@@ -574,7 +574,7 @@ SPEC CHECKSUMS:
   QMUIKit: 5122015af36dc418d4133eee502532cc6207a277
   Reachability: fd0ecd23705e2599e4cceeb943222ae02296cbc6
   SDCycleScrollView: a0d74c3384caa72bdfc81470bdbc8c14b3e1fbcf
-  SDWebImage: c666b97e1fa9c64b4909816a903322018f0a9c84
+  SDWebImage: 73c6079366fea25fa4bb9640d5fb58f0893facd8
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   SuperPlayer: bb8392e53ca303322dc306b15480c0d051ba3968
   TBCrashReporter: f7bd75524d05b51cab2ce1be483e63d1584d2a2e
