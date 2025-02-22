@@ -529,13 +529,18 @@
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ListRefreshComplete object:nil userInfo:nil];
         NSArray *notopList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"notopList"]];
-        NSArray *dataList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"dataList"]];
-        LiveListModel *model = dataList.firstObject;
+        NSArray *tmpList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"dataList"]];
+        LiveListModel *model = tmpList.firstObject;
         NSLog(@"======%@",model.matchtime);
+
+        // NSArray *dataList = [NSArray arrayWithObjects:topList, notopList, tmpList, nil];
+        NSMutableArray *dataList = [NSMutableArray arrayWithArray:topList];
+        [dataList addObjectsFromArray:notopList];
+        [dataList addObjectsFromArray:tmpList];
         
         if (isRefresh) {
-            self.topListArray = [self sortDataListAgain2:topList];
-            self.noTopListArray = [self sortDataListAgain2:notopList];
+            // self.topListArray = [self sortDataListAgain2:topList];
+            // self.noTopListArray = [self sortDataListAgain2:notopList];
             [self.datasArray removeAllObjects];
             [self.tableView reloadData];
             //子分类
