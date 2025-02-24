@@ -1329,7 +1329,11 @@
         }
     }else {
         if (self.PlayStatus == PlayingStatusNone) {
-            self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
+            // Adam 調整整個view上滑高度
+            // self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
+            // headerView整個上滑
+            // self.pagingView.pinSectionHeaderVerticalOffset = 0;
+            self.pagingView.pinSectionHeaderVerticalOffset = kContentHeight;
             [self.pagingView.mainTableView reloadData];
         }
     }
