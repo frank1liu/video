@@ -101,6 +101,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) NSInteger is_zd;
 @property(nonatomic, strong) NSString  *zd_level;
 
+@property(nonatomic, assign) BOOL isTop;
+@property(nonatomic, assign) NSInteger sourceRow;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

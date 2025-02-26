@@ -77,6 +77,7 @@ NSInteger gCategoryType = 0;
 @property(nonatomic, strong) UIView *emptyBackView;
 @property(nonatomic, strong) UIImageView *emptyImageView;
 @property(nonatomic, strong) UILabel *emptyLabel;
+@property (nonatomic, strong) NSMutableArray *originalDatasArray;
 
 @end
 
@@ -123,23 +124,33 @@ NSInteger gCategoryType = 0;
     return self;
 }
 
+- (NSMutableArray *)originalDatasArray {
+    if (!_originalDatasArray) {
+        _originalDatasArray = [NSMutableArray array];
+    }
+    return _originalDatasArray;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     self.isTodayHaveMatch = true;
     SNGlobalShared.isAppOpened = YES;
     self.timeStatus = 0;
 
     [self setupSubViews];
-    
+
     self.isFirstLoad = true;
     [KYRemindView show];
     [self getDatas:YES];
-    
+
     [self setupParams];
-    
+
     [self setupEmptyView];
-    
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topMatch:) name:@"TopMatch" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UnTopMatch:) name:@"UnTopMatch" object:nil];
 }
 
 
@@ -148,7 +159,7 @@ NSInteger gCategoryType = 0;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enterApp) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeType:) name:ChangeShowType object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteFinishList) name:RecieveFinishListData object:nil];
-     
+
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     LiveListModel *listModel = appDelegate.listModel;
     if (listModel && listModel.comeFromNotice) {
@@ -167,24 +178,24 @@ NSInteger gCategoryType = 0;
     self.tableView.backgroundColor = SRGB(250);
     self.tableView.y = 40;
     self.tableView.height = kScreenHeight-NavHeight-30-40;
-    
+
     MJRefreshHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-//        self.pn = 1;
-//        [self getDatas:YES];
+        //        self.pn = 1;
+        //        [self getDatas:YES];
         [self reloadDatas];
-    }]; 
-    
+    }];
+
     self.tableView.mj_header = header;
     MJRefreshAutoNormalFooter *footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [self getDatas:NO];
     }];
     self.tableView.mj_footer = footer;
     [self.view addSubview:self.tableView];
-      
+
     [self setupQiehuan];
-    
+
     [self setupTopView];
-    
+
 }
 
 
@@ -244,7 +255,7 @@ NSInteger gCategoryType = 0;
     todayBtn.centerX = self.view.centerX;
     todayBtn.hidden = YES;
     self.todayBtn = todayBtn;
-    
+
     UIView *qiehuanBackView = [[UIView alloc] initWithFrame:CGRectMake(0, kScreenHeight-60-xBottomHeight- (NavHeight+35), 142, 36)];
     self.qiehuanBackView = qiehuanBackView;
     qiehuanBackView.backgroundColor = [UIColor whiteColor];
@@ -253,7 +264,7 @@ NSInteger gCategoryType = 0;
     qiehuanBackView.layer.borderWidth = 0.5;
     qiehuanBackView.centerX = self.view.centerX;
     [self.view addSubview:qiehuanBackView];
-    
+
     UIButton *scoreBtn = [[UIButton alloc] initWithFrame:CGRectMake(3, 3, 68, 30)];
     scoreBtn.titleLabel.font = [UIFont systemFontOfSize:15 weight:UIFontWeightSemibold];
     [scoreBtn setTitle:@" 比分" forState:UIControlStateNormal];
@@ -266,8 +277,8 @@ NSInteger gCategoryType = 0;
     scoreBtn.selected = YES;
     [qiehuanBackView addSubview:scoreBtn];
     self.scoreBtn = scoreBtn;
-    
-    
+
+
     UIButton *zhishuBtn = [[UIButton alloc] initWithFrame:CGRectMake(142 -3 - 68, 3, 68, 30)];
     zhishuBtn.titleLabel.font = [UIFont systemFontOfSize:15 weight:UIFontWeightSemibold];
     [zhishuBtn setTitle:@" 指数" forState:UIControlStateNormal];
@@ -321,7 +332,7 @@ NSInteger gCategoryType = 0;
             self.todayBtn.hidden = true;
             self.qiehuanBackView.hidden = NO;
         }
-        
+
     }else if (self.timeStatus == 1) {
         //再过去点击今天就是刷新
         [KYRemindView show];
@@ -385,14 +396,14 @@ NSInteger gCategoryType = 0;
                 [topList addObject:listModel];
             }
         }
-        
+
         NSMutableArray *noTopList = [NSMutableArray array];
         for (LiveListModel *listModel in self.noTopListArray) {
             if (![finishList containsObject:[listModel.ID stringValue]]) {
                 [noTopList addObject:listModel];
             }
         }
-        
+
         NSMutableArray *dataList = [NSMutableArray array];
         for (NSArray *listArray in self.datasArray) {
             NSMutableArray *sectionList = [NSMutableArray array];
@@ -408,7 +419,7 @@ NSInteger gCategoryType = 0;
         self.noTopListArray = noTopList;
         self.topListArray = topList;
         self.datasArray = dataList;
-        [self.tableView reloadData]; 
+        [self.tableView reloadData];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             self.isDeletList = NO;
         });
@@ -420,7 +431,7 @@ NSInteger gCategoryType = 0;
     self.calendarChoice = nil;
     self.startTimeChoice = nil;
     [[HomeWSManager instance] cleaDatas];
-    [self getDatas:YES]; 
+    [self getDatas:YES];
 }
 
 - (void)getCalendarData {
@@ -435,7 +446,7 @@ NSInteger gCategoryType = 0;
             }
             [self.topView reloadDayNuber:self.calendarData];
         }failure:^(NSError * _Nullable error) {
-            
+
         }];
     }
 }
@@ -454,7 +465,7 @@ NSInteger gCategoryType = 0;
 }
 
 - (void)getDatas:(BOOL)isRefresh {
-     
+
     NSString *type = [self.categoryModel isKindOfClass:[LiveListCategoryModel class]] ? [NSString stringWithFormat:@"%@",self.categoryModel.type]:[NSString stringWithFormat:@"%ld",(long)self.type];
     NSNumber *cid = [self.categoryModel isKindOfClass:[LiveListCategoryModel class]] ? self.categoryModel.ID : @(0);
     NSNumber *ishot = self.isHot ? @(1) : @(-1);
@@ -465,7 +476,7 @@ NSInteger gCategoryType = 0;
     }
     NSMutableDictionary *param = nil;
     gCategoryType = type.integerValue;
-    
+
     if ([type intValue] == 3) {
         param = @{
             @"type" : @"4",
@@ -512,7 +523,7 @@ NSInteger gCategoryType = 0;
         [param setValue:loginModel.token forKey:@"token"];
     }
     void (^success)(NSDictionary *) = ^(NSDictionary * _Nonnull response) {
-        
+
         id dic = response[@"data"];
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
@@ -525,12 +536,12 @@ NSInteger gCategoryType = 0;
         self.token = response[@"data"][@"token"];
         [HomeWSManager instance].type = self.type;
         [[HomeWSManager instance] SRWebSocketOpenWithURLString:[NSString stringWithFormat:@"%@?token=%@",ListSocketUrl,self.token]];
-        
+
         NSArray *topList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"topList"]];
         [topList enumerateObjectsUsingBlock:^(LiveListModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             obj.listType = 1;
         }];
-        
+
         [[NSNotificationCenter defaultCenter] postNotificationName:ListRefreshComplete object:nil userInfo:nil];
         NSArray *notopList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"notopList"]];
         NSArray *tmpList = [LiveListModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"dataList"]];
@@ -578,6 +589,8 @@ NSInteger gCategoryType = 0;
             }
         }
         [self sortDataList:dataList];
+        [self.originalDatasArray removeAllObjects];
+        [self originalSortDataList:dataList];
         [self.tableView reloadData];
         [self.tableView.mj_header endRefreshing];
         [self.tableView.mj_footer endRefreshing];
@@ -599,7 +612,7 @@ NSInteger gCategoryType = 0;
                 [self.topView changeChoiceNotAnimated:[model.matchtime substringToIndex:10]];
             }
         }
-        
+
         /// 如果没有选择日期--说明是刷新数据    并且是第一页数据
         if ((self.calendarChoice == nil || self.calendarChoice.length <= 0) && self.pn == 1) {
             /// 如果两个热门都是空
@@ -635,10 +648,10 @@ NSInteger gCategoryType = 0;
         }else if (codeint == (-1009)) {
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
-       }else {
+        }else {
             //判断系统错误
-           self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
-           self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
+            self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
+            self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
         }
     };
     if (self.isFirstLoad) {
@@ -681,10 +694,61 @@ NSInteger gCategoryType = 0;
             [heArray addObjectsFromArray:firstArray];
             [self.datasArray removeLastObject];
             [dataArray removeObjectAtIndex:0];
-            [self.datasArray addObject:heArray]; 
+            [self.datasArray addObject:heArray];
         }
     }
-    [self.datasArray addObjectsFromArray:[self sortDataListAgain:dataArray]];
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    if ([df objectForKey:@"TopModel"] == nil) {
+        [self.datasArray addObjectsFromArray:[self sortDataListAgain:dataArray]];
+    } else {
+        [self.datasArray addObjectsFromArray:[self sortDataListAgainWithTopMatch:dataArray]];
+    }
+}
+
+- (void)originalSortDataList:(NSArray *)dataList {
+    NSMutableArray *timeArray = [NSMutableArray array];
+    [dataList enumerateObjectsUsingBlock:^(LiveListModel *listModel, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSString *timeStr = [listModel.matchtime substringToIndex:10];
+        if (![timeArray containsObject:timeStr]) {
+            [timeArray addObject:timeStr];
+        }
+    }];
+    NSMutableArray *dataArray = [NSMutableArray array];
+    for (int i = 0; i < timeArray.count; i++) {
+        NSMutableArray *sectionArray = [NSMutableArray array];
+        NSString *time = timeArray[i];
+        [dataList enumerateObjectsUsingBlock:^(LiveListModel *listModel, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *timeStr = [listModel.matchtime substringToIndex:10];
+            if ([time isEqualToString:timeStr]) {
+                [sectionArray addObject:listModel];
+            }
+        }];
+        [dataArray addObject:sectionArray];
+    }
+    if (self.originalDatasArray.count > 0 && dataArray.count > 0) {
+        NSArray *firstArray = dataArray.firstObject;
+        NSArray *lastArray = self.originalDatasArray.lastObject;
+        LiveListModel *firstModel = firstArray.firstObject;
+        LiveListModel *lastModel = lastArray.lastObject;
+        NSString *timef = [firstModel.matchtime substringToIndex:10];
+        NSString *timel = [lastModel.matchtime  substringToIndex:10];
+        if ([timef isEqualToString:timel]) {
+            NSMutableArray *heArray = [NSMutableArray arrayWithArray:lastArray];
+            [heArray addObjectsFromArray:firstArray];
+            [self.originalDatasArray removeLastObject];
+            [dataArray removeObjectAtIndex:0];
+            [self.originalDatasArray addObject:heArray];
+        }
+    }
+    [self.originalDatasArray addObjectsFromArray:[self sortDataListAgain:dataArray]];
+}
+
+- (void)originalSortDataList2:(NSArray *)dataList {
+    NSMutableArray *dataNewAry = [NSMutableArray new];
+    [dataNewAry addObjectsFromArray:[self sortDataListAgainWithTopMatch:dataList]];
+    [self.datasArray[0] removeAllObjects];
+    [self.datasArray removeAllObjects];
+    self.datasArray = [NSMutableArray arrayWithArray:dataNewAry];
 }
 
 //
@@ -722,6 +786,72 @@ NSInteger gCategoryType = 0;
     [rcAry addObjectsFromArray:ary2];
     [dataList addObject:rcAry];
     return  dataList;
+}
+
+- (NSMutableArray *)sortDataListAgainWithTopMatch:(NSArray *)dataArray {
+    NSMutableArray *ary1 = [NSMutableArray new];
+    NSMutableArray *ary2 = [NSMutableArray new];
+    NSMutableArray *rcAry = [NSMutableArray new];
+    NSMutableArray *topMatchList = nil;
+    NSMutableArray *dataList = [NSMutableArray new];
+    if (dataArray.count == 0) {
+        return (NSMutableArray *)dataArray;
+    }
+
+    for (LiveListModel *model in dataArray[0]) {
+        if (model.is_zd == 1) {
+            [ary1 addObject:model];
+        } else {
+            [ary2 addObject:model];
+        }
+    }
+
+    NSArray *sorted = [ary1 sortedArrayUsingComparator:^(id obj1, id obj2){
+        LiveListModel *s1 = obj1;
+        LiveListModel *s2 = obj2;
+
+        if ([s1.zd_level intValue] > [s2.zd_level intValue]) {
+            return (NSComparisonResult)NSOrderedAscending;
+        } else if ([s1.zd_level intValue] < [s2.zd_level intValue]) {
+            return (NSComparisonResult)NSOrderedDescending;
+        }
+
+        return NSOrderedSame;
+    }];
+
+    topMatchList = [[NSUserDefaults standardUserDefaults]objectForKey:@"TopModel"];
+    if (topMatchList == nil) {
+        [rcAry addObjectsFromArray:sorted];
+        [rcAry addObjectsFromArray:ary2];
+        [dataList addObject:rcAry];
+        return  dataList;
+    } else {
+        NSMutableArray *rc = [NSMutableArray new];
+        [rcAry addObjectsFromArray:sorted];
+        [rcAry addObjectsFromArray:ary2];
+        NSMutableArray *matchedList = [NSMutableArray new];
+        NSMutableArray *nonMatchedList = [NSMutableArray new];
+        for (LiveListModel *model in rcAry) {
+            BOOL flag = NO;
+            model.isTop = NO;
+            for (NSDictionary *d in topMatchList) {
+                if ([d[@"ID"] intValue] == [model.ID intValue]) {
+                    model.isTop = YES;
+                    flag = YES;
+                    break;
+                }
+            }
+            if (flag) {
+                [matchedList addObject:model];
+            } else {
+                [nonMatchedList addObject:model];
+            }
+        }
+        [rc addObjectsFromArray:matchedList];
+        [rc addObjectsFromArray:nonMatchedList];
+        [dataList addObject:rc];
+        return  dataList;
+    }
 }
 
 - (NSMutableArray *)sortDataListAgain2:(NSArray *)dataArray {
@@ -856,13 +986,70 @@ NSInteger gCategoryType = 0;
     }
     LiveListTableViewCell *cell = [LiveListTableViewCell cellWithTableView:tableView];
     cell.selectionStyle = 0;
+    cell.currentRow = indexPath.row;
     [cell setModel:listModel];
     cell.resolutionBtnClicked = ^(LiveCartoonModel *cartoonModel) {
         listModel.selectCartoonModel = cartoonModel;
         [weakSelf didSelectItem:listModel];
     };
     return cell;
-    
+}
+
+- (void)topMatch:(NSNotification *)noti {
+    NSDictionary *dict = noti.object;
+    LiveListModel *model = dict[@"Model"];
+
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+    dic[@"type"] = model.type;       // NSNumber 型態
+    dic[@"ID"]  = model.ID;          // NSNumber 型態
+
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    if ([df objectForKey:@"TopModel"] == nil) {
+        NSMutableArray *ary = [[NSMutableArray alloc]init];
+        [ary addObject:dic];
+        [df setObject:ary forKey:@"TopModel"];
+    } else {
+        NSArray *ary = [df objectForKey:@"TopModel"];
+        NSMutableArray *rc = [NSMutableArray new];
+        [rc addObjectsFromArray:ary];
+        [rc addObject:dic];
+        [df setObject:rc forKey:@"TopModel"];
+    }
+    NSMutableArray *dataList = [NSMutableArray arrayWithArray:self.datasArray[0]];
+    [self.datasArray[0] removeAllObjects];
+    [self.datasArray removeAllObjects];
+    [self sortDataList:dataList];
+    [self.tableView reloadData];
+}
+
+- (void)UnTopMatch:(NSNotification *)noti {
+    NSDictionary *dict = noti.object;
+    LiveListModel *model = dict[@"Model"];
+
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    if ([df objectForKey:@"TopModel"] == nil) {
+        return;
+    } else {
+        NSArray *ary = [df objectForKey:@"TopModel"];
+        NSMutableArray *rc = [NSMutableArray new];
+        [rc addObjectsFromArray:ary];
+        for (NSInteger i = rc.count - 1; i>=0; i--) {
+            NSDictionary *d = rc[i];
+            if (model.ID.intValue == [d[@"ID"] intValue]) {
+                model.isTop = NO;
+                [rc removeObjectAtIndex:i];
+            }
+        }
+        if (rc.count == 0) {
+            model.isTop = NO;
+            [df removeObjectForKey:@"TopModel"];
+        } else {
+            [df setObject:rc forKey:@"TopModel"];
+        }
+    }
+    NSMutableArray *dataList = [NSMutableArray arrayWithArray:self.originalDatasArray];
+    [self originalSortDataList2:dataList];
+    [self.tableView reloadData];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -948,6 +1135,7 @@ NSInteger gCategoryType = 0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     LiveListModel *listModel;
     // NSLog(@"[Adam]topListArray:%@", [_topListArray mj_JSONString]);
     if (indexPath.section == 0) {

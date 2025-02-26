@@ -8,9 +8,12 @@
 #import "LiveListTableViewCell.h"
 #import "SNLiveSourcesView.h"
 
-@interface LiveListTableViewCell ()
+@interface LiveListTableViewCell () {
+    BOOL isTop;
+}
 
 @property(nonatomic, strong) SNLiveSourcesView *sourceView;
+@property(nonatomic, weak) IBOutlet UIButton *btnTop;
 
 @end
 
@@ -27,12 +30,18 @@
     self.titleLabel.textColor = Blue_Color; 
     self.jiaoLabel.hidden = YES;
     self.banchangLabel.hidden = YES;
-    
+    isTop = NO;
 }
 
 - (void)setModel:(LiveListModel *)model {
     _model = model;
-    
+
+    if (model.isTop) {
+        [self.btnTop setImage:[UIImage imageNamed:@"top"] forState:UIControlStateNormal];
+    } else {
+        [self.btnTop setImage:[UIImage imageNamed:@"untop"] forState:UIControlStateNormal];
+    }
+
     [self setupHuoImageView:model];
     
     [self setupScoreLabel:model];
@@ -244,7 +253,7 @@
             if (model.listType == 1) {
                 self.banchangLabelRight.constant = 10;
             }
-        }else {
+        }else {  
             // self.statusLabel.text = @"";
             self.timeLabel.text = @"";
             self.banchangLabel.hidden = YES;
@@ -332,6 +341,21 @@
     if (self.resolutionBtnClicked) {
         self.resolutionBtnClicked(cartoonModel);
     } 
+}
+
+- (IBAction)setMatchTop:(UIButton *)sender {
+//    if (isTop) {
+//        [self.btnTop setImage:[UIImage imageNamed:@"untop"] forState:UIControlStateNormal];
+//    } else {
+//        [self.btnTop setImage:[UIImage imageNamed:@"top"] forState:UIControlStateNormal];
+//    }
+    //    isTop = !isTop;
+    //    _model.isTop = isTop;
+    if (_model.isTop) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UnTopMatch" object:@{@"Model": _model} userInfo:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"TopMatch" object:@{@"Model": _model} userInfo:nil];
+    }
 }
 
 

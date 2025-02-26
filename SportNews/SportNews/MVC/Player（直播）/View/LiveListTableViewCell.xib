@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -74,10 +74,10 @@
                                 </constraints>
                             </imageView>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="aeL-CU-nqP">
-                                <rect key="frame" x="125.5" y="69" width="71" height="14"/>
+                                <rect key="frame" x="126.5" y="69" width="69" height="14"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XSt-SX-B8z">
-                                        <rect key="frame" x="0.0" y="0.0" width="71" height="14"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="69" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="Gv5-iD-cTY"/>
                                         </constraints>
@@ -99,7 +99,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="开赛中" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JhI-V9-Iln">
-                                <rect key="frame" x="260.5" y="7.5" width="34" height="13.5"/>
+                                <rect key="frame" x="261.5" y="7.5" width="33" height="13.5"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="11"/>
                                 <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="0.84705882352941175" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -111,7 +111,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="角:1-6" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hOK-QB-9TY">
-                                <rect key="frame" x="180.5" y="7" width="32.5" height="13.5"/>
+                                <rect key="frame" x="180.5" y="7" width="32" height="13.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                 <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
@@ -179,10 +179,38 @@
                             <constraint firstItem="2lf-td-T2g" firstAttribute="centerY" secondItem="fQv-a5-tvK" secondAttribute="centerY" id="yna-pJ-GG9"/>
                         </constraints>
                     </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hDW-pR-d8x">
+                        <rect key="frame" x="31.5" y="77" width="12" height="12"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="12" id="Bz7-4K-93G"/>
+                            <constraint firstAttribute="height" constant="12" id="qtr-ky-KiC"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="untop"/>
+                        <connections>
+                            <action selector="setMatchTop:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="IKk-HH-w6x"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zyO-4H-6dI">
+                        <rect key="frame" x="12.5" y="58" width="42" height="40"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="42" id="R57-Ub-ff0"/>
+                            <constraint firstAttribute="height" constant="40" id="dWz-31-qjD"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <connections>
+                            <action selector="setMatchTop:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="UKL-AA-SVg"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
+                    <constraint firstItem="zyO-4H-6dI" firstAttribute="bottom" secondItem="W35-3B-wxd" secondAttribute="bottom" id="1tb-JS-Ujp"/>
+                    <constraint firstAttribute="bottom" secondItem="hDW-pR-d8x" secondAttribute="bottom" constant="14" id="1yi-if-MQH"/>
                     <constraint firstItem="W35-3B-wxd" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="12.5" id="8ub-8y-4xp"/>
+                    <constraint firstItem="zyO-4H-6dI" firstAttribute="leading" secondItem="W35-3B-wxd" secondAttribute="leading" id="Ipi-Ig-7O1"/>
+                    <constraint firstItem="hDW-pR-d8x" firstAttribute="centerX" secondItem="nlA-VF-VSQ" secondAttribute="centerX" id="JFf-Ny-guX"/>
                     <constraint firstItem="W35-3B-wxd" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="3" id="WON-Wb-bL6"/>
                     <constraint firstAttribute="trailing" secondItem="W35-3B-wxd" secondAttribute="trailing" constant="12.5" id="dBQ-mx-Wih"/>
                     <constraint firstAttribute="bottom" secondItem="W35-3B-wxd" secondAttribute="bottom" constant="5" id="tKd-B2-HLH"/>
@@ -196,6 +224,7 @@
                 <outlet property="backView" destination="W35-3B-wxd" id="Ewc-eK-Vhm"/>
                 <outlet property="banchangLabel" destination="fQv-a5-tvK" id="ueE-ej-SRE"/>
                 <outlet property="banchangLabelRight" destination="BKv-UW-e6x" id="GTl-mr-l6L"/>
+                <outlet property="btnTop" destination="hDW-pR-d8x" id="MLn-m0-yOj"/>
                 <outlet property="dianLabel" destination="5YG-Eb-XZf" id="unB-oQ-oM2"/>
                 <outlet property="hTeamImageView" destination="CCD-5b-Kmg" id="4yU-eH-WXh"/>
                 <outlet property="hTeamNameLabel" destination="Bij-9T-1IE" id="QXL-I4-D8E"/>
@@ -217,6 +246,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="untop" width="15" height="16.5"/>
         <image name="动画直播禁用" width="13.5" height="9"/>
         <image name="热门标记" width="8.5" height="10"/>
         <systemColor name="systemBackgroundColor">
