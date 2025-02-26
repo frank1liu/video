@@ -1135,7 +1135,6 @@ NSInteger gCategoryType = 0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     LiveListModel *listModel;
     // NSLog(@"[Adam]topListArray:%@", [_topListArray mj_JSONString]);
     if (indexPath.section == 0) {
