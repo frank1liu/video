@@ -87,12 +87,30 @@
             self.scoreLabel.text = [NSString stringWithFormat:@"%@ - %@",score.firstObject,score.lastObject];
             self.aTeamNameLabel.text = model.ateam_name;
             self.hTeamNameLabel.text = model.hteam_name;
+            [self.aTeamNameLabel sizeToFit];
+            [self.hTeamNameLabel sizeToFit];
             if ([model.ateam_logo isEqualToString:@""] && [model.hteam_logo isEqualToString:@""]) {
                 [self.aTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.clogo] placeholderImage:UIImageMake(@"clogoDef")];
                 [self.hTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.clogo] placeholderImage:UIImageMake(@"clogoDef")];
             } else {
                 [self.aTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.ateam_logo] placeholderImage:UIImageMake(@"默认头像")];
                 [self.hTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.hteam_logo] placeholderImage:UIImageMake(@"默认头像")];
+            }
+            if (model.ateam_red != nil && ![model.ateam_red isEqualToString:@""] && model.ateam_red.intValue != 0) {
+                [self.ateam_red setHidden:NO];
+                self.ateam_red.text = model.ateam_red;
+            }
+            if (model.ateam_yellow != nil && ![model.ateam_yellow isEqualToString:@""] && model.ateam_yellow.intValue != 0) {
+                [self.ateam_yellow setHidden:NO];
+                self.ateam_yellow.text = model.ateam_yellow;
+            }
+            if (model.hteam_red != nil && ![model.hteam_red isEqualToString:@""] && model.hteam_red.intValue != 0) {
+                [self.hteam_red setHidden:NO];
+                self.hteam_red.text = model.hteam_red;
+            }
+            if (model.hteam_yellow != nil && ![model.hteam_yellow isEqualToString:@""] && model.hteam_yellow.intValue != 0) {
+                [self.hteam_yellow setHidden:NO];
+                self.hteam_yellow.text = model.hteam_yellow;
             }
         }
         [self.shimmerScoreView stopShimmer];
@@ -138,6 +156,10 @@
     self.statusLabel.text = @"";
     self.statusLabel.textColor = [UIColor colorWithHexString:@"#333333"];
     self.statusLabel.alpha =0.85;
+    [self.hteam_red setHidden:YES];
+    [self.hteam_yellow setHidden:YES];
+    [self.ateam_red setHidden:YES];
+    [self.ateam_yellow setHidden:YES];
 }
 
 - (void)setupOtherLabel:(LiveListModel *)model {
