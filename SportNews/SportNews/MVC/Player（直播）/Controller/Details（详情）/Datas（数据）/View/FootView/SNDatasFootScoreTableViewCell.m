@@ -125,7 +125,7 @@
         make.width.height.mas_equalTo(19);
     }];
      
-    NSArray *timeArray = @[@"1:30",@"1:15",@"1:00",@"0:45",@"0:30",@"0:15",@"0:00"];
+    NSArray *timeArray = @[@" 90'",@"75  ",@"60'  ",@"45'  ",@"30' ",@"15' ",@"00' "];
     for (int i = 0; i < timeArray.count; i++) {
         UIColor *color = [UIColor colorWithHexString:@"#999999"];
         UILabel *label = [[UILabel alloc] init];
