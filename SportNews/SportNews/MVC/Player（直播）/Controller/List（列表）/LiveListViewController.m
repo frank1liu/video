@@ -842,7 +842,7 @@ NSInteger gCategoryType = 0;
                 }
             }
             if (flag) {
-                [matchedList addObject:model];
+                [matchedList insertObject:model atIndex:0];
             } else {
                 [nonMatchedList addObject:model];
             }
