@@ -417,6 +417,9 @@ extern NSInteger gCategoryType;
  
 
 - (void)setScoreStr:(NSString *)scoreStr {
+    if (gCategoryType == 3) {
+        return;
+    }
     _scoreStr = scoreStr;
     if (self.showBtn.isSelected) {
         self.scoreLabel.text = @"VS";
@@ -535,15 +538,24 @@ extern NSInteger gCategoryType;
 }
 
 - (void)setFootStatus:(NSInteger)footStatus {
+    if (gCategoryType == 3) {
+        return;
+    }
     _footStatus = footStatus;
     self.statusLabel.text = [NSString stringWithFormat:@"%@",[CommonTools getFootStatus:footStatus]];
 }
 - (void)setBasketStatus:(NSInteger)basketStatus {
+    if (gCategoryType == 3) {
+        return;
+    }
     _basketStatus = basketStatus;
     self.statusLabel.text = [NSString stringWithFormat:@"%@ %@",[CommonTools getBasketStatus:basketStatus], _timeStr];
 }
  
 - (void)setTimeStr:(NSString *)timeStr {
+    if (gCategoryType == 3) {
+        return;
+    }
     _timeStr = timeStr;
     if (self.model.type.intValue == 1) {
         self.timeLabel.text = timeStr;

@@ -7,6 +7,8 @@
 
 #import "LiveContentView.h"
 
+extern NSInteger gCategoryType;
+
 @interface LiveContentView ()
 
 @property (nonatomic,strong) NSTimer *timer;
@@ -159,6 +161,9 @@
 
 - (void)setScoreStr:(NSString *)scoreStr {
     _scoreStr = scoreStr;
+    if (gCategoryType == 3) {
+        return;
+    }
     @try {
         if ([scoreStr containsString:@"-"]) {
             NSArray *scoreArray = [scoreStr componentsSeparatedByString:@"-"];
@@ -226,9 +231,15 @@
 }
 
 - (void)setFootStatus:(NSInteger)footStatus {
+    if (gCategoryType == 3) {
+        return;
+    }
     self.statusLabel.text = [CommonTools getFootStatus:footStatus];
 }
 - (void)setBasketStatus:(NSInteger)basketStatus {
+    if (gCategoryType == 3) {
+        return;
+    }
     self.statusLabel.text = [CommonTools getBasketStatus:basketStatus];
 }
 
