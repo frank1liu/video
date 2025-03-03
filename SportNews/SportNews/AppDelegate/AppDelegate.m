@@ -31,7 +31,9 @@
 #import <AlicloudCrash/AlicloudCrashProvider.h>
 #import <AlicloudHAUtil/AlicloudHAProvider.h>
 
-@interface AppDelegate ()<JPUSHRegisterDelegate,BuglyDelegate>
+#import "OpenInstallSDK.h"
+
+@interface AppDelegate ()<JPUSHRegisterDelegate, BuglyDelegate, OpenInstallDelegate>
 
 @property(nonatomic, assign) BOOL isSuccess;
 @property (nonatomic, strong) NSURLSession *session;
@@ -74,6 +76,9 @@
 
     // 阿里雲崩潰報告
     [self AliCrashReport];
+
+    // init openinstall
+    [OpenInstallSDK initWithDelegate:self];
 
     return YES;
 }
