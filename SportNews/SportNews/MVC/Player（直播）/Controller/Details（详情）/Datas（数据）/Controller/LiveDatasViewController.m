@@ -23,6 +23,7 @@
 #import "SNDatasFootInjuryTableViewCell.h"
 #import "SNTeamCompareTableViewCell.h"
 #import "SNTeamGeneralRankTableViewCell.h"
+#import "TalkBaseViewController.h"
 
 @interface LiveDatasViewController ()<UITableViewDelegate,UITableViewDataSource>
 
@@ -113,6 +114,9 @@
 
 @property(nonatomic, assign) BOOL leaveSelf;
 
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+
 @end
 
 @implementation LiveDatasViewController
@@ -120,11 +124,42 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    NSLog(@"%f", self.view.bounds.origin.x);
+    NSLog(@"%f", self.view.bounds.origin.y);
+    NSLog(@"%f", self.view.bounds.size.width);
+    NSLog(@"%f", self.view.bounds.size.height);
+
+    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
+
     [self setupSubViews];
     
     [self prepareHeader];
-    
+
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)showTalkBaseView {
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkBaseVC];
+    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkBaseVC willMoveToParentViewController:nil];
+    [self.talkBaseVC.view removeFromSuperview];
+    [self.talkBaseVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
 }
 
 - (void)setupSubViews {
@@ -138,6 +173,11 @@
     }
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, height);
     [self.view addSubview:self.tableView];
+
+    CGRect frame = self.tableView.bounds;
+    // frame.size.height += 82+28;
+    self.talkBaseView.frame = frame;
+
     if (self.datasModel == nil) {
         self.tBackgroundView = [self setupEmptyViewWithFrame:CGRectMake(0, 110, kScreenWidth, 180) title:@"数据加载中..."];
         [self.tableView addSubview:self.tBackgroundView];

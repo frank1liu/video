@@ -1403,6 +1403,9 @@
         }else {
             [self.questionFloatView setupIsLive:NO];
         }
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
     }else {
         self.questionFloatView.hidden = self.questionFloatBtn.hidden = YES;
     }
@@ -1414,6 +1417,9 @@
     //    }
 
     if ([categoryStr isEqualToString:@"数据"]) {
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getDatasData];
     }else if ([categoryStr isEqualToString:@"统计"]) {
         [self getStatisticalDatas];
