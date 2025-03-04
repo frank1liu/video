@@ -10,6 +10,7 @@
 #import "SNStatisticalBottomTableViewCell.h"
 #import "SNStatisticalPlayerDataCell.h"
 #import "SNStatisticalSectionHeaderView.h"
+#import "TalkBaseViewController.h"
 
 @interface LiveStatisticalViewController ()<UITableViewDelegate,UITableViewDataSource>
  
@@ -28,6 +29,8 @@
 @property(nonatomic, strong) UIView *tBackgroundView;
 
 @property(nonatomic, assign) BOOL isFailure;
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
 
 @end
 
@@ -39,12 +42,38 @@ static NSString *reuseStatisticalPlayerDataCell = @"reuseStatisticalPlayerDataCe
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-      
+
+    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
     [self setupSubViews];
-      
+
     [self prepareHeader];
-     
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
 }
+
+- (void)showTalkBaseView {
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkBaseVC];
+    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkBaseVC willMoveToParentViewController:nil];
+    [self.talkBaseVC.view removeFromSuperview];
+    [self.talkBaseVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
+}
+
 
 
 - (void)setupSubViews {

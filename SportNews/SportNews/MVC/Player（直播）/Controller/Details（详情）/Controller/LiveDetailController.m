@@ -1416,14 +1416,26 @@
     //        self.seasonView.hidden = YES;
     //    }
 
+    if ([categoryStr isEqualToString:@"榜单"]) {
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
+    }
+
     if ([categoryStr isEqualToString:@"数据"]) {
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getDatasData];
     }else if ([categoryStr isEqualToString:@"统计"]) {
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getStatisticalDatas];
     }else if ([categoryStr isEqualToString:@"指数"]) {
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getExponentData];
     }
 }

@@ -8,6 +8,7 @@
 #import "SNExponentViewController.h"
 #import "SportNews-Swift.h"
 #import <Masonry/Masonry.h>
+#import "TalkBaseViewController.h"
 
 @interface SNExponentViewController ()
 
@@ -23,6 +24,8 @@
 @property(nonatomic, strong) UIImageView *tbImage;
 @property(nonatomic, strong) UILabel *tbLabel;
 @property(nonatomic, strong) UITapGestureRecognizer *tbTap;
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
 
 @end
 
@@ -31,7 +34,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    if (self.playStatus == PlayingStatusLive) {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    } else {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41)];
+    }
     
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
     self.view.backgroundColor = [UIColor colorWithRed:0xf5/255.0 green:0xf5/255.0 blue:0xf5/255.0 alpha:1];
     
     self.categoriesView = [[ExponentCategoriesView alloc] initWithFrame:CGRectZero categories: [self.model.type isEqualToNumber:@1] ? @[@"让球", @"胜平负", @"总进球", @"角球"] : @[@"让分", @"胜负", @"总分"]];
@@ -107,6 +120,27 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self loadNoData];
     });
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)showTalkBaseView {
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkBaseVC];
+    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkBaseVC willMoveToParentViewController:nil];
+    [self.talkBaseVC.view removeFromSuperview];
+    [self.talkBaseVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

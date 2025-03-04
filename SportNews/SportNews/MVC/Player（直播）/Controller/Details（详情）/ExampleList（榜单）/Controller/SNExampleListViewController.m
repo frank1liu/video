@@ -14,6 +14,7 @@
 #import "SNExampleMoreFooterView.h"
 #import "SNExampleMoreListViewController.h"
 #import "SNBasketTeamRankResult.h"
+#import "TalkBaseViewController.h"
 
 //10+40+10
 #define topHeight 60
@@ -38,7 +39,8 @@
  
 @property(nonatomic, strong) NSMutableDictionary *dataDic;
 @property(nonatomic, assign) SNBasketRankType rankType;     //ranktype 1球队榜 2球员榜 3伤停榜
-
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
 
 @end
 
@@ -46,7 +48,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
     self.dataDic = [NSMutableDictionary dictionary];
     
     [self setupTopSelectView];
@@ -55,6 +62,26 @@
     
     [self setupSubViews];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)showTalkBaseView {
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkBaseVC];
+    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkBaseVC willMoveToParentViewController:nil];
+    [self.talkBaseVC.view removeFromSuperview];
+    [self.talkBaseVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
 }
 
 //加载榜单的数据

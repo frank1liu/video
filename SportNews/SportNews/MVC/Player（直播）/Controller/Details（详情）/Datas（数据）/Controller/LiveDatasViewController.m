@@ -125,7 +125,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    // self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    if (self.playStatus == PlayingStatusLive) {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    } else {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41)];
+    }
+
     NSLog(@"%f", self.view.bounds.origin.x);
     NSLog(@"%f", self.view.bounds.origin.y);
     NSLog(@"%f", self.view.bounds.size.width);
@@ -174,9 +180,9 @@
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, height);
     [self.view addSubview:self.tableView];
 
-    CGRect frame = self.tableView.bounds;
+    // CGRect frame = self.tableView.bounds;
     // frame.size.height += 82+28;
-    self.talkBaseView.frame = frame;
+    // self.talkBaseView.frame = frame;
 
     if (self.datasModel == nil) {
         self.tBackgroundView = [self setupEmptyViewWithFrame:CGRectMake(0, 110, kScreenWidth, 180) title:@"数据加载中..."];
