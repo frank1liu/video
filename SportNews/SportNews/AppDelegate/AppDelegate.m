@@ -31,7 +31,9 @@
 #import <AlicloudCrash/AlicloudCrashProvider.h>
 #import <AlicloudHAUtil/AlicloudHAProvider.h>
 
-@interface AppDelegate ()<JPUSHRegisterDelegate,BuglyDelegate>
+#import "OpenInstallSDK.h"
+
+@interface AppDelegate ()<JPUSHRegisterDelegate, BuglyDelegate, OpenInstallDelegate>
 
 @property(nonatomic, assign) BOOL isSuccess;
 @property (nonatomic, strong) NSURLSession *session;
@@ -75,6 +77,9 @@
     // 阿里雲崩潰報告
     [self AliCrashReport];
 
+    // init openinstall
+    [OpenInstallSDK initWithDelegate:self];
+
     return YES;
 }
 
@@ -91,29 +96,28 @@
 
             [self.dnsManager getIPForDomain:url completion:^(NSString *resolvedIP, NSError *error) {
                 if (resolvedIP) {
-                    [self checkDomainAvailability:url completion:^(BOOL isAvailable) {
-                        if (isAvailable) {
-                            @synchronized (self) {
-                                if (!self.hasFoundValidUrl) {
-                                    self.hasFoundValidUrl = YES;
-                                    self.isReqSucDynUrl = NO;
-                                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                                    [defaults setObject:url forKey:@"app_net_root_url"];
-                                    [defaults synchronize];
-                                    NSLog(@"%@", url);
-                                    self.availableDomain = url;
-                                    [self setChannelName];
-                                    [self getChannelName];
-                                    //极光
-                                    [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
-                                    // 云信
-                                    [self setupNIM];
-                                }
-                            }
-                        } else {
+                    NSString *path = [NSString stringWithFormat:@"https://%@/prod-api/", url];
+                    NSURL *urlss = [NSURL URLWithString:path];
+                    NSData *data = [[NSData alloc] initWithContentsOfURL:urlss];
+                    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+                    if ([d[@"msg"] isEqualToString:@"ok"]) {
+                        if (!self.hasFoundValidUrl) {
+                            self.hasFoundValidUrl = YES;
+                            self.isReqSucDynUrl = NO;
+                            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                            [defaults setObject:url forKey:@"app_net_root_url"];
+                            [defaults synchronize];
+                            NSLog(@"%@", url);
+                            self.availableDomain = url;
+                            [self setChannelName];
+                            [self getChannelName];
+                            //极光
+                            [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+                            // 云信
+                            [self setupNIM];
                         }
-                        dispatch_semaphore_signal(semaphore);
-                    }];
+                    }
+                    dispatch_semaphore_signal(semaphore);
                 } else {
                     dispatch_semaphore_signal(semaphore);
                 }

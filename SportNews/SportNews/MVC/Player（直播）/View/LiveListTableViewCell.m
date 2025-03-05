@@ -8,9 +8,12 @@
 #import "LiveListTableViewCell.h"
 #import "SNLiveSourcesView.h"
 
-@interface LiveListTableViewCell ()
+@interface LiveListTableViewCell () {
+    BOOL isTop;
+}
 
 @property(nonatomic, strong) SNLiveSourcesView *sourceView;
+@property(nonatomic, weak) IBOutlet UIButton *btnTop;
 
 @end
 
@@ -27,12 +30,18 @@
     self.titleLabel.textColor = Blue_Color; 
     self.jiaoLabel.hidden = YES;
     self.banchangLabel.hidden = YES;
-    
+    isTop = NO;
 }
 
 - (void)setModel:(LiveListModel *)model {
     _model = model;
-    
+
+    if (model.isTop) {
+        [self.btnTop setImage:[UIImage imageNamed:@"top"] forState:UIControlStateNormal];
+    } else {
+        [self.btnTop setImage:[UIImage imageNamed:@"untop"] forState:UIControlStateNormal];
+    }
+
     [self setupHuoImageView:model];
     
     [self setupScoreLabel:model];
@@ -78,12 +87,30 @@
             self.scoreLabel.text = [NSString stringWithFormat:@"%@ - %@",score.firstObject,score.lastObject];
             self.aTeamNameLabel.text = model.ateam_name;
             self.hTeamNameLabel.text = model.hteam_name;
+            [self.aTeamNameLabel sizeToFit];
+            [self.hTeamNameLabel sizeToFit];
             if ([model.ateam_logo isEqualToString:@""] && [model.hteam_logo isEqualToString:@""]) {
                 [self.aTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.clogo] placeholderImage:UIImageMake(@"clogoDef")];
                 [self.hTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.clogo] placeholderImage:UIImageMake(@"clogoDef")];
             } else {
                 [self.aTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.ateam_logo] placeholderImage:UIImageMake(@"默认头像")];
                 [self.hTeamImageView sd_setImageWithURL:[NSURL URLWithString:model.hteam_logo] placeholderImage:UIImageMake(@"默认头像")];
+            }
+            if (model.ateam_red != nil && ![model.ateam_red isEqualToString:@""] && model.ateam_red.intValue != 0) {
+                [self.ateam_red setHidden:NO];
+                self.ateam_red.text = model.ateam_red;
+            }
+            if (model.ateam_yellow != nil && ![model.ateam_yellow isEqualToString:@""] && model.ateam_yellow.intValue != 0) {
+                [self.ateam_yellow setHidden:NO];
+                self.ateam_yellow.text = model.ateam_yellow;
+            }
+            if (model.hteam_red != nil && ![model.hteam_red isEqualToString:@""] && model.hteam_red.intValue != 0) {
+                [self.hteam_red setHidden:NO];
+                self.hteam_red.text = model.hteam_red;
+            }
+            if (model.hteam_yellow != nil && ![model.hteam_yellow isEqualToString:@""] && model.hteam_yellow.intValue != 0) {
+                [self.hteam_yellow setHidden:NO];
+                self.hteam_yellow.text = model.hteam_yellow;
             }
         }
         [self.shimmerScoreView stopShimmer];
@@ -129,6 +156,10 @@
     self.statusLabel.text = @"";
     self.statusLabel.textColor = [UIColor colorWithHexString:@"#333333"];
     self.statusLabel.alpha =0.85;
+    [self.hteam_red setHidden:YES];
+    [self.hteam_yellow setHidden:YES];
+    [self.ateam_red setHidden:YES];
+    [self.ateam_yellow setHidden:YES];
 }
 
 - (void)setupOtherLabel:(LiveListModel *)model {
@@ -163,6 +194,66 @@
         self.statusLabel.text = @"比赛结束";
     }
 
+    if (model.type.intValue == 1) {     // 足球
+        if (model.status_up == 1) {
+            self.statusLabel.text = @"未开赛";
+        } else if (model.status_up == 2) {
+            self.statusLabel.text = @"上半场";
+        } else if (model.status_up == 3) {
+            self.statusLabel.text = @"中场";
+        } else if (model.status_up == 4) {
+            self.statusLabel.text = @"下半场";
+        } else if (model.status_up == 5) {
+            self.statusLabel.text = @"加时赛";
+        } else if (model.status_up == 7) {
+            self.statusLabel.text = @"点球决战";
+        } else if (model.status_up == 8) {
+            self.statusLabel.text = @"完场";
+        } else if (model.status_up == 9) {
+            self.statusLabel.text = @"推迟";
+        } else if (model.status_up == 10) {
+            self.statusLabel.text = @"中断";
+        } else if (model.status_up == 11) {
+            self.statusLabel.text = @"腰斩";
+        } else if (model.status_up == 12) {
+            self.statusLabel.text = @"取消";
+        } else if (model.status_up == 13) {
+            self.statusLabel.text = @"待定";
+        }
+    } else if (model.type.intValue == 2) {  // 籃球
+        if (model.status_up == 1) {
+            self.statusLabel.text = @"未开赛";
+        } else if (model.status_up == 2) {
+            self.statusLabel.text = @"第一节";
+        } else if (model.status_up == 3) {
+            self.statusLabel.text = @"第一节完";
+        } else if (model.status_up == 4) {
+            self.statusLabel.text = @"第二节";
+        } else if (model.status_up == 5) {
+            self.statusLabel.text = @"第二节完";
+        } else if (model.status_up == 6) {
+            self.statusLabel.text = @"第三节";
+        } else if (model.status_up == 7) {
+            self.statusLabel.text = @"第三节完";
+        } else if (model.status_up == 8) {
+            self.statusLabel.text = @"第四节";
+        } else if (model.status_up == 9) {
+            self.statusLabel.text = @"加时";
+        } else if (model.status_up == 10) {
+            self.statusLabel.text = @"完场";
+        } else if (model.status_up == 11) {
+            self.statusLabel.text = @"中断";
+        } else if (model.status_up == 12) {
+            self.statusLabel.text = @"取消";
+        } else if (model.status_up == 13) {
+            self.statusLabel.text = @"延期";
+        } else if (model.status_up == 14) {
+            self.statusLabel.text = @"腰斩";
+        } else if (model.status_up == 15) {
+            self.statusLabel.text = @"待定";
+        }
+    }
+
     self.statusRight.constant = -10;
     //比赛状态：0 开赛中  1 未开赛  2 比赛结束 3 比赛推迟 4 未确定的 5 已取消的
     NSInteger status = model.status.integerValue;
@@ -184,16 +275,16 @@
             if (model.listType == 1) {
                 self.banchangLabelRight.constant = 10;
             }
-        }else {
-            self.statusLabel.text = @"";
+        }else {  
+            // self.statusLabel.text = @"";
             self.timeLabel.text = @"";
             self.banchangLabel.hidden = YES;
             self.jiaoLabel.hidden = YES;
             self.dianLabel.hidden = YES;
-            BOOL f = [self validateString:model.status_up_name withPattern:@"^[0-9]+$"];
-            if (f == NO) {
-                self.statusLabel.text = [NSString stringWithFormat:@"%@ %@",model.status_up_name,model.time];
-            }
+            // BOOL f = [self validateString:model.status_up_name withPattern:@"^[0-9]+$"];
+            // if (f == NO) {
+            self.statusLabel.text = [NSString stringWithFormat:@"%@ %@",self.statusLabel.text, model.time];
+            // }
             self.statusRight.constant = -10;
         }
     }else {
@@ -272,6 +363,21 @@
     if (self.resolutionBtnClicked) {
         self.resolutionBtnClicked(cartoonModel);
     } 
+}
+
+- (IBAction)setMatchTop:(UIButton *)sender {
+//    if (isTop) {
+//        [self.btnTop setImage:[UIImage imageNamed:@"untop"] forState:UIControlStateNormal];
+//    } else {
+//        [self.btnTop setImage:[UIImage imageNamed:@"top"] forState:UIControlStateNormal];
+//    }
+    //    isTop = !isTop;
+    //    _model.isTop = isTop;
+    if (_model.isTop) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"UnTopMatch" object:@{@"Model": _model} userInfo:nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"TopMatch" object:@{@"Model": _model} userInfo:nil];
+    }
 }
 
 

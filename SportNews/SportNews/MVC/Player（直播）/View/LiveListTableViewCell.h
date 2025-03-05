@@ -46,6 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
 @property (weak, nonatomic) IBOutlet UIButton *zanWu;
 
+@property (weak, nonatomic) IBOutlet UILabel *ateam_yellow;
+@property (weak, nonatomic) IBOutlet UILabel *ateam_red;
+@property (weak, nonatomic) IBOutlet UILabel *hteam_yellow;
+@property (weak, nonatomic) IBOutlet UILabel *hteam_red;
+
+@property (assign, nonatomic) NSInteger currentRow;
+
 @property(nonatomic, strong) LiveListModel *model;
 @property (nonatomic, copy) void(^resolutionBtnClicked)(LiveCartoonModel *cartoonModel);
 

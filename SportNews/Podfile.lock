@@ -68,6 +68,7 @@ PODS:
   - JXCategoryView (1.5.8)
   - JXPagingView/Pager (2.0.13)
   - KSCrashTao (1.0.4.2)
+  - libOpenInstallSDK (2.8.5.2)
   - LookinServer (1.0.0)
   - Masonry (1.1.0)
   - MBProgressHUD (1.2.0)
@@ -450,6 +451,7 @@ DEPENDENCIES:
   - JPush
   - JXCategoryView
   - JXPagingView/Pager
+  - libOpenInstallSDK
   - LookinServer
   - Masonry
   - MBProgressHUD
@@ -507,6 +509,7 @@ SPEC REPOS:
     - JPush
     - JXCategoryView
     - JXPagingView
+    - libOpenInstallSDK
     - LookinServer
     - Masonry
     - MBProgressHUD
@@ -562,6 +565,7 @@ SPEC CHECKSUMS:
   JXCategoryView: 778a620f76070d6598fd8d7239991b8da8326170
   JXPagingView: 821ed274f09eaf2843a96c3a74e9d138e27d9730
   KSCrashTao: 48ca4b6066c4bf99f089cf8c72f42690dfe79e6f
+  libOpenInstallSDK: 6196a6524100858704591fb8fa4709fd18096530
   LookinServer: 0002891cd3cec5e082a910e897dfe71b4f06b89e
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
@@ -590,6 +594,6 @@ SPEC CHECKSUMS:
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
   ZipArchive: e25a4373192673e3229ac8d6e9f64a3e5713c966
 
-PODFILE CHECKSUM: f48db7c73bf95e551a2d872a9a35dd24591bf673
+PODFILE CHECKSUM: 575bf35c304b8213cf1b4924a50e6dd7a2f5c517
 
 COCOAPODS: 1.16.2

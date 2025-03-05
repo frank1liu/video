@@ -23,6 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong) NSString *hteam_name;
 @property(nonatomic, strong) NSString *hteam_id;
 
+@property(nonatomic, strong) NSString *ateam_yellow;
+@property(nonatomic, strong) NSString *ateam_red;
+@property(nonatomic, strong) NSString *hteam_yellow;
+@property(nonatomic, strong) NSString *hteam_red;
+
 @property(nonatomic, strong) NSString *clogo;
 
 @property(nonatomic, strong) NSNumber *ID;
@@ -100,6 +105,10 @@ NS_ASSUME_NONNULL_BEGIN
 // Adam
 @property(nonatomic, assign) NSInteger is_zd;
 @property(nonatomic, strong) NSString  *zd_level;
+
+@property(nonatomic, assign) BOOL isTop;
+@property(nonatomic, assign) NSInteger sourceRow;
+
 
 @end
 

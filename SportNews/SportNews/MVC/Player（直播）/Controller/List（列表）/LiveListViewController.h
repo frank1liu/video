@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) NSInteger pn;
 @property(nonatomic, assign) NSInteger ps;
 @property(nonatomic, assign) NSInteger type;
+@property(nonatomic, strong) NSString *startTime;
+
 
 - (instancetype)initWithCategoryModel:(LiveListCategoryModel *)model type:(NSInteger)type isHot:(BOOL)isHot;
 

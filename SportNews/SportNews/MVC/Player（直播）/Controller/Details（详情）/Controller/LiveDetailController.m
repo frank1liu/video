@@ -154,11 +154,6 @@
 @property(nonatomic, strong) NSString  *liveUserName;
 @property(nonatomic, strong) NSString  *matchType;      // type: 1 足球  2 篮球
 @property(nonatomic, strong) NSString  *matchID;
-@property (nonatomic , strong) UIView *downloadReportBaseView;
-@property (nonatomic , strong) UIImageView *downloadReportImageView;
-@property (nonatomic , strong) UILabel *downloadReportLabel;
-@property (nonatomic , strong) UIView *downloadBaseView;
-@property (nonatomic , strong) UIButton *downloadReportButton;
 @property (nonatomic , assign) BOOL isTalkBaseViewShow;
 @property (nonatomic, strong) JXCategoryIndicatorLineView *lineView;
 
@@ -443,6 +438,7 @@
             [weakSelf shareMethod];
         }
     };
+    
 }
 
 - (void)setupLiveHeaderView{
@@ -1373,7 +1369,11 @@
         }
     }else {
         if (self.PlayStatus == PlayingStatusNone) {
-            self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
+            // Adam 調整整個view上滑高度
+            // self.pagingView.pinSectionHeaderVerticalOffset = NavHeight;
+            // headerView整個上滑
+            // self.pagingView.pinSectionHeaderVerticalOffset = 0;
+            self.pagingView.pinSectionHeaderVerticalOffset = kContentHeight;
             [self.pagingView.mainTableView reloadData];
         }
     }
@@ -1988,94 +1988,6 @@
     return _bottomView;
 }
 
-- (UIView *)downloadBaseView {
-    if (!_downloadBaseView) {
-        _downloadBaseView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, ScreenWidth, 40)];
-        // _bottomView2.backgroundColor = UIColor.blackColor;
-        [_downloadBaseView setUserInteractionEnabled:YES];
-    }
-    return _downloadBaseView;
-}
-
-- (UIView *)downloadReportBaseView {
-    if (!_downloadReportBaseView) {
-        _downloadReportBaseView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 110, 30)];
-        _downloadReportBaseView.backgroundColor = [UIColor colorWithHexString:@"#FBEBE2"];
-        _downloadReportBaseView.layer.cornerRadius = 10.0;
-        _downloadReportBaseView.clipsToBounds = YES;
-        _downloadReportBaseView.tag = 101;
-        _downloadReportBaseView.userInteractionEnabled = YES;
-//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openURL)];
-//        tap.numberOfTapsRequired = 1;
-//        [_downloadReportBaseView addGestureRecognizer:tap];
-//        UIButton *touch = [[UIButton alloc]initWithFrame:self.downloadReportBaseView.bounds];
-//        [touch setTitle:@"touch" forState:UIControlStateNormal];
-//        [touch addTarget:self action:@selector(openURL) forControlEvents:UIControlEventTouchUpInside];
-//        [touch setEnabled:YES];
-//        [touch setUserInteractionEnabled:YES];
-//        [touch setBackgroundColor:UIColor.redColor];
-        _downloadReportButton = [[UIButton alloc]initWithFrame:self.downloadReportBaseView.bounds];
-        [_downloadReportButton addTarget:self action:@selector(openURL) forControlEvents:UIControlEventTouchUpInside];
-        [_downloadReportButton setEnabled:YES];
-        [_downloadReportButton setUserInteractionEnabled:YES];
-        [_downloadReportBaseView addSubview:_downloadReportButton];
-        [_downloadReportBaseView addSubview:self.downloadReportImageView];
-        [_downloadReportBaseView addSubview:self.downloadReportLabel];
-//      [_downloadReportBaseView addSubview:touch];
-    }
-    return _downloadReportBaseView;
-}
-
-- (UIImageView *)downloadReportImageView {
-    if (!_downloadReportImageView) {
-        _downloadReportImageView = [[UIImageView alloc]initWithFrame:CGRectMake(8, 2.5, 25, 25)];
-        _downloadReportImageView.image = UIImageMake(@"元友");
-        _downloadReportImageView.tag = 102;
-    }
-    return _downloadReportImageView;
-}
-
-- (UILabel *)downloadReportLabel {
-    if (!_downloadReportLabel) {
-        _downloadReportLabel = [[UILabel alloc]initWithFrame:CGRectMake(25+10, 4, 100, 20)];
-        _downloadReportLabel.text = @"下元友撩主播";
-        _downloadReportLabel.textColor = [UIColor colorWithHexString:@"#B87649"];
-        _downloadReportLabel.font = [UIFont systemFontOfSize:13.0];
-        _downloadReportLabel.tag = 103;
-    }
-    return _downloadReportLabel;
-}
-
-//- (UIView *)downloadReport {
-//    UIView *v = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 130, 30)];
-//    v.backgroundColor = [UIColor colorWithHexString:@"#FBEBE2"];
-//    v.layer.cornerRadius = 10.0;
-//    v.clipsToBounds = YES;
-//    v.tag = 101;
-//    v.userInteractionEnabled = YES;
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openURL)];
-//    tap.numberOfTapsRequired = 1;
-//    [v addGestureRecognizer:tap];
-//    UIImageView* iconView = [[UIImageView alloc]initWithFrame:CGRectMake(8, 2.5, 25, 25)];
-//    iconView.image = UIImageMake(@"元友");
-//    iconView.tag = 102;
-//    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(25+10, 4, 100, 20)];
-//    label.text = @"下元友撩主播";
-//    label.textColor = [UIColor colorWithHexString:@"#B87649"];
-//    label.font = [UIFont systemFontOfSize:14.0];
-//    label.tag = 103;
-//    [v addSubview:iconView];
-//    [v addSubview:label];
-//    return v;
-//}
-
-- (void)openURL {
-    NSString *url = [NSString stringWithFormat:@"https://dl.nongzhiw.cn/?matchType=%ld&matchId=%ld", [self.model.type longValue], [self.model.ID longValue]];
-    if( [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:url]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
-    }
-}
-
 - (UIImageView *)videoLogo{
     if (!_videoLogo) {
         _videoLogo = [[UIImageView alloc]initWithFrame:CGRectMake(15, 15, 54.5, 18)];
@@ -2155,4 +2067,3 @@
 
 
 @end
-
