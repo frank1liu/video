@@ -88,11 +88,17 @@
 
 - (void)setModel:(LiveListModel *)model {
     _model = model;
-    self.hNameLabel.text = model.ateam_name;
-    [self.hIconImageView sd_setImageWithURL:[NSURL URLWithString:model.ateam_logo] placeholderImage:UIImageMake(@"默认头像")];
-    self.aNameLabel.text = model.hteam_name;
-    [self.aIconImageView sd_setImageWithURL:[NSURL URLWithString:model.hteam_logo] placeholderImage:UIImageMake(@"默认头像")];
-     
+    if (model.type.intValue == 1) {      // 足球
+        self.hNameLabel.text = model.hteam_name;
+        [self.hIconImageView sd_setImageWithURL:[NSURL URLWithString:model.hteam_logo] placeholderImage:UIImageMake(@"默认头像")];
+        self.aNameLabel.text = model.ateam_name;
+        [self.aIconImageView sd_setImageWithURL:[NSURL URLWithString:model.ateam_logo] placeholderImage:UIImageMake(@"默认头像")];
+    } else {
+        self.hNameLabel.text = model.ateam_name;
+        [self.hIconImageView sd_setImageWithURL:[NSURL URLWithString:model.ateam_logo] placeholderImage:UIImageMake(@"默认头像")];
+        self.aNameLabel.text = model.hteam_name;
+        [self.aIconImageView sd_setImageWithURL:[NSURL URLWithString:model.hteam_logo] placeholderImage:UIImageMake(@"默认头像")];
+    }
 }
 
 //是否勾选了按钮

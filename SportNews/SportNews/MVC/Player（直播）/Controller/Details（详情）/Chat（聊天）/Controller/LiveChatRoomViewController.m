@@ -78,6 +78,10 @@ static NSString *cellIdentifier = @"MessageCell";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self scrollToBottom:YES];
 }
 
@@ -416,7 +420,6 @@ static NSString *cellIdentifier = @"MessageCell";
                 [weakSelf.dataSource addObjectsFromArray:(NSMutableArray *)tmpAry];
                 [weakSelf.messageTableView reloadData];
                 [weakSelf scrollToBottom:YES];
-                
             }];
         }];
     }else {
