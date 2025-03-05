@@ -134,7 +134,8 @@
     }else if (self.playStatus == PlayingStatusLive) {
         height = kScreenHeight-kContentHeight-41-kBottomHeight;
     }else {
-        height = kScreenHeight-NavHeight-41;
+        // height = kScreenHeight-NavHeight-41;
+        height = kScreenHeight-kContentHeight-41;
     }
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, height);
     [self.view addSubview:self.tableView];
