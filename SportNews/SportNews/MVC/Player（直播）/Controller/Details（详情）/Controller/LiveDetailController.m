@@ -156,6 +156,7 @@
 @property(nonatomic, strong) NSString  *matchID;
 @property (nonatomic , assign) BOOL isTalkBaseViewShow;
 @property (nonatomic, strong) JXCategoryIndicatorLineView *lineView;
+@property (nonatomic, strong) UIView *talkBaseView;
 
 
 @end
@@ -528,18 +529,85 @@
     self.categoryView.indicators = @[self.lineView];
 
     CGFloat x = (kScreenWidth - self.categoryTitles.count*30)/(self.categoryTitles.count+1)/2;
-    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-100, 41); // title上移
+    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-172, 41); // title上移
     [self.categoryFatherView addSubview:self.categoryView];
     // [self setupDownloadView];       // 下載元友
 
-    UIButton *talkButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [talkButton addTarget:self action:@selector(talkButtonDidClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [talkButton setTitle:@"點擊我" forState:UIControlStateNormal];
-    talkButton.backgroundColor = UIColor.redColor;
-    [talkButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
-    talkButton.frame = CGRectMake(self.categoryView.bounds.size.width-40, -10, 90, 41);
-    [self.categoryFatherView addSubview:talkButton];
+//    UIButton *talkButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [talkButton addTarget:self action:@selector(talkButtonDidClicked:) forControlEvents:UIControlEventTouchUpInside];
+//    [talkButton setTitle:@"點擊我" forState:UIControlStateNormal];
+//    talkButton.backgroundColor = UIColor.redColor;
+//    [talkButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
+//    talkButton.frame = CGRectMake(self.categoryView.bounds.size.width-40, -10, 90, 41);
+//    [self.categoryFatherView addSubview:talkButton];
 
+    self.talkBaseView = [[UIView alloc]initWithFrame: CGRectMake(ScreenWidth-140, -10, 140, 41)];
+    self.talkBaseView.userInteractionEnabled = YES;
+    self.talkBaseView.backgroundColor = UIColor.whiteColor;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(talkButtonDidClicked:)];
+    [self.talkBaseView addGestureRecognizer:tap];
+    [self.categoryFatherView addSubview:self.talkBaseView];
+
+    UIImageView *girlImageView = [[UIImageView alloc]initWithFrame:CGRectMake(4+8, 4, 34, 34)];
+    girlImageView.image = [UIImage imageNamed:@"girl"];
+    girlImageView.layer.cornerRadius = girlImageView.bounds.size.width / 2;
+    girlImageView.clipsToBounds = YES;
+    [self.talkBaseView addSubview:girlImageView];
+
+    NSString *reporter = @"福利专员";
+    if (self.model.live_urls.count > 0) {
+        if ([self.model.live_urls[0].name isEqualToString:@"高清"]) {
+            reporter = @"福利专员";
+        } else {
+            reporter = self.model.live_urls[0].name;
+        }
+    }
+    UILabel *txtLab = [[UILabel alloc]initWithFrame:CGRectZero];
+    txtLab.text = reporter;
+    txtLab.tag = 1333;
+    txtLab.textColor = UIColor.blackColor;
+    txtLab.numberOfLines = 1;
+    [txtLab setFont:[UIFont systemFontOfSize:17]];
+    [self.talkBaseView addSubview:txtLab];
+
+    UILabel *txtLab2 = [[UILabel alloc]initWithFrame:CGRectMake(42+38+8, 8, 48, 28)];
+    txtLab2.text = @"私信";
+    txtLab2.textColor = UIColor.whiteColor;
+    txtLab2.numberOfLines = 1;
+    txtLab2.tag = 1222;
+    [txtLab2 setFont:[UIFont systemFontOfSize:15]];
+    txtLab2.backgroundColor = Origin_Color;
+    txtLab2.textAlignment = NSTextAlignmentCenter;
+    txtLab2.layer.cornerRadius = 14.0;
+    txtLab2.clipsToBounds = YES;
+    [self.talkBaseView addSubview:txtLab2];
+
+    [self.talkBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(172);
+        make.height.mas_equalTo(41);
+        make.trailing.equalTo(self.categoryFatherView);
+        make.top.equalTo(self.categoryFatherView).offset(-10);
+    }];
+
+    [txtLab2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(48);
+        make.height.mas_equalTo(28);
+        make.top.equalTo(self.talkBaseView).offset(8);
+        make.trailing.equalTo(self.talkBaseView).offset(-4);
+    }];
+
+    [txtLab mas_makeConstraints:^(MASConstraintMaker *make) {
+        // make.top.equalTo(self.talkBaseView).offset(1);
+        make.centerY.equalTo(txtLab2.mas_centerY);
+        make.trailing.equalTo(txtLab2.mas_leading).offset(-6);
+    }];
+
+    [girlImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(34);
+        make.height.mas_equalTo(34);
+        make.centerY.equalTo(txtLab.mas_centerY);
+        make.trailing.equalTo(txtLab.mas_leading).offset(-6);
+    }];
     self.categoryView.listContainer = (id<JXCategoryViewListContainer>)self.pagingView.listContainerView;
     self.navigationController.interactivePopGestureRecognizer.enabled = (self.categoryView.selectedIndex == 0);
     [self.categoryView reloadData];
@@ -567,14 +635,28 @@
     }
 }
 
-- (void)talkButtonDidClicked:(UIButton *)button {
+- (void)talkButtonDidClicked:(UITapGestureRecognizer *)sender {
+    UILabel *lab = (UILabel *)[sender.view viewWithTag:1222];
     if (self.isTalkBaseViewShow) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
+        lab.textColor = UIColor.whiteColor;
+        lab.backgroundColor = Origin_Color;
+        lab.text = @"私信";
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowTalkBaseView" object:nil userInfo:nil];
+        lab.textColor = [UIColor colorWithHexString:@"#999999"];
+        lab.backgroundColor = [UIColor colorWithHexString:@"#EAEAEA"];
+        lab.text = @"X";
     }
     [self setIndicatorColor:self.isTalkBaseViewShow];
     self.isTalkBaseViewShow = !self.isTalkBaseViewShow;
+}
+
+- (void)resetCloseBtn {
+    UILabel *lab = (UILabel *)[self.talkBaseView viewWithTag:1222];
+    lab.textColor = UIColor.whiteColor;
+    lab.backgroundColor = Origin_Color;
+    lab.text = @"私信";
 }
 
 - (void)setIndicatorColor:(BOOL)set {
@@ -1353,6 +1435,7 @@
     self.currentTitle = categoryStr;
     self.isSelectChatVc = NO;
     if ([categoryStr isEqualToString:@"聊天"]) {
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
@@ -1403,6 +1486,7 @@
         }else {
             [self.questionFloatView setupIsLive:NO];
         }
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
@@ -1417,22 +1501,26 @@
     //    }
 
     if ([categoryStr isEqualToString:@"榜单"]) {
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
     }
 
     if ([categoryStr isEqualToString:@"数据"]) {
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getDatasData];
     }else if ([categoryStr isEqualToString:@"统计"]) {
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getStatisticalDatas];
     }else if ([categoryStr isEqualToString:@"指数"]) {
+        [self resetCloseBtn];
         self.isTalkBaseViewShow = NO;
         [self setIndicatorColor:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
@@ -1980,9 +2068,16 @@
         _bottomView  = [[LiveContentBottomView alloc] initWithFrame:CGRectMake(0, kContentHeight, kScreenWidth, kBottomHeight)];
         _bottomView.autoresizingMask = UIViewAutoresizingNone;
         _bottomView.hidden = NO;
+        // 點擊主播的回呼
         WeakSelf
         _bottomView.fblTap = ^(LiveCartoonModel *model) {
             [weakSelf controlFBL:model];
+            UILabel *reportLab = (UILabel *)[weakSelf.talkBaseView viewWithTag:1333];
+            if ([model.name isEqualToString:@"高清"]) {
+                reportLab.text = @"福利专员";
+            } else {
+                reportLab.text = model.name;
+            }
         };
     }
     return _bottomView;
