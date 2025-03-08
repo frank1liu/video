@@ -5,7 +5,7 @@
 //  Created by K哥 on 2021/1/9.
 //
 
-#import "LiveListViewController.h" 
+#import "LiveListViewController.h"
 #import "LXCalender.h"
 #import "LiveListModel.h"
 #import "LiveDetailController.h"
@@ -34,7 +34,7 @@ NSInteger gCategoryType = 0;
 
 @property (nonatomic , strong) NSArray *topListArray;
 @property (nonatomic , strong) NSArray *noTopListArray;
- 
+
 
 /// 列表展示类型，0比分 1指数
 @property(nonatomic, assign) NSInteger listType;
@@ -70,7 +70,7 @@ NSInteger gCategoryType = 0;
 
 // 今天是否还有比赛
 @property(nonatomic, assign) bool isTodayHaveMatch;
- 
+
 //是否正在删除比赛
 @property(nonatomic, assign) bool isDeletList;
 
@@ -156,7 +156,7 @@ NSInteger gCategoryType = 0;
 
 - (void)setupParams {
     /// 添加监听
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enterApp) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enterApp) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeType:) name:ChangeShowType object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deleteFinishList) name:RecieveFinishListData object:nil];
 
@@ -180,9 +180,19 @@ NSInteger gCategoryType = 0;
     self.tableView.height = kScreenHeight-NavHeight-30-40;
 
     MJRefreshHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        //        self.pn = 1;
-        //        [self getDatas:YES];
-        [self reloadDatas];
+//        self.pn = 1;
+//        [self getDatas:YES];
+        if (![CommonTools isBlankString:self.startTimeChoice]) {
+            self.startTime = self.startTimeChoice;
+//            [self reloadDatas];
+            self.pn = 1;
+            // self.calendarChoice = nil;
+            // self.startTimeChoice = nil;
+            [[HomeWSManager instance] cleaDatas];
+            [self getDatas:YES];
+        } else {
+            [self reloadDatas];
+        }
     }];
 
     self.tableView.mj_header = header;
@@ -336,10 +346,12 @@ NSInteger gCategoryType = 0;
     }else if (self.timeStatus == 1) {
         //再过去点击今天就是刷新
         [KYRemindView show];
+        self.startTime = @"";
         [self reloadDatas];
     }else {
         //在未来也是刷新
         [KYRemindView show];
+        self.startTime = @"";
         [self reloadDatas];
     }
 }
@@ -375,12 +387,18 @@ NSInteger gCategoryType = 0;
 
 - (void)enterApp {
     [self.tableView reloadData];
+    NSString *currentString = [LiveListCalendarVC getCurrentString];
     if (self.datasArray.count > 0) {
         if ([CommonTools isBlankString:self.startTimeChoice]) {
             [self reloadDatas];
-        }else if ([self.startTimeChoice isEqualToString:[LiveListCalendarVC getCurrentString]]) {
+        }else if ([self.startTimeChoice isEqualToString: currentString]) {
             self.pn = 1;
             [self getDatas:YES];
+        }else if (![self.startTimeChoice isEqualToString: currentString]) {
+//            self.pn = 1;
+            self.startTime = @"";
+//            [self getDatas:YES];
+            [self reloadDatas];
         }
     }
 }
@@ -962,7 +980,7 @@ NSInteger gCategoryType = 0;
                 }
                 [weakSelf didSelectItem:listModel];
             };
-            [cell reloadCellWithModel:[self changeLiveListModelToCellModel:listModel]]; 
+            [cell reloadCellWithModel:[self changeLiveListModelToCellModel:listModel]];
             return cell;
         }
         // 好像沒用到
@@ -980,7 +998,7 @@ NSInteger gCategoryType = 0;
                 }
                 [weakSelf didSelectItem:listModel];
             };
-            [cell reloadCellWithModel:[self changeLiveListModelToCellModel:listModel]]; 
+            [cell reloadCellWithModel:[self changeLiveListModelToCellModel:listModel]];
             return cell;
         }
     }
@@ -1081,9 +1099,9 @@ NSInteger gCategoryType = 0;
     return 0;
     // return 40;
 }
-  
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
+
     if (section == 0) {
         if (self.topListArray.count > 0) {
             return [self setupSectionHeaderView:@"热门赛事"];
@@ -1126,7 +1144,7 @@ NSInteger gCategoryType = 0;
     }
     if (listModel.status.intValue > 1 && self.timeStatus < 2) {
         return 80;
-    } 
+    }
     if (self.listType == 0) {
         return 103 + (listModel.contentHeight > 0? listModel.contentHeight-30:0);
     }else {
@@ -1149,8 +1167,8 @@ NSInteger gCategoryType = 0;
     [self didSelectItem:listModel];
 }
 
-- (void)didSelectItem:(LiveListModel *)listModel { 
-    listModel.live_type = self.live_type; 
+- (void)didSelectItem:(LiveListModel *)listModel {
+    listModel.live_type = self.live_type;
     if (SNPictureInPictureShared.playerVc.model.ID == listModel.ID) {
         if (SNPictureInPictureShared.picController.isPictureInPictureActive) {
             [self.navigationController pushViewController:[SNPictureInPictureShare sharedInstance].playerVc animated:YES];
@@ -1162,7 +1180,7 @@ NSInteger gCategoryType = 0;
         }
     }else if (ZFPlayerWindowShared.zfPlayer.model.ID.intValue == listModel.ID.intValue && ZFPlayerWindowShared.backController) {
         [self.navigationController pushViewController:ZFPlayerWindowShared.backController animated:YES];
-    }else { 
+    }else {
         LiveDetailController *vc = [[LiveDetailController alloc] init];
         vc.model = listModel;
         [self.navigationController pushViewController:vc animated:YES];
@@ -1204,7 +1222,7 @@ NSInteger gCategoryType = 0;
             NSString *status_up_name = arr[3];
             model.status_up_name = status_up_name;
             // 半场比分
-            
+
             // 角球
             NSString *jiaoqiu = arr[6];
             model.jiaoqiu = jiaoqiu;
@@ -1247,13 +1265,13 @@ NSInteger gCategoryType = 0;
             if (time1 < time2) {
                 model.time = time;
             }
-            
+
             NSString *homeScore= arr[8];
             if (![homeScore isEqualToString:@"no"]) {
                 NSArray *home_score_xiaojie = [homeScore componentsSeparatedByString:@","];
                 model.home_score_xiaojie = home_score_xiaojie;
             }
-            
+
             NSString *awayScore = arr[9];
             if (![awayScore isEqualToString:@"no"]) {
                 NSArray *away_score_xiaojie = [awayScore componentsSeparatedByString:@","];
@@ -1287,7 +1305,7 @@ NSInteger gCategoryType = 0;
         t1name = model.hteam_name;
         t2url = model.ateam_logo;
         t1url = model.hteam_logo;
-    }  
+    }
     /// 整理视频信息
     NSMutableArray *videos = [NSMutableArray new];
     if (model.live_urls.count > 0) {
@@ -1418,7 +1436,7 @@ NSInteger gCategoryType = 0;
             f2 = @"封";
         }
     }
-    
+
     NSString *aScore1 = @"";
     NSString *aScore2 = @"";
     NSString *aScore3 = @"";
@@ -1442,8 +1460,8 @@ NSInteger gCategoryType = 0;
         hScore3 = [self check0:[NSString stringWithFormat:@"%ld", ((NSNumber *)model.home_score_xiaojie[2]).integerValue]];
         hScore4 = [self check0:[NSString stringWithFormat:@"%ld", ((NSNumber *)model.home_score_xiaojie[3]).integerValue]];
         hScore5 = [self check0:[NSString stringWithFormat:@"%ld", ((NSNumber *)model.home_score_xiaojie[4]).integerValue]];
-    } 
-    
+    }
+
     return [[CellModel alloc] initWithName:[NSString stringWithFormat:@"%@ %@ %@",model.time, model.name, model.status_up_name]
                                       time:time
                                     t1Name:t1name
@@ -1539,7 +1557,7 @@ NSInteger gCategoryType = 0;
                 [self.topView changeChoice:_calendarChoice];
             }
         }
-    } 
+    }
     if (self.timeStatus == 0) {
         if (nowSection > 2) {
             self.todayBtn.selected = NO;
@@ -1571,14 +1589,14 @@ NSInteger gCategoryType = 0;
             }
         }
     }
-    
+
 //    CGFloat sectionHeaderHeight = 40;
 //    if (scrollView.contentOffset.y <= sectionHeaderHeight && scrollView.contentOffset.y >= 0) {
 //        scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y,0,0,0);
 //    } else if (scrollView.contentOffset.y >= sectionHeaderHeight) {
 //        scrollView.contentInset=UIEdgeInsetsMake(-sectionHeaderHeight,0,0,0);
 //    }
-     
+
 }
 
 - (void)showCalendar {
@@ -1594,7 +1612,7 @@ NSInteger gCategoryType = 0;
             [self.topView reloadDayNuber:self.calendarData];
             [self showCalendarView];
         }failure:^(NSError * _Nullable error) {
-            
+
         }];
         return;
     }
@@ -1670,7 +1688,7 @@ NSInteger gCategoryType = 0;
         self.todayBtn.selected = NO;
     }
 }
- 
+
 - (UIView *)setupSectionHeaderView:(NSString *)week {
     UIView *sectionHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 40)];
     sectionHeaderView.backgroundColor = SRGB(250);
@@ -1678,7 +1696,7 @@ NSInteger gCategoryType = 0;
     backView.backgroundColor = SRGB(244);
     backView.layer.cornerRadius = 6;
     [sectionHeaderView addSubview:backView];
-    
+
     QMUILabel *dateLabel = [[QMUILabel alloc] init];
     dateLabel.font = [UIFont systemFontOfSize:13 weight:UIFontWeightSemibold];
     dateLabel.text = week;
@@ -1687,7 +1705,7 @@ NSInteger gCategoryType = 0;
     [dateLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(sectionHeaderView);
     }];
-    
+
 //    QMUIButton *calendar = [[QMUIButton alloc] qmui_initWithImage:[UIImage imageNamed:@"日历"] title:nil];
 //    [sectionHeaderView addSubview:calendar];
 //    [calendar mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -1697,12 +1715,12 @@ NSInteger gCategoryType = 0;
 //        make.width.equalTo(sectionHeaderView.mas_height);
 //    }];
 //    [calendar addTarget:self action:@selector(showCalendar) forControlEvents:UIControlEventTouchUpInside];
-    
+
     return sectionHeaderView;
 }
 //获取当前时间日期星期
 - (NSString *)getCurrentTimeAndWeekDay:(NSString *)time {
-    
+
     NSArray * arrWeek=[NSArray arrayWithObjects:@"星期日",@"星期一",@"星期二",@"星期三",@"星期四",@"星期五",@"星期六", nil];
     NSDate *date = [NSDate date];
     if (time.length > 0) {
@@ -1728,6 +1746,7 @@ NSInteger gCategoryType = 0;
     }
     return   [NSString stringWithFormat:@"%ld-%@-%@  %@",(long)year,monthS,dayS,[arrWeek objectAtIndex:week-1]];
 }
- 
+
 
 @end
+
