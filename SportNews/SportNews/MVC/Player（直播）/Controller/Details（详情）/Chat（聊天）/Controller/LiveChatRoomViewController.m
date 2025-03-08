@@ -26,8 +26,8 @@
 
 #define maxOnlineCount 1000
 
-NSString *talkWebUrl = @"https://kzb2knmj.com/notification";
-// NSString *talkWebUrl = @"https://test.kzb001.net/notification";
+// NSString *talkWebUrl = @"https://kzb2knmj.com/notification";
+NSString *talkWebUrl = @"https://test.kzb001.net/notification";
 
 @interface LiveChatRoomViewController ()<ChatToolBarDelegate,UITableViewDataSource,UITableViewDelegate,NIMChatManagerDelegate>
 

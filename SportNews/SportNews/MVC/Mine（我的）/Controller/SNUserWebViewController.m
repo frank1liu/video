@@ -80,8 +80,22 @@
     _webView.navigationDelegate = self;
     // 是否允许手势左滑返回上一级, 类似导航控制的左滑返回
     _webView.allowsBackForwardNavigationGestures = YES;
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.url]];
+
+    /*
+    var params = {
+          clientType: 2, // 0 android平台、1 ios平台、2 web平台
+          clientVersion: '', // web传空
+          deviceInfo: navigator.userAgent, // web 可以传浏览器信息
+          deviceNo: state.murmur // 要生成 想办法根据当前手机生成唯一可重复用的设备id
+        }
+     */
+
+    NSString *ver = [NSString stringWithFormat:@"%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
+    NSString *deviceid = [KKKeyChain getDeviceIDInKeychain];
+
+    NSString *urls = [NSString stringWithFormat:@"%@?clientType=1&clientVersion=%@&deviceInfo=%@&deviceNo=%@", self.url, ver, @"sqd_ios", deviceid];
+
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urls]];
     [request setValue:@"sqd_ios" forHTTPHeaderField:@"User-Agent"];
     [request setValue:@"sqd_ios" forHTTPHeaderField:@"UserAgent"];
     /// 设置内部请求cookie
