@@ -100,7 +100,7 @@
     [request setValue:@"sqd_ios" forHTTPHeaderField:@"UserAgent"];
     /// 设置内部请求cookie
     [request setValue:[NSString stringWithFormat:@"userinfo=%@", [self getLoginString]] forHTTPHeaderField:@"Cookie"];
-    
+    // [self clearWKWebViewCache];
     /// 设置user agent
     [self.webView setCustomUserAgent:@"sqd_ios"];
     [self.webView loadRequest:request];
@@ -109,6 +109,24 @@
     self.view.backgroundColor = UIColor.whiteColor;
     [self.view bringSubviewToFront:self.navView];
     
+}
+
+- (void)clearWKWebViewCache {
+    // 取得所有網站數據的類型 (包含 Cookies、快取、LocalStorage 等)
+    NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+
+    // 計算時間範圍（從現在開始的所有緩存）
+    NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+
+    // 取得 WKWebsiteDataStore 的預設資料存儲
+    WKWebsiteDataStore *dataStore = [WKWebsiteDataStore defaultDataStore];
+
+    // 移除指定類型的網站數據
+    [dataStore removeDataOfTypes:websiteDataTypes
+                   modifiedSince:dateFrom
+               completionHandler:^{
+                   NSLog(@"WKWebView 緩存清理完成！");
+               }];
 }
 
 - (NSString *)getLoginString {
