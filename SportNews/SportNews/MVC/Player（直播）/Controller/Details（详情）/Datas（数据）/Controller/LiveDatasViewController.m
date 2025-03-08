@@ -143,22 +143,21 @@ extern NSString *talkWebUrl;
 
     // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
 
-    self.talkWebVC = [[SNUserWebViewController alloc]init];
-    self.talkWebVC.url = talkWebUrl;
+//    self.talkWebVC = [[SNUserWebViewController alloc]init];
+//    self.talkWebVC.url = talkWebUrl;
 
     [self setupSubViews];
     
     [self prepareHeader];
 
     self.talkBaseView.backgroundColor = UIColor.clearColor;
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)showTalkBaseView {
     [self hideTalkBaseView];
+    self.talkWebVC = nil;
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
     [self.view addSubview:self.talkBaseView];
     self.talkBaseView.backgroundColor = UIColor.yellowColor;
     [self addChildViewController:self.talkWebVC];
@@ -174,6 +173,19 @@ extern NSString *talkWebUrl;
     [self.talkWebVC removeFromParentViewController];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
     [self.talkBaseView removeFromSuperview];
+    self.talkWebVC = nil;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)setupSubViews {

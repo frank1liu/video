@@ -83,6 +83,8 @@ static NSString *cellIdentifier = @"MessageCell";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -93,6 +95,8 @@ static NSString *cellIdentifier = @"MessageCell";
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.chatToolBar dismissKeyBoard];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HideTalkBaseView" object:nil];
 }
  
 - (void)viewDidLoad {
@@ -102,8 +106,8 @@ static NSString *cellIdentifier = @"MessageCell";
     self.talkBaseView.backgroundColor = UIColor.clearColor;
 
     // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
-    self.talkWebVC = [[SNUserWebViewController alloc]init];
-    self.talkWebVC.url = talkWebUrl;
+//    self.talkWebVC = [[SNUserWebViewController alloc]init];
+//    self.talkWebVC.url = talkWebUrl;
 
     self.hasQrcodeData = YES;
 
@@ -130,14 +134,13 @@ static NSString *cellIdentifier = @"MessageCell";
 //    self.bannerImageView.image = [UIImage imageNamed:@"card"];
 //    self.bannerImageView.contentMode = UIViewContentModeScaleToFill;
 //    [self.view addSubview:self.bannerImageView];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)showTalkBaseView {
     [self hideTalkBaseView];
+    self.talkWebVC = nil;
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
     [self.view addSubview:self.talkBaseView];
     self.talkBaseView.backgroundColor = UIColor.yellowColor;
     [self addChildViewController:self.talkWebVC];
@@ -153,6 +156,7 @@ static NSString *cellIdentifier = @"MessageCell";
     [self.talkWebVC removeFromParentViewController];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
     [self.talkBaseView removeFromSuperview];
+    self.talkWebVC = nil;
 }
 
 - (void)getQRcodeInfo {
