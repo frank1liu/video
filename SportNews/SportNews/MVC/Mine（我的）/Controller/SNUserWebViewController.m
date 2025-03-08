@@ -28,7 +28,6 @@
     [super viewDidLoad];
     
     [self setupWKWebView];
-       
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -39,7 +38,11 @@
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"BackOnclick"];
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"EnterMission"];
 }
-  
+
+- (void)setWebViewSize:(CGRect)frame {
+    _webView.frame = frame;
+}
+
 - (void)setupWKWebView {
     WKUserContentController *userContentController = WKUserContentController.new;
     // 注册js方法
@@ -65,8 +68,11 @@
     gradinentlayer.endPoint = CGPointMake(1, 0.5);
     gradinentlayer.frame = CGRectMake(0, 0, kScreenWidth, NavHeight-44);
     [self.topView.layer addSublayer:gradinentlayer];
-    
+
     _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, NavHeight-44, kScreenWidth, kScreenHeight -NavHeight +44) configuration:config];
+
+    // _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 515) configuration:config];
+
     [self.view addSubview:_webView];
     // UI代理
     _webView.UIDelegate = self;

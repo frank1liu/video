@@ -389,8 +389,6 @@
         liveDetailVc.model = model;
         [weakSelf.navigationController pushViewController:liveDetailVc animated:YES];
     };
-
-
 }
 
 - (void)setupTopHeaderView {
@@ -430,6 +428,7 @@
 //                }
 //            }else {
             // 設為NO支持小窗
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
             weakSelf.isClickPop = YES;
             [weakSelf.navigationController popViewControllerAnimated:YES];
 //            }
@@ -439,11 +438,9 @@
             [weakSelf shareMethod];
         }
     };
-    
 }
 
 - (void)setupLiveHeaderView{
-
     [self.topHeaderView addSubview:self.bottomView];
     [self.topHeaderView addSubview:self.contentView];
     [self.topHeaderView addSubview:self.playerFatherView];
@@ -529,7 +526,7 @@
     self.categoryView.indicators = @[self.lineView];
 
     CGFloat x = (kScreenWidth - self.categoryTitles.count*30)/(self.categoryTitles.count+1)/2;
-    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-172, 41); // title上移
+    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-154, 41); // title上移
     [self.categoryFatherView addSubview:self.categoryView];
     // [self setupDownloadView];       // 下載元友
 
@@ -541,7 +538,7 @@
 //    talkButton.frame = CGRectMake(self.categoryView.bounds.size.width-40, -10, 90, 41);
 //    [self.categoryFatherView addSubview:talkButton];
 
-    self.talkBaseView = [[UIView alloc]initWithFrame: CGRectMake(ScreenWidth-140, -10, 140, 41)];
+    self.talkBaseView = [[UIView alloc]initWithFrame: CGRectMake(ScreenWidth-100, -10, 100, 41)];
     self.talkBaseView.userInteractionEnabled = YES;
     self.talkBaseView.backgroundColor = UIColor.whiteColor;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(talkButtonDidClicked:)];
@@ -583,7 +580,7 @@
     [self.talkBaseView addSubview:txtLab2];
 
     [self.talkBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(172);
+        make.width.mas_equalTo(120);
         make.height.mas_equalTo(41);
         make.trailing.equalTo(self.categoryFatherView);
         make.top.equalTo(self.categoryFatherView).offset(-10);
@@ -927,6 +924,9 @@
     }
     if (self.squadVc) {
         [self.squadVc updateScrollViewHeight:PlayStatus];
+    }
+    if (self.exponentVc) {
+        self.exponentVc.playStatus = PlayStatus;
     }
 }
 
@@ -1835,6 +1835,7 @@
             return self.exponentVc;
         }
         SNExponentViewController *exponentVc = [[SNExponentViewController alloc] init];
+        exponentVc.playStatus = self.PlayStatus;
         self.exponentVc = exponentVc;
         WeakSelf
         exponentVc.jumpDetail = ^(NSInteger num, NSInteger ID){

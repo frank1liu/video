@@ -11,6 +11,9 @@
 #import "SNStatisticalPlayerDataCell.h"
 #import "SNStatisticalSectionHeaderView.h"
 #import "TalkBaseViewController.h"
+#import "SNUserWebViewController.h"
+
+extern NSString *talkWebUrl;
 
 @interface LiveStatisticalViewController ()<UITableViewDelegate,UITableViewDataSource>
  
@@ -30,7 +33,8 @@
 
 @property(nonatomic, assign) BOOL isFailure;
 @property (nonatomic, strong) UIView *talkBaseView;
-@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+// @property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+@property (nonatomic, strong) SNUserWebViewController *talkWebVC;
 
 @end
 
@@ -46,7 +50,10 @@ static NSString *reuseStatisticalPlayerDataCell = @"reuseStatisticalPlayerDataCe
     self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
 
-    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+    // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
 
     [self setupSubViews];
 
@@ -58,23 +65,23 @@ static NSString *reuseStatisticalPlayerDataCell = @"reuseStatisticalPlayerDataCe
 }
 
 - (void)showTalkBaseView {
+    [self hideTalkBaseView];
     [self.view addSubview:self.talkBaseView];
     self.talkBaseView.backgroundColor = UIColor.yellowColor;
-    [self addChildViewController:self.talkBaseVC];
-    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
-    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self addChildViewController:self.talkWebVC];
+    self.talkWebVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkWebVC.view];
     [self.view bringSubviewToFront:self.talkBaseView];
+    [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height-28.0)];
 }
 
 - (void)hideTalkBaseView {
-    [self.talkBaseVC willMoveToParentViewController:nil];
-    [self.talkBaseVC.view removeFromSuperview];
-    [self.talkBaseVC removeFromParentViewController];
+    [self.talkWebVC willMoveToParentViewController:nil];
+    [self.talkWebVC.view removeFromSuperview];
+    [self.talkWebVC removeFromParentViewController];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
     [self.talkBaseView removeFromSuperview];
 }
-
-
 
 - (void)setupSubViews {
     

@@ -9,6 +9,9 @@
 #import "SportNews-Swift.h"
 #import <Masonry/Masonry.h>
 #import "TalkBaseViewController.h"
+#import "SNUserWebViewController.h"
+
+extern NSString *talkWebUrl;
 
 @interface SNExponentViewController ()
 
@@ -25,7 +28,8 @@
 @property(nonatomic, strong) UILabel *tbLabel;
 @property(nonatomic, strong) UITapGestureRecognizer *tbTap;
 @property (nonatomic, strong) UIView *talkBaseView;
-@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+// @property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+@property (nonatomic, strong) SNUserWebViewController *talkWebVC;
 
 @end
 
@@ -43,7 +47,10 @@
     
     self.talkBaseView.backgroundColor = UIColor.clearColor;
 
-    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+    // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
 
     self.view.backgroundColor = [UIColor colorWithRed:0xf5/255.0 green:0xf5/255.0 blue:0xf5/255.0 alpha:1];
     
@@ -127,18 +134,24 @@
 }
 
 - (void)showTalkBaseView {
+    [self hideTalkBaseView];
     [self.view addSubview:self.talkBaseView];
     self.talkBaseView.backgroundColor = UIColor.yellowColor;
-    [self addChildViewController:self.talkBaseVC];
-    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
-    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self addChildViewController:self.talkWebVC];
+    self.talkWebVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkWebVC.view];
     [self.view bringSubviewToFront:self.talkBaseView];
+//    if (self.playStatus == PlayingStatusLive) {
+//        [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height-98.0)];
+//    } else {
+        [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height-28.0)];
+//    }
 }
 
 - (void)hideTalkBaseView {
-    [self.talkBaseVC willMoveToParentViewController:nil];
-    [self.talkBaseVC.view removeFromSuperview];
-    [self.talkBaseVC removeFromParentViewController];
+    [self.talkWebVC willMoveToParentViewController:nil];
+    [self.talkWebVC.view removeFromSuperview];
+    [self.talkWebVC removeFromParentViewController];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
     [self.talkBaseView removeFromSuperview];
 }

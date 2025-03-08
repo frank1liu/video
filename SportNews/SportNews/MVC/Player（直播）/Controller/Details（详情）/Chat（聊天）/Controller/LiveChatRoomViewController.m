@@ -22,8 +22,12 @@
 #import "SWNinePatchImageFactory.h"
 #import "TalkBaseViewController.h"
 #import <MLLabel/NSString+MLExpression.h>
+#import "SNUserWebViewController.h"
 
 #define maxOnlineCount 1000
+
+NSString *talkWebUrl = @"https://kzb2knmj.com/notification";
+// NSString *talkWebUrl = @"https://test.kzb001.net/notification";
 
 @interface LiveChatRoomViewController ()<ChatToolBarDelegate,UITableViewDataSource,UITableViewDelegate,NIMChatManagerDelegate>
 
@@ -67,7 +71,8 @@
 @property(nonatomic, assign) BOOL hasQrcodeData;
 @property (nonatomic, strong) NSUserDefaults *df;
 @property (nonatomic, strong) UIView *talkBaseView;
-@property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+// @property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+@property (nonatomic, strong) SNUserWebViewController *talkWebVC;
 
 @end
 
@@ -96,7 +101,9 @@ static NSString *cellIdentifier = @"MessageCell";
     self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
 
-    self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+    // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
 
     self.hasQrcodeData = YES;
 
@@ -130,18 +137,20 @@ static NSString *cellIdentifier = @"MessageCell";
 }
 
 - (void)showTalkBaseView {
+    [self hideTalkBaseView];
     [self.view addSubview:self.talkBaseView];
     self.talkBaseView.backgroundColor = UIColor.yellowColor;
-    [self addChildViewController:self.talkBaseVC];
-    self.talkBaseVC.view.frame = self.talkBaseView.bounds;
-    [self.talkBaseView addSubview:self.talkBaseVC.view];
+    [self addChildViewController:self.talkWebVC];
+    self.talkWebVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkWebVC.view];
     [self.view bringSubviewToFront:self.talkBaseView];
+    [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height)];
 }
 
 - (void)hideTalkBaseView {
-    [self.talkBaseVC willMoveToParentViewController:nil];
-    [self.talkBaseVC.view removeFromSuperview];
-    [self.talkBaseVC removeFromParentViewController];
+    [self.talkWebVC willMoveToParentViewController:nil];
+    [self.talkWebVC.view removeFromSuperview];
+    [self.talkWebVC removeFromParentViewController];
     self.talkBaseView.backgroundColor = UIColor.clearColor;
     [self.talkBaseView removeFromSuperview];
 }

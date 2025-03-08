@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 //请求链接加载H5
 @property (nonatomic , copy) NSString *url;
 
+- (void)setWebViewSize:(CGRect)frame;
+
 @end
 
 NS_ASSUME_NONNULL_END
