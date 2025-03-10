@@ -96,28 +96,33 @@
 
             [self.dnsManager getIPForDomain:url completion:^(NSString *resolvedIP, NSError *error) {
                 if (resolvedIP) {
-                    NSString *path = [NSString stringWithFormat:@"https://%@/prod-api/", url];
-                    NSURL *urlss = [NSURL URLWithString:path];
-                    NSData *data = [[NSData alloc] initWithContentsOfURL:urlss];
-                    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
-                    if ([d[@"msg"] isEqualToString:@"ok"]) {
-                        if (!self.hasFoundValidUrl) {
-                            self.hasFoundValidUrl = YES;
-                            self.isReqSucDynUrl = NO;
-                            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                            [defaults setObject:url forKey:@"app_net_root_url"];
-                            [defaults synchronize];
-                            NSLog(@"%@", url);
-                            self.availableDomain = url;
-                            [self setChannelName];
-                            [self getChannelName];
-                            //极光
-                            [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
-                            // 云信
-                            [self setupNIM];
+                    @try {
+                        NSString *path = [NSString stringWithFormat:@"https://%@/prod-api/", url];
+                        NSURL *urlss = [NSURL URLWithString:path];
+                        NSData *data = [[NSData alloc] initWithContentsOfURL:urlss];
+                        NSDictionary *d = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+                        if ([d[@"msg"] isEqualToString:@"ok"]) {
+                            if (!self.hasFoundValidUrl) {
+                                self.hasFoundValidUrl = YES;
+                                self.isReqSucDynUrl = NO;
+                                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                                [defaults setObject:url forKey:@"app_net_root_url"];
+                                [defaults synchronize];
+                                NSLog(@"%@", url);
+                                self.availableDomain = url;
+                                [self setChannelName];
+                                [self getChannelName];
+                                //极光
+                                [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+                                // 云信
+                                [self setupNIM];
+                            }
                         }
+                        dispatch_semaphore_signal(semaphore);
+                    } @catch (NSException *exception) {
+                        NSLog(@"%@", exception.reason);
+                        dispatch_semaphore_signal(semaphore);
                     }
-                    dispatch_semaphore_signal(semaphore);
                 } else {
                     dispatch_semaphore_signal(semaphore);
                 }
