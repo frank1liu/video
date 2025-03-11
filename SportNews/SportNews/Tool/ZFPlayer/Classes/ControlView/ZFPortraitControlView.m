@@ -108,10 +108,11 @@
         [self.bottomToolView addSubview:self.danmuBtn];
         [self.bottomToolView addSubview:self.videoTypeDotView];
         [self.bottomToolView addSubview:self.videoTypeLabel];
-        [self.bottomToolView addSubview:self.fbl];
-        [self addSubview:self.fblView];
+        // 移除播放頁面選擇訊號原
+        // [self.bottomToolView addSubview:self.fbl];
+        // [self addSubview:self.fblView];
         [self addSubview:self.rateView];
-        
+
         [self buildRate];
         
         // 设置子控件的响应事件
