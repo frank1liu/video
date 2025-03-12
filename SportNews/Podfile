@@ -40,7 +40,7 @@ target "SportNews" do
     pod 'Reachability'
     pod 'AlicloudPDNS'
     pod 'AlicloudCrash'
-    pod 'libOpenInstallSDK'
+    # pod 'libOpenInstallSDK'
 end
 
 post_install do |installer|
