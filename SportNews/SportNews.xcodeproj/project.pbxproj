@@ -310,6 +310,10 @@
 		8CF7774725EE6A1300E927B9 /* LoginChoiceCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CF7774625EE6A1300E927B9 /* LoginChoiceCodeView.swift */; };
 		B5222C832D1D950500C60C6D /* LevelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B5222C812D1D950500C60C6D /* LevelViewController.m */; };
 		B5222C842D1D950500C60C6D /* LevelViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5222C822D1D950500C60C6D /* LevelViewController.xib */; };
+		B538AAF42D83031A001A4E71 /* PrivateTalkViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B538AAF22D83031A001A4E71 /* PrivateTalkViewController.xib */; };
+		B538AAF52D83031A001A4E71 /* PrivateTalkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B538AAF12D83031A001A4E71 /* PrivateTalkViewController.m */; };
+		B538AAF92D830332001A4E71 /* TalkBaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B538AAF82D830332001A4E71 /* TalkBaseViewController.xib */; };
+		B538AAFA2D830332001A4E71 /* TalkBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B538AAF72D830332001A4E71 /* TalkBaseViewController.m */; };
 		B57106342D351687008EFECC /* ZFUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B57105FF2D351687008EFECC /* ZFUtilities.m */; };
 		B57106352D351687008EFECC /* ZFVolumeBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = B57106012D351687008EFECC /* ZFVolumeBrightnessView.m */; };
 		B57106362D351687008EFECC /* UIScrollView+ZFPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B57106042D351687008EFECC /* UIScrollView+ZFPlayer.m */; };
@@ -1086,6 +1090,12 @@
 		B5222C802D1D950500C60C6D /* LevelViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LevelViewController.h; sourceTree = "<group>"; };
 		B5222C812D1D950500C60C6D /* LevelViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LevelViewController.m; sourceTree = "<group>"; };
 		B5222C822D1D950500C60C6D /* LevelViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LevelViewController.xib; sourceTree = "<group>"; };
+		B538AAF02D83031A001A4E71 /* PrivateTalkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrivateTalkViewController.h; sourceTree = "<group>"; };
+		B538AAF12D83031A001A4E71 /* PrivateTalkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PrivateTalkViewController.m; sourceTree = "<group>"; };
+		B538AAF22D83031A001A4E71 /* PrivateTalkViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PrivateTalkViewController.xib; sourceTree = "<group>"; };
+		B538AAF62D830332001A4E71 /* TalkBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TalkBaseViewController.h; sourceTree = "<group>"; };
+		B538AAF72D830332001A4E71 /* TalkBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TalkBaseViewController.m; sourceTree = "<group>"; };
+		B538AAF82D830332001A4E71 /* TalkBaseViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TalkBaseViewController.xib; sourceTree = "<group>"; };
 		B57105E42D351687008EFECC /* ZFAVPlayerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZFAVPlayerManager.h; sourceTree = "<group>"; };
 		B57105E52D351687008EFECC /* ZFAVPlayerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZFAVPlayerManager.m; sourceTree = "<group>"; };
 		B57105E72D351687008EFECC /* UIImageView+ZFCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+ZFCache.h"; sourceTree = "<group>"; };
@@ -1529,6 +1539,7 @@
 		4A7DA00025B28539007F25C1 /* List（列表） */ = {
 			isa = PBXGroup;
 			children = (
+				B538AAF32D83031A001A4E71 /* talk */,
 				4A61B23B2578BB2E00AC6EC5 /* PlayerViewController.h */,
 				4A61B23C2578BB2E00AC6EC5 /* PlayerViewController.m */,
 				FBEBC5582578DF8F001FF23D /* LiveSubjectViewController.h */,
@@ -2044,6 +2055,9 @@
 				8C4B1359264446E000186A9C /* OtherLiveDetailVC.h */,
 				8C4B135A264446E000186A9C /* OtherLiveDetailVC.m */,
 				4AB76480260DB80A00B34079 /* LivePlayerPingVC.swift */,
+				B538AAF62D830332001A4E71 /* TalkBaseViewController.h */,
+				B538AAF72D830332001A4E71 /* TalkBaseViewController.m */,
+				B538AAF82D830332001A4E71 /* TalkBaseViewController.xib */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -2769,6 +2783,16 @@
 			path = Shopping;
 			sourceTree = "<group>";
 		};
+		B538AAF32D83031A001A4E71 /* talk */ = {
+			isa = PBXGroup;
+			children = (
+				B538AAF02D83031A001A4E71 /* PrivateTalkViewController.h */,
+				B538AAF12D83031A001A4E71 /* PrivateTalkViewController.m */,
+				B538AAF22D83031A001A4E71 /* PrivateTalkViewController.xib */,
+			);
+			path = talk;
+			sourceTree = "<group>";
+		};
 		B57105E62D351687008EFECC /* AVPlayer */ = {
 			isa = PBXGroup;
 			children = (
@@ -3359,6 +3383,7 @@
 				4AA518B225C412B20033FFAB /* RealNameAuthViewController.xib in Resources */,
 				DA6F83F325C9A4C2004A845F /* f_static_094@2x.png in Resources */,
 				DA6F83FE25C9A4C3004A845F /* f_static_075@2x.png in Resources */,
+				B538AAF92D830332001A4E71 /* TalkBaseViewController.xib in Resources */,
 				DA6F844125C9A4C3004A845F /* f_static_023@2x.png in Resources */,
 				DA6F845225C9A4C3004A845F /* f_static_037@2x.png in Resources */,
 				DA6F842825C9A4C3004A845F /* f_static_066@2x.png in Resources */,
@@ -3455,6 +3480,7 @@
 				DA6F843B25C9A4C3004A845F /* f_static_076@2x.png in Resources */,
 				4A7C47F4264CD7290058546A /* SNYinLangListTableViewCell.xib in Resources */,
 				4A8A541E257F07610022BD71 /* SuggestionViewController.xib in Resources */,
+				B538AAF42D83031A001A4E71 /* PrivateTalkViewController.xib in Resources */,
 				DA6F845B25C9A4C3004A845F /* f_static_091@2x.png in Resources */,
 				DA6F843D25C9A4C3004A845F /* f_static_064@2x.png in Resources */,
 				DA6F842125C9A4C3004A845F /* f_static_063@2x.png in Resources */,
@@ -3747,9 +3773,11 @@
 				4ADEA76725771C2400AB8226 /* UIImage+Extension.m in Sources */,
 				4A8AC23F257A0D2900859F16 /* NoMessageViewController.m in Sources */,
 				4A7C47CA264CC5D80058546A /* SNTuiGuangViewController.m in Sources */,
+				B538AAF52D83031A001A4E71 /* PrivateTalkViewController.m in Sources */,
 				FB70C220257E372600EE0380 /* RegexKitLite.m in Sources */,
 				4A6C751F25C38D7900F06978 /* NSTimer+addition.m in Sources */,
 				4A70FF9B257B4C73007DD8D5 /* SettingTableViewCell.m in Sources */,
+				B538AAFA2D830332001A4E71 /* TalkBaseViewController.m in Sources */,
 				4A774E9125A147D900856E14 /* LiveListTableViewCell.m in Sources */,
 				4AB7652A260DB80A00B34079 /* SNMatchSeasonButton.m in Sources */,
 				4AB7650E260DB80A00B34079 /* ChatBottomToolBar.m in Sources */,
@@ -4139,7 +4167,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.25;
+				MARKETING_VERSION = "1.26(測試版)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SportLives.Ball.ccc.adam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4205,7 +4233,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.25;
+				MARKETING_VERSION = "1.26(測試版)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SportLives.Ball.ccc.adam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -28,7 +28,6 @@
     [super viewDidLoad];
     
     [self setupWKWebView];
-       
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -38,8 +37,18 @@
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"LoginOut"];
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"BackOnclick"];
     [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"EnterMission"];
+    [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"GetFriendTalkID"];
+    [self.webView.configuration.userContentController removeScriptMessageHandlerForName:@"GetExtraInfo"];
+    [self.webView removeFromSuperview];
+    [self.topView removeFromSuperview];
+    self.webView = nil;
+    self.topView = nil;
 }
-  
+
+- (void)setWebViewSize:(CGRect)frame {
+    _webView.frame = frame;
+}
+
 - (void)setupWKWebView {
     WKUserContentController *userContentController = WKUserContentController.new;
     // 注册js方法
@@ -48,6 +57,9 @@
     [userContentController addScriptMessageHandler:self name:@"LoginOut"];
     [userContentController addScriptMessageHandler:self name:@"BackOnclick"];
     [userContentController addScriptMessageHandler:self name:@"EnterMission"];
+    [userContentController addScriptMessageHandler:self name:@"GetFriendTalkID"];
+    [userContentController addScriptMessageHandler:self name:@"GetExtraInfo"];
+
     /// 设置网页请求的cookie
     NSString *cookieSource = [NSString stringWithFormat:@"document.cookie = 'userinfo=%@';", [self getLoginString]];
     WKUserScript *cookieScript = [[WKUserScript alloc] initWithSource:cookieSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
@@ -65,8 +77,11 @@
     gradinentlayer.endPoint = CGPointMake(1, 0.5);
     gradinentlayer.frame = CGRectMake(0, 0, kScreenWidth, NavHeight-44);
     [self.topView.layer addSublayer:gradinentlayer];
-    
+
     _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, NavHeight-44, kScreenWidth, kScreenHeight -NavHeight +44) configuration:config];
+
+    // _webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 515) configuration:config];
+
     [self.view addSubview:_webView];
     // UI代理
     _webView.UIDelegate = self;
@@ -74,13 +89,38 @@
     _webView.navigationDelegate = self;
     // 是否允许手势左滑返回上一级, 类似导航控制的左滑返回
     _webView.allowsBackForwardNavigationGestures = YES;
-    
+
+    /*
+    var params = {
+          clientType: 2, // 0 android平台、1 ios平台、2 web平台
+          clientVersion: '', // web传空
+          deviceInfo: navigator.userAgent, // web 可以传浏览器信息
+          deviceNo: state.murmur // 要生成 想办法根据当前手机生成唯一可重复用的设备id
+        }
+     */
+
+    // NSString *ver = [NSString stringWithFormat:@"%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
+
+    if ([self.url containsString:@"notification"]) {
+        NSString *ver = @"1";
+#if DEBUG
+        self.url = [NSString stringWithFormat:@"%@?clientType=1&clientVersion=%@&deviceInfo=%@&deviceNo=%@", self.url, ver, @"sqd_ios", @"E5A11564-3F22-45B7-A9C4-86C921F57C23"];
+#else
+        NSString *deviceid = [KKKeyChain getDeviceIDInKeychain];
+        // 這是 Apple 官方提供的 App 唯一識別碼，適用於同一個開發商的所有 App。當使用者刪除並重新安裝 App 時，這個值可能會改變。
+        NSString *deviceID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        NSLog(@"📌 IDFV: %@", deviceID);
+        self.url = [NSString stringWithFormat:@"%@?clientType=1&clientVersion=%@&deviceInfo=%@&deviceNo=%@", self.url, ver, @"sqd_ios", deviceid];
+#endif
+        NSLog(@"[Adam] 帶入私聊的url: %@", self.url);
+    }
+
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.url]];
     [request setValue:@"sqd_ios" forHTTPHeaderField:@"User-Agent"];
     [request setValue:@"sqd_ios" forHTTPHeaderField:@"UserAgent"];
     /// 设置内部请求cookie
     [request setValue:[NSString stringWithFormat:@"userinfo=%@", [self getLoginString]] forHTTPHeaderField:@"Cookie"];
-    
+    [self clearWKWebViewCache];
     /// 设置user agent
     [self.webView setCustomUserAgent:@"sqd_ios"];
     [self.webView loadRequest:request];
@@ -89,6 +129,24 @@
     self.view.backgroundColor = UIColor.whiteColor;
     [self.view bringSubviewToFront:self.navView];
     
+}
+
+- (void)clearWKWebViewCache {
+    // 取得所有網站數據的類型 (包含 Cookies、快取、LocalStorage 等)
+    NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+
+    // 計算時間範圍（從現在開始的所有緩存）
+    NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+
+    // 取得 WKWebsiteDataStore 的預設資料存儲
+    WKWebsiteDataStore *dataStore = [WKWebsiteDataStore defaultDataStore];
+
+    // 移除指定類型的網站數據
+    [dataStore removeDataOfTypes:websiteDataTypes
+                   modifiedSince:dateFrom
+               completionHandler:^{
+                   NSLog(@"WKWebView 緩存清理完成！");
+               }];
 }
 
 - (NSString *)getLoginString {
@@ -115,6 +173,23 @@
     [self.webView evaluateJavaScript:[NSString stringWithFormat:@"ios_getUserInfo('%@')",[self getLoginStringNoURLEncode]] completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         
     }];
+}
+
+- (void)getFriendTalkID:(NSDictionary *)body {
+    NSString *myID = body[@"uid"];
+    NSString *myToken = body[@"token"];
+    NSString *friendID = body[@"customerUid"];
+    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", myID] forKey:@"UserTalkID"];
+    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", myToken] forKey:@"UserToken"];
+    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", friendID] forKey:@"FriendTalkID"];
+}
+
+- (void)getExtraInfo:(NSDictionary *)body {
+    NSString *fromAvatar = body[@"fromAvatar"];
+    NSString *fromNickname = body[@"fromNickname"];
+    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", fromAvatar] forKey:@"fromAvatar"];
+    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", fromNickname] forKey:@"fromNickname"];
+//    [[NSUserDefaults standardUserDefaults]setObject:[NSString stringWithFormat:@"%@", friendID] forKey:@"FriendTalkID"];
 }
 
 - (void)ShareIn:(WKScriptMessage *)message {
@@ -181,6 +256,10 @@
         [self BackOnclick];
     }else if ([message.name isEqualToString:@"EnterMission"]) {
         self.topView.hidden = NO;
+    }else if ([message.name isEqualToString:@"GetFriendTalkID"]) {
+        [self getFriendTalkID:message.body];
+    }else if ([message.name isEqualToString:@"GetExtraInfo"]) {
+        [self getExtraInfo:message.body];
     }
 }
  

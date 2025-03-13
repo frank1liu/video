@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** POST请求 */
 + (void)POST:(NSString *)urlStr withParams:(NSDictionary  * _Nullable)params success:(void (^)(NSDictionary *response))success failure:(void (^)(NSError * _Nullable error))failure;
 
++ (void)POST_TALK:(NSString *)urlStr withParams:(NSDictionary  * _Nullable)params success:(void (^)(NSDictionary *response))success failure:(void (^)(NSError * _Nullable error))failure;
+
 /** 单/多图上传 */
 + (void)UploadImage:(NSString *)urlStr withParams:(NSDictionary  * _Nullable)params withImages:(NSArray *)images success:(void (^)(NSDictionary *response))success failure:(void (^)(NSError * _Nullable error))failure;
 

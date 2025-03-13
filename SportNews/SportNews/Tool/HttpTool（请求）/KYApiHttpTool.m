@@ -423,7 +423,35 @@
     } @finally {
             
     }
-    
+}
+
+/** POST_TALK 请求 */
++ (void)POST_TALK:(NSString *)urlStr withParams:(NSDictionary  * _Nullable)params success:(void (^)(NSDictionary *response))success failure:(void (^)(NSError * _Nullable error))failure {
+
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr]];
+    request.HTTPMethod = @"POST";  // 指定 HTTP 方法為 POST
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:params options:0 error:&error];
+    request.HTTPBody = jsonData;
+
+    // 5️⃣ 使用 NSURLSession 發送請求
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request
+                                                                 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"[Adam] 請求失敗: %@", error.localizedDescription);
+            failure(error);
+            return;
+        }
+
+        // 解析 JSON 回應
+        id jsonResponse = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        NSLog(@"[Adam] 回應資料: %@", jsonResponse);
+        success(jsonResponse);
+    }];
+
+    [task resume];
 }
 
 

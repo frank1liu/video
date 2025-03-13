@@ -52,6 +52,8 @@
 #import "SNZFPlayerWindow.h" 
 #import <CallKit/CallKit.h>
 
+extern NSString *talkGetUnreadUrl;
+extern BOOL isTalkRed;
 
 @interface LiveDetailController ()<UITableViewDelegate, UITableViewDataSource,WKNavigationDelegate,SocketRocketUtilityDelegate,JXPagerViewDelegate,JXCategoryViewDelegate,SuperPlayerDelegate,AVPictureInPictureControllerDelegate,CXCallObserverDelegate>
 
@@ -154,6 +156,11 @@
 @property(nonatomic, strong) NSString  *liveUserName;
 @property(nonatomic, strong) NSString  *matchType;      // type: 1 足球  2 篮球
 @property(nonatomic, strong) NSString  *matchID;
+@property (nonatomic , assign) BOOL isTalkBaseViewShow;
+@property (nonatomic, strong) JXCategoryIndicatorLineView *lineView;
+@property (nonatomic, strong) UIView *talkBaseView;
+@property (nonatomic, strong) UIButton *redBtn;
+@property(nonatomic, strong) NSTimer *checkTimer;
 
 @end
 
@@ -204,6 +211,8 @@
             }
         }
     }
+    [self.checkTimer invalidate];
+    self.checkTimer = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -239,9 +248,51 @@
             }
         }
     }
-    
+
     if (self.chatVc) {
         [self.chatVc isLoginOut];
+    }
+
+    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(checkNewTalkMsg) userInfo:nil repeats:YES];
+}
+
+- (void)checkNewTalkMsg {
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    LoginUserModel *loginModel = [UserModelTool loginModel];
+    if (loginModel != nil) {       // 登入
+
+    } else {
+        NSString *friendID = [df objectForKey:@"FriendTalkID"];
+        if (friendID != nil) {
+            NSLog(@"[Adam] friend talk id = %@", friendID);
+            NSString *myID = [df objectForKey:@"UserTalkID"];
+            NSString *myToken = [df objectForKey:@"UserToken"];
+            NSLog(@"[Adam] user talk id = %@", myID);
+            NSLog(@"[Adam] user token = %@", myToken);
+            NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+            dic[@"actionId"] = @88;
+            // dic[@"device"] = @"0";
+            // dic[@"doInput"] = @"1";
+            dic[@"jobDispatchId"] = @4;
+            dic[@"newData"] = [NSString stringWithFormat:@"{\"user_uid\":\"%@\"}", myID];
+            dic[@"processorId"] = @1008;
+            // dic[@"token"] = myToken;
+            // dic[@"v"] = @"4110052";
+            [KYApiHttpTool POST_TALK:talkGetUnreadUrl withParams:dic success:^(NSDictionary * _Nonnull response) {
+                if ([response[@"success"] boolValue] == YES) {
+                    NSDictionary *rc = [CommonTools dictionaryWithJsonString:response[@"returnValue"]];
+                    if ([rc objectForKey:friendID]) {
+                        NSLog(@"[Adam]管理有%d條新訊息!!", [[rc objectForKey:friendID] intValue]);
+                        dispatch_async(dispatch_get_main_queue(), ^(void){
+                            [self.redBtn setHidden: NO];
+                            isTalkRed = NO;
+                        });
+                    }
+                }
+            } failure:^(NSError * _Nullable error) {
+                NSLog(@"%@", error);
+            }];
+        }
     }
 }
 
@@ -273,6 +324,8 @@
     
     //添加来电监测
     [self setupCallObserver];
+
+    self.isTalkBaseViewShow = NO;
 
 }
 
@@ -424,6 +477,7 @@
 //                }
 //            }else {
             // 設為NO支持小窗
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
             weakSelf.isClickPop = YES;
             [weakSelf.navigationController popViewControllerAnimated:YES];
 //            }
@@ -433,16 +487,14 @@
             [weakSelf shareMethod];
         }
     };
-    
 }
 
 - (void)setupLiveHeaderView{
-    
     [self.topHeaderView addSubview:self.bottomView];
     [self.topHeaderView addSubview:self.contentView];
     [self.topHeaderView addSubview:self.playerFatherView];
     [self.topHeaderView addSubview:self.animationWebView];
-    
+
     [self.bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.equalTo(self.topHeaderView);
         make.bottom.equalTo(self.topHeaderView);
@@ -515,17 +567,104 @@
     self.categoryView.titleColor = [UIColor colorWithHexString:@"#666666"];
     self.categoryView.titleSelectedColor = [UIColor colorWithHexString:@"#27C5C3"];
     //下划线
-    JXCategoryIndicatorLineView *lineView = [[JXCategoryIndicatorLineView alloc] init];
-    lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
-    lineView.verticalMargin = 3;
-    lineView.indicatorHeight = 3;
-    self.categoryView.indicators = @[lineView];
+    self.lineView = [[JXCategoryIndicatorLineView alloc] init];
+    self.lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
+    self.lineView.verticalMargin = 3;
+    self.lineView.indicatorHeight = 3;
+    self.lineView.tag = 1022;
+    self.categoryView.indicators = @[self.lineView];
 
     CGFloat x = (kScreenWidth - self.categoryTitles.count*30)/(self.categoryTitles.count+1)/2;
-    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2, 41); // title上移
+    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-154, 41); // title上移
     [self.categoryFatherView addSubview:self.categoryView];
     // [self setupDownloadView];       // 下載元友
 
+//    UIButton *talkButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [talkButton addTarget:self action:@selector(talkButtonDidClicked:) forControlEvents:UIControlEventTouchUpInside];
+//    [talkButton setTitle:@"點擊我" forState:UIControlStateNormal];
+//    talkButton.backgroundColor = UIColor.redColor;
+//    [talkButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
+//    talkButton.frame = CGRectMake(self.categoryView.bounds.size.width-40, -10, 90, 41);
+//    [self.categoryFatherView addSubview:talkButton];
+
+    self.talkBaseView = [[UIView alloc]initWithFrame: CGRectMake(ScreenWidth-100, -10, 100, 41)];
+    self.talkBaseView.userInteractionEnabled = YES;
+    self.talkBaseView.backgroundColor = UIColor.whiteColor;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(talkButtonDidClicked:)];
+    [self.talkBaseView addGestureRecognizer:tap];
+    [self.categoryFatherView addSubview:self.talkBaseView];
+
+    UIImageView *girlImageView = [[UIImageView alloc]initWithFrame:CGRectMake(4+8, 4, 34, 34)];
+    girlImageView.image = [UIImage imageNamed:@"girl"];
+    girlImageView.layer.cornerRadius = girlImageView.bounds.size.width / 2;
+    girlImageView.clipsToBounds = YES;
+    [self.talkBaseView addSubview:girlImageView];
+
+    // 紅點
+    self.redBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.redBtn.frame = CGRectMake(13, 4, 13, 13);
+    [self.redBtn setBackgroundImage:[UIImage imageNamed:@"reddot"] forState:UIControlStateNormal];
+    [self.redBtn setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    //[redBtn setTitle:@"3" forState:UIControlStateNormal];
+    self.redBtn.titleLabel.font = [UIFont systemFontOfSize:11.0];
+    // [redBtn addTarget:self action:@selector(intoTalkView) forControlEvents:UIControlEventTouchUpInside];
+    [self.redBtn setHidden:isTalkRed];
+    [self.talkBaseView addSubview:self.redBtn];
+
+    NSString *reporter = @"福利专员";
+    if (self.model.live_urls.count > 0) {
+        if ([self.model.live_urls[0].name isEqualToString:@"高清"]) {
+            reporter = @"福利专员";
+        } else {
+            reporter = self.model.live_urls[0].name;
+        }
+    }
+    UILabel *txtLab = [[UILabel alloc]initWithFrame:CGRectZero];
+    txtLab.text = reporter;
+    txtLab.tag = 1333;
+    txtLab.textColor = UIColor.blackColor;
+    txtLab.numberOfLines = 1;
+    [txtLab setFont:[UIFont systemFontOfSize:17]];
+    [self.talkBaseView addSubview:txtLab];
+
+    UILabel *txtLab2 = [[UILabel alloc]initWithFrame:CGRectMake(42+38+8, 8, 48, 28)];
+    txtLab2.text = @"私信";
+    txtLab2.textColor = UIColor.whiteColor;
+    txtLab2.numberOfLines = 1;
+    txtLab2.tag = 1222;
+    [txtLab2 setFont:[UIFont systemFontOfSize:15]];
+    txtLab2.backgroundColor = Origin_Color;
+    txtLab2.textAlignment = NSTextAlignmentCenter;
+    txtLab2.layer.cornerRadius = 14.0;
+    txtLab2.clipsToBounds = YES;
+    [self.talkBaseView addSubview:txtLab2];
+
+    [self.talkBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(120);
+        make.height.mas_equalTo(41);
+        make.trailing.equalTo(self.categoryFatherView);
+        make.top.equalTo(self.categoryFatherView).offset(-10);
+    }];
+
+    [txtLab2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(48);
+        make.height.mas_equalTo(28);
+        make.top.equalTo(self.talkBaseView).offset(8);
+        make.trailing.equalTo(self.talkBaseView).offset(-4);
+    }];
+
+    [txtLab mas_makeConstraints:^(MASConstraintMaker *make) {
+        // make.top.equalTo(self.talkBaseView).offset(1);
+        make.centerY.equalTo(txtLab2.mas_centerY);
+        make.trailing.equalTo(txtLab2.mas_leading).offset(-6);
+    }];
+
+    [girlImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(34);
+        make.height.mas_equalTo(34);
+        make.centerY.equalTo(txtLab.mas_centerY);
+        make.trailing.equalTo(txtLab.mas_leading).offset(-6);
+    }];
     self.categoryView.listContainer = (id<JXCategoryViewListContainer>)self.pagingView.listContainerView;
     self.navigationController.interactivePopGestureRecognizer.enabled = (self.categoryView.selectedIndex == 0);
     [self.categoryView reloadData];
@@ -551,7 +690,46 @@
             }
         }
     }
+}
 
+- (void)talkButtonDidClicked:(UITapGestureRecognizer *)sender {
+    UILabel *lab = (UILabel *)[sender.view viewWithTag:1222];
+    if (self.isTalkBaseViewShow) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
+        lab.textColor = UIColor.whiteColor;
+        lab.backgroundColor = Origin_Color;
+        lab.text = @"私信";
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowTalkBaseView" object:nil userInfo:nil];
+        lab.textColor = [UIColor colorWithHexString:@"#999999"];
+        lab.backgroundColor = [UIColor colorWithHexString:@"#EAEAEA"];
+        lab.text = @"X";
+    }
+    [self setIndicatorColor:self.isTalkBaseViewShow];
+    self.isTalkBaseViewShow = !self.isTalkBaseViewShow;
+    [self.redBtn setHidden:YES];
+    isTalkRed = YES;
+}
+
+- (void)resetCloseBtn {
+    UILabel *lab = (UILabel *)[self.talkBaseView viewWithTag:1222];
+    lab.textColor = UIColor.whiteColor;
+    lab.backgroundColor = Origin_Color;
+    lab.text = @"私信";
+}
+
+- (void)setIndicatorColor:(BOOL)set {
+    if (set) {
+        self.lineView = nil;
+        self.lineView = [[JXCategoryIndicatorLineView alloc] init];
+        self.lineView.indicatorColor = [UIColor colorWithHexString:@"#27C5C3"];
+        self.lineView.verticalMargin = 3;
+        self.lineView.indicatorHeight = 3;
+        self.categoryView.indicators = @[self.lineView];
+        [self.categoryView reloadData];
+    } else {
+        self.categoryView.indicators = nil;
+    }
 }
 
 - (void)setupAnimateLoadingView {
@@ -809,10 +987,13 @@
     if (self.squadVc) {
         [self.squadVc updateScrollViewHeight:PlayStatus];
     }
+    if (self.exponentVc) {
+        self.exponentVc.playStatus = PlayStatus;
+    }
 }
 
 - (void)getDatas {
-    
+
     NSMutableDictionary *param = @{
         @"isnew": @"1",
         @"mid"  : self.model.ID,
@@ -1310,12 +1491,16 @@
 
 - (void)categoryView:(JXCategoryBaseView *)categoryView didSelectedItemAtIndex:(NSInteger)index {
     NSString *categoryStr = self.categoryTitles[index];
-    if ([self.currentTitle isEqualToString:categoryStr]) {
+    if ([self.currentTitle isEqualToString:categoryStr] && self.isTalkBaseViewShow == NO) {
         return;
     }
     self.currentTitle = categoryStr;
     self.isSelectChatVc = NO;
     if ([categoryStr isEqualToString:@"聊天"]) {
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         self.isSelectChatVc = YES;
         self.pagingView.mainTableView.contentOffset = CGPointMake(0, 0);
         if (self.PlayStatus == PlayingStatusLive) {
@@ -1340,7 +1525,7 @@
     if (self.datasVc) {
         [self.datasVc hideScreenView:![categoryStr isEqualToString:@"数据"]];
     }
-    
+
     if ([categoryStr isEqualToString:@"直播"]) {
         self.vsfloatView.hidden = NO;
         if (self.vsfloatView.dataSource.count) {
@@ -1355,7 +1540,7 @@
     }else {
         self.vsBtn.hidden = self.vsfloatView.hidden = YES;
     }
-    
+
     if ([categoryStr isEqualToString:@"直播"] || [categoryStr isEqualToString:@"阵容"]) {
         self.questionFloatView.hidden = self.questionFloatBtn.hidden = NO;
         if ([categoryStr isEqualToString:@"直播"]) {
@@ -1363,21 +1548,44 @@
         }else {
             [self.questionFloatView setupIsLive:NO];
         }
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
     }else {
         self.questionFloatView.hidden = self.questionFloatBtn.hidden = YES;
     }
-    
+
     //    if ([categoryStr isEqualToString:@"榜单"]) {
     //        self.seasonView.hidden = NO;
     //    }else {
     //        self.seasonView.hidden = YES;
     //    }
-    
+
+    if ([categoryStr isEqualToString:@"榜单"]) {
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
+    }
+
     if ([categoryStr isEqualToString:@"数据"]) {
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getDatasData];
     }else if ([categoryStr isEqualToString:@"统计"]) {
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getStatisticalDatas];
     }else if ([categoryStr isEqualToString:@"指数"]) {
+        [self resetCloseBtn];
+        self.isTalkBaseViewShow = NO;
+        [self setIndicatorColor:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"HideTalkBaseView" object:nil userInfo:nil];
         [self getExponentData];
     }
 }
@@ -1689,6 +1897,7 @@
             return self.exponentVc;
         }
         SNExponentViewController *exponentVc = [[SNExponentViewController alloc] init];
+        exponentVc.playStatus = self.PlayStatus;
         self.exponentVc = exponentVc;
         WeakSelf
         exponentVc.jumpDetail = ^(NSInteger num, NSInteger ID){
@@ -1922,9 +2131,16 @@
         _bottomView  = [[LiveContentBottomView alloc] initWithFrame:CGRectMake(0, kContentHeight, kScreenWidth, kBottomHeight)];
         _bottomView.autoresizingMask = UIViewAutoresizingNone;
         _bottomView.hidden = NO;
+        // 點擊主播的回呼
         WeakSelf
         _bottomView.fblTap = ^(LiveCartoonModel *model) {
             [weakSelf controlFBL:model];
+            UILabel *reportLab = (UILabel *)[weakSelf.talkBaseView viewWithTag:1333];
+            if ([model.name isEqualToString:@"高清"]) {
+                reportLab.text = @"福利专员";
+            } else {
+                reportLab.text = model.name;
+            }
         };
     }
     return _bottomView;

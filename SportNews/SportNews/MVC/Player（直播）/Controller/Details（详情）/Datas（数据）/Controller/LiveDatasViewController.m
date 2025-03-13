@@ -23,6 +23,10 @@
 #import "SNDatasFootInjuryTableViewCell.h"
 #import "SNTeamCompareTableViewCell.h"
 #import "SNTeamGeneralRankTableViewCell.h"
+#import "TalkBaseViewController.h"
+#import "SNUserWebViewController.h"
+
+extern NSString *talkWebUrl;
 
 @interface LiveDatasViewController ()<UITableViewDelegate,UITableViewDataSource>
 
@@ -113,6 +117,10 @@
 
 @property(nonatomic, assign) BOOL leaveSelf;
 
+@property (nonatomic, strong) UIView *talkBaseView;
+// @property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+@property (nonatomic, strong) SNUserWebViewController *talkWebVC;
+
 @end
 
 @implementation LiveDatasViewController
@@ -120,11 +128,64 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    // self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    if (self.playStatus == PlayingStatusLive) {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    } else {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41)];
+    }
+
+    NSLog(@"%f", self.view.bounds.origin.x);
+    NSLog(@"%f", self.view.bounds.origin.y);
+    NSLog(@"%f", self.view.bounds.size.width);
+    NSLog(@"%f", self.view.bounds.size.height);
+
+    // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+
+//    self.talkWebVC = [[SNUserWebViewController alloc]init];
+//    self.talkWebVC.url = talkWebUrl;
+
     [self setupSubViews];
     
     [self prepareHeader];
-    
+
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+}
+
+- (void)showTalkBaseView {
+    [self hideTalkBaseView];
+    self.talkWebVC = nil;
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkWebVC];
+    self.talkWebVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkWebVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+    [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height-28.0)];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkWebVC willMoveToParentViewController:nil];
+    [self.talkWebVC.view removeFromSuperview];
+    [self.talkWebVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
+    self.talkWebVC = nil;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)setupSubViews {
@@ -139,6 +200,11 @@
     }
     self.tableView.frame = CGRectMake(0, 0, kScreenWidth, height);
     [self.view addSubview:self.tableView];
+
+    // CGRect frame = self.tableView.bounds;
+    // frame.size.height += 82+28;
+    // self.talkBaseView.frame = frame;
+
     if (self.datasModel == nil) {
         self.tBackgroundView = [self setupEmptyViewWithFrame:CGRectMake(0, 110, kScreenWidth, 180) title:@"数据加载中..."];
         [self.tableView addSubview:self.tBackgroundView];

@@ -320,7 +320,6 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self getJPushAccount:registrationID];
     }];
- 
 }
   
 //先检查是否登录
@@ -479,12 +478,10 @@
     if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
         [JPUSHService handleRemoteNotification:userInfo];
         //App在前台接受通知会走这里 
-        
-        
+
     }
     // App在前台也要弹出消息的话 就要打开
-//    completionHandler(UNNotificationPresentationOptionAlert);
-
+    completionHandler(UNNotificationPresentationOptionAlert);
 }
 
 // iOS 10 Support 用户点击了通知
@@ -497,6 +494,11 @@
             //处理用户点击通知
             [self dealToUserClickNotification:userInfo];
         }
+    } else if(userInfo) {
+        // **處理點擊通知的動作，例如導航至特定頁面**
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"PrivatedTalkClicked"
+                                                                object:nil
+                                                              userInfo:userInfo];
     }
     // 系统要求执行这个方法
     completionHandler();

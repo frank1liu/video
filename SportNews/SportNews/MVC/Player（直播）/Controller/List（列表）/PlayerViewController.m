@@ -18,12 +18,22 @@
 #import "SNUserWebViewController.h"
 #import "CustomActivity.h"
 #import "levelViewController.h"
+#import "PrivateTalkViewController.h"
+#import <UserNotifications/UserNotifications.h>
+#import "JPUSHService.h"
 
 extern UIImage *gChangedImage;
 
 #define magin 100
 
 static CGFloat const animationTime = 0.4;
+
+// NSString *talkWebUrl = @"https://kzb2knmj.com/notification";
+NSString *talkWebUrl = @"https://test.kzb001.net/notification";
+// NSString *talkGetUnreadUrl = @"https://nongzhiwios.com/rest_post";
+NSString *talkGetUnreadUrl = @"https://testim.nongzhiwios.com/rest_post";
+
+BOOL isTalkRed = YES;
 
 @interface PlayerViewController () <JXCategoryViewDelegate>
 
@@ -69,11 +79,14 @@ static CGFloat const animationTime = 0.4;
 @property(nonatomic, strong) UIView *emptyBackView;
 @property(nonatomic, strong) UIImageView *emptyImageView;
 @property(nonatomic, strong) UILabel *emptyLabel;
+@property(nonatomic, strong) NSTimer *checkTimer;
+@property (nonatomic, strong) UIButton *redBtn;
 
 @end
 
 @implementation PlayerViewController
-  
+@synthesize redBtn;
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     LoginUserModel *loginModel = [UserModelTool loginModel];
@@ -98,11 +111,145 @@ static CGFloat const animationTime = 0.4;
             }];
         }
     }
+    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(checkNewTalkMsg) userInfo:nil repeats:YES];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(intoTalkView)
+                                                 name:@"PrivatedTalkClicked"
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.checkTimer invalidate];
+    self.checkTimer = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PrivatedTalkClicked" object:nil];
+}
+
+- (void)checkNewTalkMsg {
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    LoginUserModel *loginModel = [UserModelTool loginModel];
+    if (loginModel != nil) {       // 登入
+
+    } else {
+        NSString *friendID = [df objectForKey:@"FriendTalkID"];
+        if (friendID != nil) {
+            NSLog(@"[Adam] friend talk id = %@", friendID);
+            NSString *myID = [df objectForKey:@"UserTalkID"];
+            NSString *myToken = [df objectForKey:@"UserToken"];
+            NSLog(@"[Adam] user talk id = %@", myID);
+            NSLog(@"[Adam] user token = %@", myToken);
+            NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+            dic[@"actionId"] = @88;
+            // dic[@"device"] = @"0";
+            // dic[@"doInput"] = @"1";
+            dic[@"jobDispatchId"] = @4;
+            dic[@"newData"] = [NSString stringWithFormat:@"{\"user_uid\":\"%@\"}", myID];
+            dic[@"processorId"] = @1008;
+            // dic[@"token"] = myToken;
+            // dic[@"v"] = @"4110052";
+            [KYApiHttpTool POST_TALK:talkGetUnreadUrl withParams:dic success:^(NSDictionary * _Nonnull response) {
+                if ([response[@"success"] boolValue] == YES) {
+                    NSDictionary *rc = [CommonTools dictionaryWithJsonString:response[@"returnValue"]];
+                    if ([rc objectForKey:friendID]) {
+                        NSLog(@"[Adam]管理有%d條新訊息!!", [[rc objectForKey:friendID] intValue]);
+                        dispatch_async(dispatch_get_main_queue(), ^(void){
+                            [self triggerNotification:[[rc objectForKey:friendID] intValue]];
+                            [self.redBtn setHidden: NO];
+                            isTalkRed = NO;
+                            [self.redBtn setTitle:[NSString stringWithFormat:@"%d", [[rc objectForKey:friendID] intValue]] forState:UIControlStateNormal];
+                        });
+                    }
+                }
+            } failure:^(NSError * _Nullable error) {
+                NSLog(@"%@", error);
+            }];
+        }
+    }
+}
+
+- (void)triggerNotification:(NSInteger)num {
+    // 設定推播內容
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    JPushNotificationContent *content = [[JPushNotificationContent alloc] init];
+    NSString *fromNickname = [df objectForKey:@"fromNickname"];
+
+    if (fromNickname != nil && ![fromNickname isEqualToString:@""]) {
+        content.title = fromNickname;
+    } else {
+        content.title = @"私聊推送";
+    }
+    content.body = [NSString stringWithFormat:@"您有%ld则未读私聊讯息", num];
+    content.sound = @"default";  // 設定音效
+    content.badge = @1;
+
+    NSString *fromAvatar = [df objectForKey:@"fromAvatar"];
+    NSString *imageName = @"girl.png"; // 確保這張圖片在 `Assets.xcassets` 或 `App Bundle` 內
+    NSString *imagePath = [[NSBundle mainBundle] pathForResource:imageName ofType:nil];
+
+    if (fromAvatar != nil && ![fromAvatar isEqualToString:@""]) {
+        imagePath = fromAvatar;
+    }
+
+    if (imagePath) {
+        NSURL *imageURL;
+        if ([imagePath containsString:@"http"]) {
+            imageURL = [NSURL URLWithString:imagePath];
+
+            NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
+
+            if (imageData) {
+                // 取得本地儲存路徑
+                NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"downloaded_image.jpg"];
+                [imageData writeToFile:filePath atomically:YES];
+
+                imageURL = [NSURL fileURLWithPath:filePath];
+                NSLog(@"📌 圖片已儲存: %@", filePath);
+            } else {
+                NSLog(@"❌ 下載失敗");
+            }
+        } else {
+            imageURL = [NSURL fileURLWithPath:imagePath];
+        }
+
+        NSError *error;
+        UNNotificationAttachment *attachment = [UNNotificationAttachment attachmentWithIdentifier:@"image"
+                                                                                              URL:imageURL
+                                                                                          options:nil
+                                                                                            error:&error];
+        if (attachment) {
+            content.attachments = @[attachment];
+        } else {
+            NSLog(@"❌ 圖片載入失敗: %@", error.localizedDescription);
+        }
+    }
+
+    // 設定觸發條件（5 秒後觸發）
+    JPushNotificationTrigger *trigger = [[JPushNotificationTrigger alloc] init];
+    trigger.timeInterval = 1;
+    trigger.repeat = NO;
+
+    // 設定請求
+    JPushNotificationRequest *request = [[JPushNotificationRequest alloc] init];
+    request.content = content;
+    request.trigger = trigger;
+    request.requestIdentifier = @"JPushLocalNotification";
+
+    // 發送通知
+    [JPUSHService addNotification:request];
 }
 
 - (void)viewDidLoad {
 
     [super viewDidLoad];
+
+// #if DEBUG
+#if 1
+    talkWebUrl = @"https://test.kzb001.net/notification";
+    talkGetUnreadUrl = @"https://testim.nongzhiwios.com/rest_post";
+#else
+    talkWebUrl = @"https://kzb2knmj.com/notification";
+    talkGetUnreadUrl = @"https://nongzhiwios.com/rest_post";
+#endif
 
     NSData* imageData = [[NSUserDefaults standardUserDefaults] objectForKey:@"gChangedImage"];
     if (imageData != nil) {
@@ -129,6 +276,8 @@ static CGFloat const animationTime = 0.4;
     [self getDatas];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshBtnComplete) name:ListRefreshComplete object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginSuccessNotification) name:@"loginSuccess" object:nil];
+
+    // [self.redBtn setHidden:YES];
 }
 
 - (void)setupLeftVc {
@@ -224,11 +373,12 @@ static CGFloat const animationTime = 0.4;
     
     CGFloat w = self.categoryWidth/4;
     CGFloat h = 31;
+    // 原本是14
     UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, h)];
     [self.navView insertSubview:backView atIndex:0];
     backView.centerY = NavHeight-20;
     
-    UIView *borderView = [[UIView alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-14)-w*4, 0, self.categoryWidth, h)];
+    UIView *borderView = [[UIView alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-w*4, 0, self.categoryWidth, h)];
     borderView.layer.cornerRadius = backView.height/2;
     borderView.layer.borderColor = SRGB(215).CGColor;
     borderView.layer.borderWidth = 0.5;
@@ -243,6 +393,24 @@ static CGFloat const animationTime = 0.4;
     [enterBtn addTarget:self action:@selector(showAnimation) forControlEvents:UIControlEventTouchUpInside];
     [backView addSubview:enterBtn];
 
+    //私聊入口
+    UIButton *talkBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    talkBtn.frame = CGRectMake(SCREEN_WIDTH - 36, 5, 22, 22);
+    [talkBtn setBackgroundImage:[UIImage imageNamed:@"msgicon"] forState:UIControlStateNormal];
+    [talkBtn addTarget:self action:@selector(intoTalkView) forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:talkBtn];
+
+    // 紅點
+    redBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    redBtn.frame = CGRectMake(SCREEN_WIDTH - 23, 1, 15, 15);
+    [redBtn setBackgroundImage:[UIImage imageNamed:@"reddot"] forState:UIControlStateNormal];
+    [redBtn setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    // [redBtn setTitle:@"3" forState:UIControlStateNormal];
+    redBtn.titleLabel.font = [UIFont systemFontOfSize:11.0];
+    [redBtn addTarget:self action:@selector(intoTalkView) forControlEvents:UIControlEventTouchUpInside];
+    [backView addSubview:redBtn];
+    [redBtn setHidden:YES];
+    isTalkRed = YES;
 
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(40, 8, 60, 16)];
     imageView.image = [UIImage imageNamed:@"说球帝logo_home-2"];
@@ -250,7 +418,7 @@ static CGFloat const animationTime = 0.4;
     [backView addSubview:imageView];
     enterBtn.centerY = imageView.centerY;
 
-    UIButton *allBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-14)-w*4, 0.5, w, h-1)];
+    UIButton *allBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-w*4, 0.5, w, h-1)];
     [allBtn setTitle:@" 热门" forState:UIControlStateNormal];
     allBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightSemibold];
     [allBtn setTitleColor:SRGB(153) forState:UIControlStateNormal];
@@ -261,8 +429,8 @@ static CGFloat const animationTime = 0.4;
     allBtn.selected = YES;
     [backView addSubview:allBtn];
     self.allBtn = allBtn;
-    
-    UIButton *footBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-14)-3*w, 0.5, w, h-1)];
+
+    UIButton *footBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-3*w, 0.5, w, h-1)];
     [footBallBtn setTitle:@" 足球" forState:UIControlStateNormal];
     footBallBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightSemibold];
     [footBallBtn setTitleColor:SRGB(153) forState:UIControlStateNormal];
@@ -273,7 +441,7 @@ static CGFloat const animationTime = 0.4;
     [backView addSubview:footBallBtn];
     self.footBallBtn = footBallBtn;
     
-    UIButton *basketBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-14)-2*w, 0.5, w, h-1)];
+    UIButton *basketBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-2*w, 0.5, w, h-1)];
     [basketBallBtn setTitle:@" 篮球" forState:UIControlStateNormal];
     basketBallBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightSemibold];
     [basketBallBtn setTitleColor:SRGB(153) forState:UIControlStateNormal];
@@ -284,7 +452,7 @@ static CGFloat const animationTime = 0.4;
     [backView addSubview:basketBallBtn];
     self.basketBallBtn = basketBallBtn;
     
-    UIButton *otherBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-14)-w, 0.5, w, h-1)];
+    UIButton *otherBallBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-w, 0.5, w, h-1)];
     [otherBallBtn setTitle:@" 赛果" forState:UIControlStateNormal];
     otherBallBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightSemibold];
     [otherBallBtn setTitleColor:SRGB(153) forState:UIControlStateNormal];
@@ -294,6 +462,13 @@ static CGFloat const animationTime = 0.4;
     [otherBallBtn setBackgroundImage:[UIImage imageNamed:@"矩形"] forState:UIControlStateSelected];
     [backView addSubview:otherBallBtn];
     self.otherBtn = otherBallBtn;
+}
+
+- (void)intoTalkView {
+    PrivateTalkViewController *VC = [[PrivateTalkViewController alloc] init];
+    [self.navigationController pushViewController:VC animated:YES];
+    [self.redBtn setHidden:YES];
+    isTalkRed = YES;
 }
 
 - (void)setupTableView {
@@ -548,7 +723,7 @@ static CGFloat const animationTime = 0.4;
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     CGFloat w = self.categoryWidth/4;
-    self.myCategoryView.frame = CGRectMake((SCREEN_WIDTH-14)-4*w, 0, self.categoryWidth, 33);
+    self.myCategoryView.frame = CGRectMake((SCREEN_WIDTH-gap)-4*w, 0, self.categoryWidth, 33);
     self.myCategoryView.centerY = NavHeight - 20;
 }
 

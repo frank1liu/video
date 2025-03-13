@@ -20,9 +20,13 @@
 #import "GiftBubbleCell.h"
 #import "GiftBubble2Cell.h"
 #import "SWNinePatchImageFactory.h"
+#import "TalkBaseViewController.h"
 #import <MLLabel/NSString+MLExpression.h>
+#import "SNUserWebViewController.h"
 
 #define maxOnlineCount 1000
+
+extern NSString *talkWebUrl;
 
 @interface LiveChatRoomViewController ()<ChatToolBarDelegate,UITableViewDataSource,UITableViewDelegate,NIMChatManagerDelegate>
 
@@ -65,6 +69,9 @@
 @property (nonatomic,strong) UILabel *labAddressIos;
 @property(nonatomic, assign) BOOL hasQrcodeData;
 @property (nonatomic, strong) NSUserDefaults *df;
+@property (nonatomic, strong) UIView *talkBaseView;
+// @property (nonatomic, strong) TalkBaseViewController *talkBaseVC;
+@property (nonatomic, strong) SNUserWebViewController *talkWebVC;
 
 @end
 
@@ -75,6 +82,8 @@ static NSString *cellIdentifier = @"MessageCell";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showTalkBaseView) name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideTalkBaseView) name:@"HideTalkBaseView" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -85,10 +94,19 @@ static NSString *cellIdentifier = @"MessageCell";
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.chatToolBar dismissKeyBoard];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"ShowTalkBaseView" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HideTalkBaseView" object:nil];
 }
  
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectZero];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+
+    // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
+//    self.talkWebVC = [[SNUserWebViewController alloc]init];
+//    self.talkWebVC.url = talkWebUrl;
 
     self.hasQrcodeData = YES;
 
@@ -115,6 +133,29 @@ static NSString *cellIdentifier = @"MessageCell";
 //    self.bannerImageView.image = [UIImage imageNamed:@"card"];
 //    self.bannerImageView.contentMode = UIViewContentModeScaleToFill;
 //    [self.view addSubview:self.bannerImageView];
+}
+
+- (void)showTalkBaseView {
+    [self hideTalkBaseView];
+    self.talkWebVC = nil;
+    self.talkWebVC = [[SNUserWebViewController alloc]init];
+    self.talkWebVC.url = talkWebUrl;
+    [self.view addSubview:self.talkBaseView];
+    self.talkBaseView.backgroundColor = UIColor.yellowColor;
+    [self addChildViewController:self.talkWebVC];
+    self.talkWebVC.view.frame = self.talkBaseView.bounds;
+    [self.talkBaseView addSubview:self.talkWebVC.view];
+    [self.view bringSubviewToFront:self.talkBaseView];
+    [self.talkWebVC setWebViewSize:CGRectMake(0, 0, kScreenWidth, self.talkBaseView.frame.size.height)];
+}
+
+- (void)hideTalkBaseView {
+    [self.talkWebVC willMoveToParentViewController:nil];
+    [self.talkWebVC.view removeFromSuperview];
+    [self.talkWebVC removeFromParentViewController];
+    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    [self.talkBaseView removeFromSuperview];
+    self.talkWebVC = nil;
 }
 
 - (void)getQRcodeInfo {
@@ -1269,6 +1310,9 @@ static NSString *cellIdentifier = @"MessageCell";
         if (@available(iOS 11.0, *)) {
             _messageTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
+        CGRect frame = _messageTableView.bounds;
+        frame.size.height += 82+28;
+        self.talkBaseView.frame = frame;
     }
     return _messageTableView;
 }
