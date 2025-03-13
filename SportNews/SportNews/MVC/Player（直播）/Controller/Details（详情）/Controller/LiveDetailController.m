@@ -52,6 +52,8 @@
 #import "SNZFPlayerWindow.h"
 #import <CallKit/CallKit.h>
 
+extern NSString *talkGetUnreadUrl;
+extern BOOL isTalkRed;
 
 @interface LiveDetailController ()<UITableViewDelegate, UITableViewDataSource,WKNavigationDelegate,SocketRocketUtilityDelegate,JXPagerViewDelegate,JXCategoryViewDelegate,SuperPlayerDelegate,AVPictureInPictureControllerDelegate,CXCallObserverDelegate>
 
@@ -157,7 +159,8 @@
 @property (nonatomic , assign) BOOL isTalkBaseViewShow;
 @property (nonatomic, strong) JXCategoryIndicatorLineView *lineView;
 @property (nonatomic, strong) UIView *talkBaseView;
-
+@property (nonatomic, strong) UIButton *redBtn;
+@property(nonatomic, strong) NSTimer *checkTimer;
 
 @end
 
@@ -208,6 +211,8 @@
             }
         }
     }
+    [self.checkTimer invalidate];
+    self.checkTimer = nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -246,6 +251,48 @@
 
     if (self.chatVc) {
         [self.chatVc isLoginOut];
+    }
+
+    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(checkNewTalkMsg) userInfo:nil repeats:YES];
+}
+
+- (void)checkNewTalkMsg {
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    LoginUserModel *loginModel = [UserModelTool loginModel];
+    if (loginModel != nil) {       // 登入
+
+    } else {
+        NSString *friendID = [df objectForKey:@"FriendTalkID"];
+        if (friendID != nil) {
+            NSLog(@"[Adam] friend talk id = %@", friendID);
+            NSString *myID = [df objectForKey:@"UserTalkID"];
+            NSString *myToken = [df objectForKey:@"UserToken"];
+            NSLog(@"[Adam] user talk id = %@", myID);
+            NSLog(@"[Adam] user token = %@", myToken);
+            NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+            dic[@"actionId"] = @88;
+            // dic[@"device"] = @"0";
+            // dic[@"doInput"] = @"1";
+            dic[@"jobDispatchId"] = @4;
+            dic[@"newData"] = [NSString stringWithFormat:@"{\"user_uid\":\"%@\"}", myID];
+            dic[@"processorId"] = @1008;
+            // dic[@"token"] = myToken;
+            // dic[@"v"] = @"4110052";
+            [KYApiHttpTool POST_TALK:talkGetUnreadUrl withParams:dic success:^(NSDictionary * _Nonnull response) {
+                if ([response[@"success"] boolValue] == YES) {
+                    NSDictionary *rc = [CommonTools dictionaryWithJsonString:response[@"returnValue"]];
+                    if ([rc objectForKey:friendID]) {
+                        NSLog(@"[Adam]管理有%d條新訊息!!", [[rc objectForKey:friendID] intValue]);
+                        dispatch_async(dispatch_get_main_queue(), ^(void){
+                            [self.redBtn setHidden: NO];
+                            isTalkRed = NO;
+                        });
+                    }
+                }
+            } failure:^(NSError * _Nullable error) {
+                NSLog(@"%@", error);
+            }];
+        }
     }
 }
 
@@ -551,6 +598,17 @@
     girlImageView.clipsToBounds = YES;
     [self.talkBaseView addSubview:girlImageView];
 
+    // 紅點
+    self.redBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.redBtn.frame = CGRectMake(13, 4, 13, 13);
+    [self.redBtn setBackgroundImage:[UIImage imageNamed:@"reddot"] forState:UIControlStateNormal];
+    [self.redBtn setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    //[redBtn setTitle:@"3" forState:UIControlStateNormal];
+    self.redBtn.titleLabel.font = [UIFont systemFontOfSize:11.0];
+    // [redBtn addTarget:self action:@selector(intoTalkView) forControlEvents:UIControlEventTouchUpInside];
+    [self.redBtn setHidden:isTalkRed];
+    [self.talkBaseView addSubview:self.redBtn];
+
     NSString *reporter = @"福利专员";
     if (self.model.live_urls.count > 0) {
         if ([self.model.live_urls[0].name isEqualToString:@"高清"]) {
@@ -647,6 +705,8 @@
     }
     [self setIndicatorColor:self.isTalkBaseViewShow];
     self.isTalkBaseViewShow = !self.isTalkBaseViewShow;
+    [self.redBtn setHidden:YES];
+    isTalkRed = YES;
 }
 
 - (void)resetCloseBtn {

@@ -312,6 +312,9 @@
 		B518D1A42D65E47B00A70193 /* TalkBaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B518D1A22D65E47B00A70193 /* TalkBaseViewController.xib */; };
 		B5222C832D1D950500C60C6D /* LevelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B5222C812D1D950500C60C6D /* LevelViewController.m */; };
 		B5222C842D1D950500C60C6D /* LevelViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5222C822D1D950500C60C6D /* LevelViewController.xib */; };
+		B53891F12D7ED203001A4E71 /* PrivateTalkViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = B53891EF2D7ED203001A4E71 /* PrivateTalkViewController.xib */; };
+		B53891F22D7ED203001A4E71 /* PrivateTalkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B53891EE2D7ED203001A4E71 /* PrivateTalkViewController.m */; };
+		B538AAEF2D82BB60001A4E71 /* girl.png in Resources */ = {isa = PBXBuildFile; fileRef = B538AAEE2D82BB60001A4E71 /* girl.png */; };
 		B57106342D351687008EFECC /* ZFUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = B57105FF2D351687008EFECC /* ZFUtilities.m */; };
 		B57106352D351687008EFECC /* ZFVolumeBrightnessView.m in Sources */ = {isa = PBXBuildFile; fileRef = B57106012D351687008EFECC /* ZFVolumeBrightnessView.m */; };
 		B57106362D351687008EFECC /* UIScrollView+ZFPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B57106042D351687008EFECC /* UIScrollView+ZFPlayer.m */; };
@@ -1091,6 +1094,10 @@
 		B5222C802D1D950500C60C6D /* LevelViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LevelViewController.h; sourceTree = "<group>"; };
 		B5222C812D1D950500C60C6D /* LevelViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LevelViewController.m; sourceTree = "<group>"; };
 		B5222C822D1D950500C60C6D /* LevelViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LevelViewController.xib; sourceTree = "<group>"; };
+		B53891ED2D7ED203001A4E71 /* PrivateTalkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrivateTalkViewController.h; sourceTree = "<group>"; };
+		B53891EE2D7ED203001A4E71 /* PrivateTalkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PrivateTalkViewController.m; sourceTree = "<group>"; };
+		B53891EF2D7ED203001A4E71 /* PrivateTalkViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PrivateTalkViewController.xib; sourceTree = "<group>"; };
+		B538AAEE2D82BB60001A4E71 /* girl.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = girl.png; sourceTree = "<group>"; };
 		B57105E42D351687008EFECC /* ZFAVPlayerManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZFAVPlayerManager.h; sourceTree = "<group>"; };
 		B57105E52D351687008EFECC /* ZFAVPlayerManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZFAVPlayerManager.m; sourceTree = "<group>"; };
 		B57105E72D351687008EFECC /* UIImageView+ZFCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+ZFCache.h"; sourceTree = "<group>"; };
@@ -1534,6 +1541,7 @@
 		4A7DA00025B28539007F25C1 /* List（列表） */ = {
 			isa = PBXGroup;
 			children = (
+				B53891F02D7ED203001A4E71 /* talk */,
 				4A61B23B2578BB2E00AC6EC5 /* PlayerViewController.h */,
 				4A61B23C2578BB2E00AC6EC5 /* PlayerViewController.m */,
 				FBEBC5582578DF8F001FF23D /* LiveSubjectViewController.h */,
@@ -2409,6 +2417,7 @@
 		4ADEA68325771C2300AB8226 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				B538AAEE2D82BB60001A4E71 /* girl.png */,
 				4AC829652643C8E0001EE2A9 /* living2.gif */,
 				4AAFF8C7264616AA00710AD2 /* living.gif */,
 				4ADEA68B25771C2300AB8226 /* Info.plist */,
@@ -2775,6 +2784,16 @@
 				8CD93417264BA315003EBEFA /* SNShoppingListVC.swift */,
 			);
 			path = Shopping;
+			sourceTree = "<group>";
+		};
+		B53891F02D7ED203001A4E71 /* talk */ = {
+			isa = PBXGroup;
+			children = (
+				B53891ED2D7ED203001A4E71 /* PrivateTalkViewController.h */,
+				B53891EE2D7ED203001A4E71 /* PrivateTalkViewController.m */,
+				B53891EF2D7ED203001A4E71 /* PrivateTalkViewController.xib */,
+			);
+			path = talk;
 			sourceTree = "<group>";
 		};
 		B57105E62D351687008EFECC /* AVPlayer */ = {
@@ -3442,6 +3461,7 @@
 				B518D1A42D65E47B00A70193 /* TalkBaseViewController.xib in Resources */,
 				DA6F836325C9895F004A845F /* backFace@2x.png in Resources */,
 				4AAFF8C8264616AB00710AD2 /* living.gif in Resources */,
+				B53891F12D7ED203001A4E71 /* PrivateTalkViewController.xib in Resources */,
 				DA6F842C25C9A4C3004A845F /* f_static_074@2x.png in Resources */,
 				4AB76562260DB80B00B34079 /* SNDatasHistoryTableViewCell.xib in Resources */,
 				4A7CFBED257B87F900E16058 /* ChangeNameAndSignController.xib in Resources */,
@@ -3476,6 +3496,7 @@
 				4AA394F92612CFCC00B564E6 /* SNLiveListCollectionViewCell.xib in Resources */,
 				4ADEA74625771C2400AB8226 /* Assets.xcassets in Resources */,
 				B5BFA6AE2D5C4FD100667408 /* LevelCell.xib in Resources */,
+				B538AAEF2D82BB60001A4E71 /* girl.png in Resources */,
 				B5BFA6AF2D5C4FD100667408 /* BubbleCell.xib in Resources */,
 				B5BFA6B02D5C4FD100667408 /* GiftCell.xib in Resources */,
 				DA6F836625C9895F004A845F /* chat_bottom_tab_bg@2x.png in Resources */,
@@ -3909,6 +3930,7 @@
 				4AB7651E260DB80A00B34079 /* SNStatisticalBottomTableViewCell.m in Sources */,
 				4AB76564260DB80B00B34079 /* SNDatasHistoryTableViewCell.m in Sources */,
 				4ABE6046264B9FFE0063BF59 /* SNMissionCenterSignInCellView.m in Sources */,
+				B53891F22D7ED203001A4E71 /* PrivateTalkViewController.m in Sources */,
 				4AB7655A260DB80B00B34079 /* SNDatasFootInjuryTableViewCell.m in Sources */,
 				4A7C47FA264CDA8B0058546A /* SNYinLangRecordListViewController.m in Sources */,
 				4AB764FC260DB80A00B34079 /* EuroIndexView.swift in Sources */,

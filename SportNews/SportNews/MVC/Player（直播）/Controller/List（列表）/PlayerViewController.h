@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define gap 52
+
 @interface PlayerViewController : BaseCategoryTableVC
 
 @end
