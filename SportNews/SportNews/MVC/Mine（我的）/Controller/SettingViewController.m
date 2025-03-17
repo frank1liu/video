@@ -9,6 +9,8 @@
 #import "SettingTableViewCell.h"
 #import "SettingSwitchTableViewCell.h"
 
+extern NSInteger gUnReadMsgCount;
+
 @interface SettingViewController ()
 
 @end
@@ -122,6 +124,8 @@
         if (self.loginOutBlock) {
             self.loginOutBlock();
         }
+
+        gUnReadMsgCount = 0;
         [self.navigationController popViewControllerAnimated:YES];
 
 //        LoginUserModel *loginModel = [LoginUserModel mj_objectWithKeyValues:response];

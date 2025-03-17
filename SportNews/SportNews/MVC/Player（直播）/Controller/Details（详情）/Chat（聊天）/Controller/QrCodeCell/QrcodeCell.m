@@ -32,8 +32,11 @@
 }
 
 - (IBAction)tapQrCodeCellAction:(UITapGestureRecognizer *)sender {
-    if( [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:self.labAddressIos.text]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.labAddressIos.text] options:@{} completionHandler:nil];
+    NSLog(@"[Adam] before url:%@", self.labAddressIos.text);
+    NSString *url = [self.labAddressIos.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSLog(@"[Adam] after url:%@", url);
+    if( [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:url]]) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
     }
 }
 

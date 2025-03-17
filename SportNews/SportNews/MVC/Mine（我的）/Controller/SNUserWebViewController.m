@@ -12,6 +12,7 @@
 #import "CustomActivity.h"
 #import "SNUserShareModel.h"
 
+extern NSInteger gUnReadMsgCount;
 
 @interface SNUserWebViewController ()<UIGestureRecognizerDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler>
  
@@ -28,6 +29,14 @@
     [super viewDidLoad];
     
     [self setupWKWebView];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if ([self.url containsString:@"notification"]) {
+        gUnReadMsgCount = 0;
+        [MBProgressHUD showSuccess:@"正在私聊连接中，请稍等" toView:nil];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -282,12 +291,18 @@
 // 页面加载完成之后调用
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
     self.navView.hidden = YES;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [MBProgressHUD hideHUD];
+    });
     [KYRemindView dismiss];
 }
 
 // 页面加载失败时调用
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation{
     self.navView.hidden = NO;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [MBProgressHUD hideHUD];
+    });
     [KYRemindView dismiss];
 }
   

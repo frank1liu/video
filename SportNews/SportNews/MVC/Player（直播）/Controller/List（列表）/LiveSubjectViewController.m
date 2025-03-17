@@ -61,7 +61,8 @@
 }
 
 - (void)refreshBtnAction {
-    [self.currentVc reloadDatas];
+    [self.currentVc reloadDatasFromOutside];
+    // [self.currentVc reloadDatas];
 }
 
 - (void)viewDidLayoutSubviews {

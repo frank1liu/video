@@ -28,10 +28,11 @@ extern UIImage *gChangedImage;
 
 static CGFloat const animationTime = 0.4;
 
-// NSString *talkWebUrl = @"https://kzb2knmj.com/notification";
-NSString *talkWebUrl = @"https://test.kzb001.net/notification";
-// NSString *talkGetUnreadUrl = @"https://nongzhiwios.com/rest_post";
-NSString *talkGetUnreadUrl = @"https://testim.nongzhiwios.com/rest_post";
+// NSString *talkWebUrl = @"";
+NSString *talkWebUrl = @"";
+// NSString *talkGetUnreadUrl = @"";
+NSString *talkGetUnreadUrl = @"";
+NSInteger gUnReadMsgCount = 0;
 
 BOOL isTalkRed = YES;
 
@@ -129,7 +130,32 @@ BOOL isTalkRed = YES;
     NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
     LoginUserModel *loginModel = [UserModelTool loginModel];
     if (loginModel != nil) {       // 登入
-
+        NSString *friendID = [df objectForKey:@"FriendTalkID"];
+        NSLog(@"[Adam] friend talk id = %@", friendID);
+        NSString *myID = [df objectForKey:@"UserTalkID"];
+        NSLog(@"[Adam] user talk id = %@", myID);
+        NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+        dic[@"actionId"] = @88;
+        dic[@"jobDispatchId"] = @4;
+        dic[@"newData"] = [NSString stringWithFormat:@"{\"user_uid\":\"%@\"}", myID];
+        dic[@"processorId"] = @1008;
+        [KYApiHttpTool POST_TALK:talkGetUnreadUrl withParams:dic success:^(NSDictionary * _Nonnull response) {
+            if ([response[@"success"] boolValue] == YES) {
+                NSDictionary *rc = [CommonTools dictionaryWithJsonString:response[@"returnValue"]];
+                if ([rc objectForKey:friendID]) {
+                    gUnReadMsgCount += [[rc objectForKey:friendID] intValue];
+                    NSLog(@"[Adam]管理有%ld條新消息!!", gUnReadMsgCount);
+                    dispatch_async(dispatch_get_main_queue(), ^(void){
+                        [self triggerNotification:gUnReadMsgCount];
+                        [self.redBtn setHidden: NO];
+                        isTalkRed = NO;
+                        [self.redBtn setTitle:[NSString stringWithFormat:@"%ld", gUnReadMsgCount] forState:UIControlStateNormal];
+                    });
+                }
+            }
+        } failure:^(NSError * _Nullable error) {
+            NSLog(@"%@", error);
+        }];
     } else {
         NSString *friendID = [df objectForKey:@"FriendTalkID"];
         if (friendID != nil) {
@@ -151,12 +177,13 @@ BOOL isTalkRed = YES;
                 if ([response[@"success"] boolValue] == YES) {
                     NSDictionary *rc = [CommonTools dictionaryWithJsonString:response[@"returnValue"]];
                     if ([rc objectForKey:friendID]) {
-                        NSLog(@"[Adam]管理有%d條新訊息!!", [[rc objectForKey:friendID] intValue]);
+                        gUnReadMsgCount += [[rc objectForKey:friendID] intValue];
+                        NSLog(@"[Adam]管理有%ld條新消息!!", gUnReadMsgCount);
                         dispatch_async(dispatch_get_main_queue(), ^(void){
-                            [self triggerNotification:[[rc objectForKey:friendID] intValue]];
+                            [self triggerNotification: gUnReadMsgCount];
                             [self.redBtn setHidden: NO];
                             isTalkRed = NO;
-                            [self.redBtn setTitle:[NSString stringWithFormat:@"%d", [[rc objectForKey:friendID] intValue]] forState:UIControlStateNormal];
+                            [self.redBtn setTitle:[NSString stringWithFormat:@"%ld", gUnReadMsgCount] forState:UIControlStateNormal];
                         });
                     }
                 }
@@ -178,7 +205,7 @@ BOOL isTalkRed = YES;
     } else {
         content.title = @"私聊推送";
     }
-    content.body = [NSString stringWithFormat:@"您有%ld则未读私聊讯息", num];
+    content.body = [NSString stringWithFormat:@"您有%ld则未读私聊消息", num];
     content.sound = @"default";  // 設定音效
     content.badge = @1;
 
@@ -242,8 +269,8 @@ BOOL isTalkRed = YES;
 
     [super viewDidLoad];
 
-// #if DEBUG
-#if 1
+#if DEBUG
+// #if 1
     talkWebUrl = @"https://test.kzb001.net/notification";
     talkGetUnreadUrl = @"https://testim.nongzhiwios.com/rest_post";
 #else
@@ -660,6 +687,7 @@ BOOL isTalkRed = YES;
         }
         self.userImageView.layer.cornerRadius = _userImageView.frame.size.width / 2;
         self.userImageView.clipsToBounds = YES;
+        gUnReadMsgCount = 0;
     }else {
         self.userImageView.layer.cornerRadius = _userImageView.frame.size.width / 2;
         self.userImageView.clipsToBounds = YES;

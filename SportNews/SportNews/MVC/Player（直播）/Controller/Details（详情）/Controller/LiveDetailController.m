@@ -575,7 +575,11 @@ extern BOOL isTalkRed;
     self.categoryView.indicators = @[self.lineView];
 
     CGFloat x = (kScreenWidth - self.categoryTitles.count*30)/(self.categoryTitles.count+1)/2;
-    self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-154, 41); // title上移
+    if (self.categoryTitles.count >= 6) {
+        self.categoryView.frame = CGRectMake(0, -10, kScreenWidth+x*2-154, 41); // title上移
+    } else {
+        self.categoryView.frame = CGRectMake(-x, -10, kScreenWidth+x*2-154, 41); // title上移
+    }
     [self.categoryFatherView addSubview:self.categoryView];
     // [self setupDownloadView];       // 下載元友
 
@@ -624,7 +628,7 @@ extern BOOL isTalkRed;
     txtLab.tag = 1333;
     txtLab.textColor = UIColor.blackColor;
     txtLab.numberOfLines = 1;
-    [txtLab setFont:[UIFont systemFontOfSize:17]];
+    [txtLab setFont:[UIFont systemFontOfSize:16]];
     [self.talkBaseView addSubview:txtLab];
 
     UILabel *txtLab2 = [[UILabel alloc]initWithFrame:CGRectMake(42+38+8, 8, 48, 28)];
@@ -640,7 +644,7 @@ extern BOOL isTalkRed;
     [self.talkBaseView addSubview:txtLab2];
 
     [self.talkBaseView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(120);
+        make.width.mas_equalTo(110);
         make.height.mas_equalTo(41);
         make.trailing.equalTo(self.categoryFatherView);
         make.top.equalTo(self.categoryFatherView).offset(-10);
@@ -656,14 +660,14 @@ extern BOOL isTalkRed;
     [txtLab mas_makeConstraints:^(MASConstraintMaker *make) {
         // make.top.equalTo(self.talkBaseView).offset(1);
         make.centerY.equalTo(txtLab2.mas_centerY);
-        make.trailing.equalTo(txtLab2.mas_leading).offset(-6);
+        make.trailing.equalTo(txtLab2.mas_leading).offset(-3);
     }];
 
     [girlImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.width.mas_equalTo(34);
         make.height.mas_equalTo(34);
         make.centerY.equalTo(txtLab.mas_centerY);
-        make.trailing.equalTo(txtLab.mas_leading).offset(-6);
+        make.trailing.equalTo(txtLab.mas_leading).offset(-3);
     }];
     self.categoryView.listContainer = (id<JXCategoryViewListContainer>)self.pagingView.listContainerView;
     self.navigationController.interactivePopGestureRecognizer.enabled = (self.categoryView.selectedIndex == 0);
@@ -690,6 +694,15 @@ extern BOOL isTalkRed;
             }
         }
     }
+}
+
+-(BOOL) isScreenSizeLessThanOrEqualToIPhone11 {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+
+    CGFloat maxWidth = MAX(screenSize.width, screenSize.height); // 取最大邊 (適用橫直模式)
+    CGFloat maxHeight = MIN(screenSize.width, screenSize.height); // 取最小邊
+
+    return (maxWidth <= 414 && maxHeight <= 896);
 }
 
 - (void)talkButtonDidClicked:(UITapGestureRecognizer *)sender {

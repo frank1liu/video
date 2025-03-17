@@ -14,6 +14,7 @@
 #import "SNCountryModel.h"
 
 UIViewController *loginVC;
+extern NSInteger gUnReadMsgCount;
 
 @interface LoginViewController ()<UITextFieldDelegate>
 
@@ -355,7 +356,8 @@ UIViewController *loginVC;
     [self presentViewController:actionSheet animated:YES completion:nil];
 }
 
-- (void)loginSuccess:(NSDictionary *)response { 
+- (void)loginSuccess:(NSDictionary *)response {
+    gUnReadMsgCount = 0;
     LoginUserModel *loginModel = [LoginUserModel mj_objectWithKeyValues:response];
     [UserModelTool save:loginModel]; 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSuccess" object:nil];

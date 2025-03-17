@@ -47,8 +47,11 @@ static NSString *reuseStatisticalPlayerDataCell = @"reuseStatisticalPlayerDataCe
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
-    self.talkBaseView.backgroundColor = UIColor.clearColor;
+    if (self.playStatus == PlayingStatusLive) {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41-kBottomHeight)];
+    } else {
+        self.talkBaseView = [[UIView alloc]initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y, self.view.bounds.size.width, kScreenHeight-kContentHeight-41)];
+    }
 
     // self.talkBaseVC = [[TalkBaseViewController alloc]initWithNibName:@"TalkBaseViewController" bundle:nil];
 

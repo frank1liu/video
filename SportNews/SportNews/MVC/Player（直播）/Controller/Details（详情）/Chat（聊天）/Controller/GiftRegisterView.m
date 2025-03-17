@@ -8,6 +8,7 @@
 #import "GiftRegisterView.h"
 
 extern UIImage *gChangedImage;
+extern NSInteger gUnReadMsgCount;
 
 @interface GiftRegisterView()
 //记录倒计时
@@ -192,6 +193,7 @@ extern UIImage *gChangedImage;
     });
     LoginUserModel *loginModel = [LoginUserModel mj_objectWithKeyValues:response];
     [UserModelTool save:loginModel];
+    gUnReadMsgCount = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSuccess" object:nil];
     [self dismissKey];
     if (_delegate && [_delegate respondsToSelector:@selector(MoveKeyboardDown:)]) {

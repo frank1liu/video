@@ -8,6 +8,8 @@
 #import "GiftLoginView.h"
 #import "MBProgressHUD.h"
 
+extern NSInteger gUnReadMsgCount;
+
 @implementation GiftLoginView
 
 - (id)initWithFrame:(CGRect)frame {
@@ -125,6 +127,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [MBProgressHUD showSuccess:@"登入成功" toView:nil];
     });
+    gUnReadMsgCount = 0;
     LoginUserModel *loginModel = [LoginUserModel mj_objectWithKeyValues:response];
     [UserModelTool save:loginModel];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSuccess" object:nil];

@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reloadDatas;
 
+- (void)reloadDatasFromOutside;
+
 - (void)getDatas:(BOOL)isRefresh;
 
 - (void)getCalendarData;

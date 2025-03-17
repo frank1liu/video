@@ -452,6 +452,13 @@ NSInteger gCategoryType = 0;
     [self getDatas:YES];
 }
 
+- (void)reloadDatasFromOutside {
+    self.startTime = self.startTimeChoice;
+    self.pn = 1;
+    [[HomeWSManager instance] cleaDatas];
+    [self getDatas:YES];
+}
+
 - (void)getCalendarData {
     if (self.calendarData == nil) {
         NSString *type = [self.categoryModel isKindOfClass:[LiveListCategoryModel class]] ? [NSString stringWithFormat:@"%@",self.categoryModel.type]:[NSString stringWithFormat:@"%d",4];
@@ -505,7 +512,7 @@ NSInteger gCategoryType = 0;
             @"pid" : @"4",
             @"isfanye" : @"1",
             @"status" : @"2",
-            @"zhuboType" : @"0",
+            @"zhuboType" : @"1",
             @"starttime" : [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
@@ -523,7 +530,7 @@ NSInteger gCategoryType = 0;
             @"starttime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
-            @"zhuboType" : @"0"
+            @"zhuboType" : @"1"
         }.mutableCopy;
     }
 

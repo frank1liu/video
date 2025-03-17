@@ -477,11 +477,10 @@
     NSDictionary * userInfo = notification.request.content.userInfo;
     if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
         [JPUSHService handleRemoteNotification:userInfo];
-        //App在前台接受通知会走这里 
-
+        //App在前台接受通知会走这里
     }
     // App在前台也要弹出消息的话 就要打开
-    completionHandler(UNNotificationPresentationOptionAlert);
+    completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
 }
 
 // iOS 10 Support 用户点击了通知
