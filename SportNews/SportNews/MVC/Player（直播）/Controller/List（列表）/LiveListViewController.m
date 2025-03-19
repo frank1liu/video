@@ -512,7 +512,7 @@ NSInteger gCategoryType = 0;
             @"pid" : @"4",
             @"isfanye" : @"1",
             @"status" : @"2",
-            @"zhuboType" : @"1",
+            @"zhuboType" : @"0",
             @"starttime" : [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
@@ -530,7 +530,7 @@ NSInteger gCategoryType = 0;
             @"starttime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
-            @"zhuboType" : @"1"
+            @"zhuboType" : [type intValue] == -1 ? @"1" : @"0"  // 只有熱門-全部才要設為1
         }.mutableCopy;
     }
 

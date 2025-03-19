@@ -146,7 +146,8 @@ BOOL isTalkRed = YES;
                     gUnReadMsgCount += [[rc objectForKey:friendID] intValue];
                     NSLog(@"[Adam]管理有%ld條新消息!!", gUnReadMsgCount);
                     dispatch_async(dispatch_get_main_queue(), ^(void){
-                        [self triggerNotification:gUnReadMsgCount];
+                        // [self triggerNotification:gUnReadMsgCount];
+                        [self sendLocalNotification: gUnReadMsgCount];
                         [self.redBtn setHidden: NO];
                         isTalkRed = NO;
                         [self.redBtn setTitle:[NSString stringWithFormat:@"%ld", gUnReadMsgCount] forState:UIControlStateNormal];
@@ -180,7 +181,8 @@ BOOL isTalkRed = YES;
                         gUnReadMsgCount += [[rc objectForKey:friendID] intValue];
                         NSLog(@"[Adam]管理有%ld條新消息!!", gUnReadMsgCount);
                         dispatch_async(dispatch_get_main_queue(), ^(void){
-                            [self triggerNotification: gUnReadMsgCount];
+                            // [self triggerNotification: gUnReadMsgCount];
+                            [self sendLocalNotification: gUnReadMsgCount];
                             [self.redBtn setHidden: NO];
                             isTalkRed = NO;
                             [self.redBtn setTitle:[NSString stringWithFormat:@"%ld", gUnReadMsgCount] forState:UIControlStateNormal];
@@ -194,6 +196,79 @@ BOOL isTalkRed = YES;
     }
 }
 
+- (void)sendLocalNotification:(NSInteger)num {
+    // 1️⃣ 建立通知內容
+    NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    NSString *fromNickname = [df objectForKey:@"fromNickname"];
+
+    if (fromNickname != nil && ![fromNickname isEqualToString:@""]) {
+        content.title = fromNickname;
+    } else {
+        content.title = @"私聊推送";
+    }
+    content.body = [NSString stringWithFormat:@"您有%ld则未读私聊消息", num];
+    content.sound = [UNNotificationSound defaultSound];
+
+    // 2️⃣ 設定觸發條件（5 秒後觸發）
+    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1 repeats:NO];
+
+    NSString *fromAvatar = [df objectForKey:@"fromAvatar"];
+    NSString *imageName = @"girl.png"; // 確保這張圖片在 `Assets.xcassets` 或 `App Bundle` 內
+    NSString *imagePath = [[NSBundle mainBundle] pathForResource:imageName ofType:nil];
+
+    if (fromAvatar != nil && ![fromAvatar isEqualToString:@""]) {
+        imagePath = fromAvatar;
+    }
+
+    if (imagePath) {
+        NSURL *imageURL;
+        if ([imagePath containsString:@"http"]) {
+            imageURL = [NSURL URLWithString:imagePath];
+
+            NSData *imageData = [NSData dataWithContentsOfURL:imageURL];
+
+            if (imageData) {
+                // 取得本地儲存路徑
+                NSString *filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"downloaded_image.jpg"];
+                [imageData writeToFile:filePath atomically:YES];
+
+                imageURL = [NSURL fileURLWithPath:filePath];
+                NSLog(@"📌 圖片已儲存: %@", filePath);
+            } else {
+                NSLog(@"❌ 下載失敗");
+            }
+        } else {
+            imageURL = [NSURL fileURLWithPath:imagePath];
+        }
+
+        NSError *error;
+        UNNotificationAttachment *attachment = [UNNotificationAttachment attachmentWithIdentifier:@"image"
+                                                                                              URL:imageURL
+                                                                                          options:nil
+                                                                                            error:&error];
+        if (attachment) {
+            content.attachments = @[attachment];
+        } else {
+            NSLog(@"❌ 圖片載入失敗: %@", error.localizedDescription);
+        }
+    }
+    // 3️⃣ 建立通知請求
+    NSString *identifier = @"LocalNotification";
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:trigger];
+
+    // 4️⃣ 加入通知中心
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"推播發送失敗: %@", error.localizedDescription);
+        } else {
+            NSLog(@"推播已排程");
+        }
+    }];
+}
+
+/*
 - (void)triggerNotification:(NSInteger)num {
     // 設定推播內容
     NSUserDefaults *df = [NSUserDefaults standardUserDefaults];
@@ -264,6 +339,7 @@ BOOL isTalkRed = YES;
     // 發送通知
     [JPUSHService addNotification:request];
 }
+*/
 
 - (void)viewDidLoad {
 
@@ -687,6 +763,7 @@ BOOL isTalkRed = YES;
         }
         self.userImageView.layer.cornerRadius = _userImageView.frame.size.width / 2;
         self.userImageView.clipsToBounds = YES;
+        [self.redBtn setHidden:YES];
         gUnReadMsgCount = 0;
     }else {
         self.userImageView.layer.cornerRadius = _userImageView.frame.size.width / 2;

@@ -30,10 +30,11 @@
 
 #import <AlicloudCrash/AlicloudCrashProvider.h>
 #import <AlicloudHAUtil/AlicloudHAProvider.h>
+#import <UserNotifications/UserNotifications.h>
 
 // #import "OpenInstallSDK.h"
 
-@interface AppDelegate ()<JPUSHRegisterDelegate, BuglyDelegate/*, OpenInstallDelegate*/>
+@interface AppDelegate ()<JPUSHRegisterDelegate, BuglyDelegate/*, OpenInstallDelegate*/, UNUserNotificationCenterDelegate>
 
 @property(nonatomic, assign) BOOL isSuccess;
 @property (nonatomic, strong) NSURLSession *session;
@@ -77,10 +78,58 @@
     // 阿里雲崩潰報告
     [self AliCrashReport];
 
+    [self setupPushNotification];
+
     // init openinstall
     // [OpenInstallSDK initWithDelegate:self];
 
     return YES;
+}
+
+- (void)setupPushNotification {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self; // 設定代理，以便在前景時接收推播
+
+    // 請求通知授權
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert | UNAuthorizationOptionSound | UNAuthorizationOptionBadge)
+                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (granted) {
+            NSLog(@"使用者允許推播");
+        } else {
+            NSLog(@"使用者拒絕推播");
+        }
+    }];
+}
+// **處理前景通知顯示**
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+    // 讓通知在前景時仍然顯示
+    completionHandler(UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge);
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void(^)(void))completionHandler {
+
+    UNNotificationContent *content = response.notification.request.content;
+
+    NSLog(@"點擊推播後觸發，推播內容: %@", content.body);
+
+    // 你可以根據 content.userInfo 來決定跳轉到哪個頁面
+    NSDictionary *userInfo = content.userInfo;
+
+    // 範例：通知內的自訂資訊
+    NSString *customData = userInfo[@"customKey"];
+    if (customData) {
+        NSLog(@"自訂參數: %@", customData);
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"PrivatedTalkClicked"
+                                                            object:nil
+                                                          userInfo:userInfo];
+    
+    completionHandler();
 }
 
 - (void) setAvailableDomain:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -113,7 +162,7 @@
                                 [self setChannelName];
                                 [self getChannelName];
                                 //极光
-                                [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+                                // [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
                                 // 云信
                                 [self setupNIM];
                             }
@@ -134,7 +183,7 @@
             [self setChannelName];
             [self getChannelName];
             //极光
-            [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+            // [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
             // 云信
             [self setupNIM];
         }
