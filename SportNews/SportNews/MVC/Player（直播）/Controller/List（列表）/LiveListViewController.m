@@ -178,6 +178,7 @@ NSInteger gCategoryType = 0;
     self.tableView.backgroundColor = SRGB(250);
     self.tableView.y = 40;
     self.tableView.height = kScreenHeight-NavHeight-30-40;
+    // self.tableView.alwaysBounceVertical = YES;
 
     MJRefreshHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
 //        self.pn = 1;
@@ -220,6 +221,16 @@ NSInteger gCategoryType = 0;
         [weakSelf showCalendar];
     };
     self.topView.choiceItem = ^(NSString * _Nonnull choice) {
+        BOOL isLarger = NO;
+        NSComparisonResult result = [weakSelf.startTime compare:choice];
+        if (result == NSOrderedAscending) {
+            isLarger = YES;
+        }
+        if (isLarger && weakSelf.type == 3 && (![[weakSelf getTodayString] isEqualToString:choice])) {
+            [weakSelf.topView changeChoice:weakSelf.startTime];
+            [MBProgressHUD showSuccess:@"此时段无赛果" toView:nil];
+            return;
+        }
         weakSelf.calendarChoice = choice;
         weakSelf.startTimeChoice = choice;
         weakSelf.pn = 1;
@@ -453,10 +464,24 @@ NSInteger gCategoryType = 0;
 }
 
 - (void)reloadDatasFromOutside {
-    self.startTime = self.startTimeChoice;
-    self.pn = 1;
-    [[HomeWSManager instance] cleaDatas];
-    [self getDatas:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self simulateTableViewPullToRefresh];
+    });
+
+//    self.startTime = self.startTimeChoice;
+//    self.pn = 1;
+//    [[HomeWSManager instance] cleaDatas];
+//    [self getDatas:YES];
+}
+
+- (void)simulateTableViewPullToRefresh {
+    CGFloat offsetY = -self.tableView.mj_header.frame.size.height;
+    [self.tableView setContentOffset:CGPointMake(0, offsetY) animated:YES];
+
+    // 等動畫結束後，再觸發 beginRefreshing
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.tableView.mj_header beginRefreshing];
+    });
 }
 
 - (void)getCalendarData {
@@ -505,7 +530,7 @@ NSInteger gCategoryType = 0;
     if ([type intValue] == 3) {
         param = @{
             @"type" : @"4",
-            @"cid" : cid,
+            @"cid" : @"-1",
             @"ishot" : @"1",
             @"pn" : pn,
             @"ps" : ps,
@@ -1639,6 +1664,16 @@ NSInteger gCategoryType = 0;
                           choiceDate:choice
                        dayNumberDate:self.calendarData
                               choice:^(NSString * _Nonnull choice) {
+        BOOL isLarger = NO;
+        NSComparisonResult result = [weakSelf.startTime compare:choice];
+        if (result == NSOrderedAscending) {
+            isLarger = YES;
+        }
+        if (isLarger && weakSelf.type == 3 && (![[weakSelf getTodayString] isEqualToString:choice])) {
+            [weakSelf.topView changeChoice:weakSelf.startTime];
+            [MBProgressHUD showSuccess:@"此时段无赛果" toView:nil];
+            return;
+        }
         NSLog(@"选择了:%@", choice);
         [LiveListCalendarVC dismissVC];
         weakSelf.pn = 1;
