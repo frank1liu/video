@@ -162,4 +162,7 @@
 //送出禮物
 #define URL_SendGift @"gift/sendGift"
 
+//取的聊天的敏感訊息
+#define URL_SensitiveWord @"liveStudio/room/sensitive/get"
+
 #endif /* MacroApi_h */ 

@@ -190,7 +190,7 @@
         [MSNetwork setRequestTimeoutInterval:60.0f];
         [MSNetwork closeLog];
         [MSNetwork GET:url parameters:(NSMutableDictionary *)params headers:nil cachePolicy:MSCachePolicyOnlyNetNoCache success:^(id  _Nonnull responseObject) {
-            if (![self notHideHUDView:urlStr]) {
+            if (![self  notHideHUDView:urlStr]) {
                 [MBProgressHUD hideHUD];
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [KYRemindView dismiss];

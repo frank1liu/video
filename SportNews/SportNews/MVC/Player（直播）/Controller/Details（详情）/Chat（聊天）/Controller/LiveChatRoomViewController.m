@@ -340,98 +340,102 @@ static NSString *cellIdentifier = @"MessageCell";
             //获取之前的聊天记录
             NIMHistoryMessageSearchOption *option = [NIMHistoryMessageSearchOption new];
             option.limit = 100;
-//            NSDateComponents *comp1 = [[NSDateComponents alloc]init];
-//            comp1.year = 1990;
-//            comp1.month = 1;
-//            comp1.day = 1;
-//            NSDate *date1 = [[NSCalendar currentCalendar] dateFromComponents:comp1];
-//            option.endTime = [date1 timeIntervalSince1970];
-//            NSDate *date2 = [NSDate date];
-//            option.startTime = [date2 timeIntervalSince1970];
-            //option.messageTypes
-//            [NIMSDK sharedSDK].
-            // NIMSession *session = [NIMSession session:self.roomID type:NIMSessionTypeChatroom];
-
-//            [[NIMSDK sharedSDK].conversationManager fetchMessageHistory:session option:option result:^(NSError * _Nullable error, NSArray<NIMMessage *> * _Nullable messages) {
-//                NSLog(messages);
-//            }];
-            [[NIMSDK sharedSDK].chatroomManager fetchMessageHistory:roomID option:option result:^(NSError * _Nullable error, NSArray<NIMMessage *> * _Nullable messages) {
-                NSLog(@"[Adam]room id: %@, message count: %lu", roomID, (unsigned long)messages.count);
-                NSMutableArray *msgArray = [NSMutableArray array];
-                for (NIMMessage *message in messages) {
-                    JCHATChatModel *model = [[JCHATChatModel alloc]init];
-                    // NSLog(@"[Adam] message: %@", message);
-                    model.msgId = message.messageId;
-                    NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
-                    model.fromName = messageExt.roomNickname;
-                    int level = [message.remoteExt[@"level"] intValue];
-                    if (level == 0) {
-                        model.level = 0;
-                    } else {
-                        model.level = level;
-                    }
-                    if (message.messageType == NIMMessageTypeText) {
-                        if (message.remoteExt[@"giftName"] == nil && message.remoteExt[@"bubbleUrl"] == nil) {
-                            model.contentType = 0;
-                            model.text = message.text;
-                            [msgArray addObject:model];
-                        } else if (message.remoteExt[@"bubbleUrl"] != nil) {
-                            model.contentType = 3;
-                            model.bubbleAndroidUrl = message.remoteExt[@"bobbleBackgroundAndroidUrl"];
-                            model.bubbleFrontColor = message.remoteExt[@"bobbleFrontColor"];
-                            model.text = message.text;
-                            UILabel *l = [[UILabel alloc]init];
-                            l.numberOfLines = 0;
-                            l.text = message.text;
-                            int w = [l calculateSizeForWidth:SCREEN_WIDTH].width;
-                            if (w >= SCREEN_WIDTH - 120) {
-                                model.contentType = 4;
+            // 獲取敏感字詞，需過濾掉
+            [KYApiHttpTool GET:URL_SensitiveWord withParams:@{@"pid" : @"1"} success:^(NSDictionary * _Nonnull response) {
+                NSArray *sensitiveData = response[@"data"];
+                [[NIMSDK sharedSDK].chatroomManager fetchMessageHistory:roomID option:option result:^(NSError * _Nullable error, NSArray<NIMMessage *> * _Nullable messages) {
+                    NSLog(@"[Adam]room id: %@, message count: %lu", roomID, (unsigned long)messages.count);
+                    NSMutableArray *msgArray = [NSMutableArray array];
+                    for (NIMMessage *message in messages) {
+                        BOOL haveSensitiveWord = NO;
+                        NSString *sensitiveWord = @"";
+                        for (NSString *sensitivedata in sensitiveData) {
+                            if ([message.text containsString:sensitivedata] || [((NIMMessageChatroomExtension *)message.messageExt).roomNickname containsString:sensitivedata]) {
+                                haveSensitiveWord = YES;
+                                sensitiveWord = sensitivedata;
+                                break;
                             }
-                            [msgArray addObject:model];
-                        } else {
-                            model.contentType = 1;
-                            model.fromName = message.remoteExt[@"nickName"];
-                            model.text = [NSString stringWithFormat:@"%@%@ %@ %@", @"送了一个", message.remoteExt[@"giftName"], message.remoteExt[@"giftTrendsUrl"], @""];
-                            [msgArray addObject:model];
                         }
-                    } else if (message.messageType == NIMMessageTypeNotification) {
-                        //网易自己通知加入聊天室
-                        NIMNotificationObject *notification = (NIMNotificationObject *)message.messageObject;
-                        NIMChatroomNotificationContent *content = (NIMChatroomNotificationContent *)notification.content;
-                        if (content.eventType == NIMChatroomEventTypeEnter) {
-                            model.contentType = 1;
-                            model.fromName = content.source.nick;
-                            //在线人数大于maxOnlineCount人后 不在添加 欢迎加入聊天室
-                            if (weakSelf.countOnline < maxOnlineCount) {
+                        if (haveSensitiveWord == YES) {
+                            NSLog(@"發現有敏感詞:%@", sensitiveWord);
+                            continue;
+                        }
+                        JCHATChatModel *model = [[JCHATChatModel alloc]init];
+                        // NSLog(@"[Adam] message: %@", message);
+                        model.msgId = message.messageId;
+                        NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
+                        model.fromName = messageExt.roomNickname;
+                        int level = [message.remoteExt[@"level"] intValue];
+                        if (level == 0) {
+                            model.level = 0;
+                        } else {
+                            model.level = level;
+                        }
+                        if (message.messageType == NIMMessageTypeText) {
+                            if (message.remoteExt[@"giftName"] == nil && message.remoteExt[@"bubbleUrl"] == nil) {
+                                model.contentType = 0;
+                                model.text = message.text;
+                                [msgArray addObject:model];
+                            } else if (message.remoteExt[@"bubbleUrl"] != nil) {
+                                model.contentType = 3;
+                                model.bubbleAndroidUrl = message.remoteExt[@"bobbleBackgroundAndroidUrl"];
+                                model.bubbleFrontColor = message.remoteExt[@"bobbleFrontColor"];
+                                model.text = message.text;
+                                UILabel *l = [[UILabel alloc]init];
+                                l.numberOfLines = 0;
+                                l.text = message.text;
+                                int w = [l calculateSizeForWidth:SCREEN_WIDTH].width;
+                                if (w >= SCREEN_WIDTH - 120) {
+                                    model.contentType = 4;
+                                }
+                                [msgArray addObject:model];
+                            } else {
+                                model.contentType = 1;
+                                model.fromName = message.remoteExt[@"nickName"];
+                                model.text = [NSString stringWithFormat:@"%@%@ %@ %@", @"送了一个", message.remoteExt[@"giftName"], message.remoteExt[@"giftTrendsUrl"], @""];
                                 [msgArray addObject:model];
                             }
+                        } else if (message.messageType == NIMMessageTypeNotification) {
+                            //网易自己通知加入聊天室
+                            NIMNotificationObject *notification = (NIMNotificationObject *)message.messageObject;
+                            NIMChatroomNotificationContent *content = (NIMChatroomNotificationContent *)notification.content;
+                            if (content.eventType == NIMChatroomEventTypeEnter) {
+                                model.contentType = 1;
+                                model.fromName = content.source.nick;
+                                //在线人数大于maxOnlineCount人后 不在添加 欢迎加入聊天室
+                                if (weakSelf.countOnline < maxOnlineCount) {
+                                    [msgArray addObject:model];
+                                }
+                            }
+                        }
+                        // model.contentType = message.messageType;
+                    }
+                    [weakSelf.dataSource addObjectsFromArray:(NSMutableArray *)[[msgArray reverseObjectEnumerator] allObjects]];
+                    if (weakSelf.dataSource.count > 200) {
+                        NSArray *data = [weakSelf.dataSource subarrayWithRange:NSMakeRange(weakSelf.dataSource.count -200, 200)];
+                        weakSelf.dataSource = [NSMutableArray arrayWithArray:data];
+                    }
+                    NSMutableArray *tmpAry = [NSMutableArray new];
+                    NSMutableArray *tmpDataSource = [NSMutableArray arrayWithCapacity:1000];
+                    for (int i=0; i<weakSelf.dataSource.count; i++) {
+                        [tmpDataSource addObject:weakSelf.dataSource[i]];
+                    }
+                    for (int i=0; i<tmpDataSource.count; i++) {
+                        // [tmpAry addObject: tmpDataSource[i]];
+                        if (i % 10 == 0 && tmpDataSource.count > 2 && self.hasQrcodeData == YES) {
+                            [weakSelf.dataSource insertObject:weakSelf.dataSource[i] atIndex:i];
                         }
                     }
-                    // model.contentType = message.messageType;
-                }
-                [weakSelf.dataSource addObjectsFromArray:(NSMutableArray *)[[msgArray reverseObjectEnumerator] allObjects]];
-                if (weakSelf.dataSource.count > 200) {
-                    NSArray *data = [weakSelf.dataSource subarrayWithRange:NSMakeRange(weakSelf.dataSource.count -200, 200)];
-                    weakSelf.dataSource = [NSMutableArray arrayWithArray:data];
-                }
-                NSMutableArray *tmpAry = [NSMutableArray new];
-                NSMutableArray *tmpDataSource = [NSMutableArray arrayWithCapacity:1000];
-                for (int i=0; i<weakSelf.dataSource.count; i++) {
-                    [tmpDataSource addObject:weakSelf.dataSource[i]];
-                }
-                for (int i=0; i<tmpDataSource.count; i++) {
-                    // [tmpAry addObject: tmpDataSource[i]];
-                    if (i % 10 == 0 && tmpDataSource.count > 2 && self.hasQrcodeData == YES) {
-                        [weakSelf.dataSource insertObject:weakSelf.dataSource[i] atIndex:i];
+                    for (int i=0; i<tmpDataSource.count; i++) {
+                        [tmpAry addObject: tmpDataSource[i]];
                     }
-                }
-                for (int i=0; i<tmpDataSource.count; i++) {
-                    [tmpAry addObject: tmpDataSource[i]];
-                }
-                [weakSelf.dataSource removeAllObjects];
-                [weakSelf.dataSource addObjectsFromArray:(NSMutableArray *)tmpAry];
-                [weakSelf.messageTableView reloadData];
-                [weakSelf scrollToBottom:YES];
+                    [weakSelf.dataSource removeAllObjects];
+                    [weakSelf.dataSource addObjectsFromArray:(NSMutableArray *)tmpAry];
+                    [weakSelf.messageTableView reloadData];
+                    [weakSelf scrollToBottom:YES];
+                }];
+            } failure:^(NSError * _Nonnull error) {
+                NSLog(@"調用敏感詞錯誤:%@",error.localizedDescription);
             }];
         }];
     }else {
