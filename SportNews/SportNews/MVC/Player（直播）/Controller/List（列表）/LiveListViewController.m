@@ -233,6 +233,7 @@ NSInteger gCategoryType = 0;
         }
         weakSelf.calendarChoice = choice;
         weakSelf.startTimeChoice = choice;
+        weakSelf.startTime = choice;
         weakSelf.pn = 1;
         [KYRemindView show];
         [weakSelf getDatas:YES];
@@ -1679,6 +1680,7 @@ NSInteger gCategoryType = 0;
         weakSelf.pn = 1;
         weakSelf.calendarChoice = choice;
         weakSelf.startTimeChoice = choice;
+        weakSelf.startTime = choice;
         [KYRemindView show];
         [weakSelf getDatas:YES];
     }];
