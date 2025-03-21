@@ -57,7 +57,18 @@ class LiveListCalendarVC: QMUICommonViewController {
     /// 日历内容
     let content = CalendarContent()
     /// 日历日期来源，不设置，默认为当前
-    var date = Date()
+    // var date = Date()
+
+    var date: Date = {
+        let calendar = Calendar(identifier: .gregorian)
+        var components = calendar.dateComponents(in: TimeZone(identifier: "Asia/Taipei")!, from: Date())
+        // 用台北時區組合成一個新的 Date
+        if let taipeiDate = calendar.date(from: components) {
+            print("台北時區的 Date: \(taipeiDate)")
+            return taipeiDate
+        }
+        return Date()
+    }()
     /// 选择日期，不设置，则默认为当前
     var choice: Date?
     /// 比赛数目数据，外部传入，字典，格式：["2021-02-01":"20","2021-02-02":"22"]
@@ -317,7 +328,16 @@ class LiveListCalendarVC: QMUICommonViewController {
     }
     
     @objc static func getCurrentString() -> String {
-        return Date().toString(format: "yyyy-MM-dd")
+        // return Date().toString(format: "yyyy-MM-dd")
+        let date = Date()
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "Asia/Taipei") // 這裡可以改成其他亞洲時區
+
+        let taipeiTime = formatter.string(from: date)
+        print("台北時間：\(taipeiTime)")
+        return taipeiTime;
     }
 }
 

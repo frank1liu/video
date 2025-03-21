@@ -503,16 +503,25 @@ NSInteger gCategoryType = 0;
 }
 
 - (NSString *)getTodayString {
-    NSCalendar *calendar = [NSCalendar currentCalendar];
+//    NSCalendar *calendar = [NSCalendar currentCalendar];
+//    NSDate *date = [NSDate date];
+//
+//    NSInteger year = [calendar component:NSCalendarUnitYear fromDate:date];
+//    NSInteger month = [calendar component:NSCalendarUnitMonth fromDate:date];
+//    NSInteger day = [calendar component:NSCalendarUnitDay fromDate:date];
+//
+//    NSString *dateString = [NSString stringWithFormat:@"%04ld-%02ld-%02ld", year, month, day];
+//
+//    return  dateString;
     NSDate *date = [NSDate date];
 
-    NSInteger year = [calendar component:NSCalendarUnitYear fromDate:date];
-    NSInteger month = [calendar component:NSCalendarUnitMonth fromDate:date];
-    NSInteger day = [calendar component:NSCalendarUnitDay fromDate:date];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd";
+    formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"];
 
-    NSString *dateString = [NSString stringWithFormat:@"%04ld-%02ld-%02ld", year, month, day];
-
-    return  dateString;
+    NSString *taipeiTime = [formatter stringFromDate:date];
+    NSLog(@"台北時間：%@", taipeiTime);
+    return taipeiTime;
 }
 
 - (void)getDatas:(BOOL)isRefresh {
@@ -540,6 +549,7 @@ NSInteger gCategoryType = 0;
             @"status" : @"2",
             @"zhuboType" : @"0",
             @"starttime" : [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
+            @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
             @"isnew" : @"1"
@@ -554,6 +564,7 @@ NSInteger gCategoryType = 0;
             @"ps" : ps,
             @"pid" : @"4",
             @"starttime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
+            @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
             @"zoneId" : @"Asia/Taipei",
             @"langtype" : @"zh",
             @"zhuboType" : [type intValue] == -1 ? @"1" : @"0"  // 只有熱門-全部才要設為1
@@ -1653,7 +1664,13 @@ NSInteger gCategoryType = 0;
 }
 
 - (void)showCalendarView {
-    NSDate *date = [NSDate new];
+    // NSDate *date = [NSDate new];
+    NSString *dateString = [self getTodayString];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"yyyy-MM-dd"; // 根據你的字串格式設定
+    // formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"]; // 設定時區 (可選)
+
+    NSDate *date = [formatter dateFromString:dateString];
     NSDate *choice = date;
     if (self.calendarChoice != nil && self.calendarChoice.length > 0) {
         NSDateFormatter *formatter = [NSDateFormatter new];
