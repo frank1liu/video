@@ -22,6 +22,7 @@
 #import "SNZFPlayerWindow.h"
 
 NSInteger gCategoryType = 0;
+BOOL isListLoadFail = NO;
 
 @interface LiveListViewController ()
 
@@ -149,10 +150,15 @@ NSInteger gCategoryType = 0;
     [self setupEmptyView];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topMatch:) name:@"TopMatch" object:nil];
-
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UnTopMatch:) name:@"UnTopMatch" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadDataAgain) name:@"NetworkAvailable" object:nil];
 }
 
+- (void)loadDataAgain {
+    if (isListLoadFail) {
+        [self reloadDatas];
+    }
+}
 
 - (void)setupParams {
     /// 添加监听
@@ -591,6 +597,7 @@ NSInteger gCategoryType = 0;
             return;
         }
         //=0是用来审核的
+        isListLoadFail = NO;
         self.tableView.backgroundView = nil;
         self.live_type = [response[@"data"][@"live_type"] integerValue];
         self.live_type = 0;
@@ -701,6 +708,7 @@ NSInteger gCategoryType = 0;
         [self.tableView.mj_footer endRefreshing];
         NSInteger codeint = error.code;
         self.tableView.backgroundView = self.emptyBackView;
+        isListLoadFail = YES;
         if (codeint == (-999)) {
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
