@@ -222,7 +222,7 @@ NSInteger gCategoryType = 0;
     };
     self.topView.choiceItem = ^(NSString * _Nonnull choice) {
         BOOL isLarger = NO;
-        NSComparisonResult result = [weakSelf.startTime compare:choice];
+        NSComparisonResult result = [[weakSelf getTodayString] compare:choice];
         if (result == NSOrderedAscending) {
             isLarger = YES;
         }
@@ -656,7 +656,6 @@ NSInteger gCategoryType = 0;
         [self.tableView reloadData];
         [self.tableView.mj_header endRefreshing];
         [self.tableView.mj_footer endRefreshing];
-        self.pn = [response[@"data"][@"currentPage"] integerValue] + 1;
         self.startTime = response[@"data"][@"starttime"];
         if (self.pn == [response[@"data"][@"totalPage"] integerValue]) {
             [self.tableView.mj_footer endRefreshingWithNoMoreData];
@@ -693,6 +692,7 @@ NSInteger gCategoryType = 0;
                 self.isTodayHaveMatch = true;
             }
         }
+        self.pn = [response[@"data"][@"currentPage"] integerValue] + 1;
         // self.pn++;
     };
     void (^ fail)(NSError *) = ^(NSError * _Nonnull error) {
@@ -1683,7 +1683,7 @@ NSInteger gCategoryType = 0;
                        dayNumberDate:self.calendarData
                               choice:^(NSString * _Nonnull choice) {
         BOOL isLarger = NO;
-        NSComparisonResult result = [weakSelf.startTime compare:choice];
+        NSComparisonResult result = [[weakSelf getTodayString] compare:choice];
         if (result == NSOrderedAscending) {
             isLarger = YES;
         }

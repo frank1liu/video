@@ -35,6 +35,7 @@ NSString *talkGetUnreadUrl = @"";
 NSInteger gUnReadMsgCount = 0;
 
 BOOL isTalkRed = YES;
+BOOL isLoadFail = NO;
 
 @interface PlayerViewController () <JXCategoryViewDelegate>
 
@@ -379,8 +380,14 @@ BOOL isTalkRed = YES;
     [self getDatas];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshBtnComplete) name:ListRefreshComplete object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginSuccessNotification) name:@"loginSuccess" object:nil];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadDataAgain) name:@"NetworkAvailable" object:nil];
     // [self.redBtn setHidden:YES];
+}
+
+- (void)loadDataAgain {
+    if (isLoadFail) {
+        [self getDatas];
+    }
 }
 
 - (void)setupLeftVc {
@@ -515,11 +522,13 @@ BOOL isTalkRed = YES;
     [redBtn setHidden:YES];
     isTalkRed = YES;
 
+    /*
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(40, 8, 60, 16)];
     imageView.image = [UIImage imageNamed:@"说球帝logo_home-2"];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     [backView addSubview:imageView];
     enterBtn.centerY = imageView.centerY;
+    */
 
     UIButton *allBtn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH-gap)-w*4, 0.5, w, h-1)];
     [allBtn setTitle:@" 热门" forState:UIControlStateNormal];
@@ -928,6 +937,7 @@ BOOL isTalkRed = YES;
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
         }
+        isLoadFail = NO;
         self.tableView.backgroundView = nil;
         self.isFirstLoad = NO;
         self.categorysArray = [LiveListCategoryModel mj_objectArrayWithKeyValuesArray:response[@"data"][@"twoCategoryList"]];
@@ -951,6 +961,7 @@ BOOL isTalkRed = YES;
     };
     void (^ fail)(NSError *) = ^(NSError * _Nonnull error) {
         self.isFirstLoad = NO;
+        isLoadFail = YES;
         [self.tableView.mj_header endRefreshing];
         NSInteger codeint = error.code;
         self.tableView.backgroundView = self.emptyBackView;
@@ -968,7 +979,6 @@ BOOL isTalkRed = YES;
            self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
            self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
         }
-        
     };
     
     void (^otherSuccess)(NSDictionary *) = ^(NSDictionary * _Nonnull response) {
