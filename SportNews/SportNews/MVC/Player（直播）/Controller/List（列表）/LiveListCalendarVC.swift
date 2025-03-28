@@ -336,7 +336,7 @@ class LiveListCalendarVC: QMUICommonViewController {
         formatter.timeZone = TimeZone(identifier: "Asia/Taipei") // 這裡可以改成其他亞洲時區
 
         let taipeiTime = formatter.string(from: date)
-        print("台北時間：\(taipeiTime)")
+        // print("台北時間：\(taipeiTime)")
         return taipeiTime;
     }
 }

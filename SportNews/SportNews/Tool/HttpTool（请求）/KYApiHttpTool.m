@@ -535,7 +535,7 @@
         // [KYRemindView showWithStatus:@"请检查您的网络！"];
    }else {
         //判断系统错误
-       [KYRemindView showWithStatus:@"系统繁忙"];
+       //[KYRemindView showWithStatus:@"系统繁忙"];
     }
 }
 

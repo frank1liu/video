@@ -23,6 +23,7 @@
 
 NSInteger gCategoryType = 0;
 BOOL isListLoadFail = NO;
+static NSUInteger netWorkTryTime = 0;
 
 @interface LiveListViewController ()
 
@@ -187,19 +188,7 @@ BOOL isListLoadFail = NO;
     // self.tableView.alwaysBounceVertical = YES;
 
     MJRefreshHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-//        self.pn = 1;
-//        [self getDatas:YES];
-        if (![CommonTools isBlankString:self.startTimeChoice]) {
-            self.startTime = self.startTimeChoice;
-//            [self reloadDatas];
-            self.pn = 1;
-            // self.calendarChoice = nil;
-            // self.startTimeChoice = nil;
-            [[HomeWSManager instance] cleaDatas];
-            [self getDatas:YES];
-        } else {
-            [self reloadDatas];
-        }
+        [self refreshData];
     }];
 
     self.tableView.mj_header = header;
@@ -509,16 +498,6 @@ BOOL isListLoadFail = NO;
 }
 
 - (NSString *)getTodayString {
-//    NSCalendar *calendar = [NSCalendar currentCalendar];
-//    NSDate *date = [NSDate date];
-//
-//    NSInteger year = [calendar component:NSCalendarUnitYear fromDate:date];
-//    NSInteger month = [calendar component:NSCalendarUnitMonth fromDate:date];
-//    NSInteger day = [calendar component:NSCalendarUnitDay fromDate:date];
-//
-//    NSString *dateString = [NSString stringWithFormat:@"%04ld-%02ld-%02ld", year, month, day];
-//
-//    return  dateString;
     NSDate *date = [NSDate date];
 
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
@@ -526,12 +505,26 @@ BOOL isListLoadFail = NO;
     formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"];
 
     NSString *taipeiTime = [formatter stringFromDate:date];
-    NSLog(@"台北時間：%@", taipeiTime);
+    // NSLog(@"台北時間：%@", taipeiTime);
     return taipeiTime;
 }
 
-- (void)getDatas:(BOOL)isRefresh {
+// 下拉刷新頁面
+- (void)refreshData {
+    if (![CommonTools isBlankString:self.startTimeChoice]) {
+        self.startTime = self.startTimeChoice;
+//            [self reloadDatas];
+        self.pn = 1;
+        // self.calendarChoice = nil;
+        // self.startTimeChoice = nil;
+        [[HomeWSManager instance] cleaDatas];
+        [self getDatas:YES];
+    } else {
+        [self reloadDatas];
+    }
+}
 
+- (void)getDatas:(BOOL)isRefresh {
     NSString *type = [self.categoryModel isKindOfClass:[LiveListCategoryModel class]] ? [NSString stringWithFormat:@"%@",self.categoryModel.type]:[NSString stringWithFormat:@"%ld",(long)self.type];
     NSNumber *cid = [self.categoryModel isKindOfClass:[LiveListCategoryModel class]] ? self.categoryModel.ID : @(0);
     NSNumber *ishot = self.isHot ? @(1) : @(-1);
@@ -591,12 +584,11 @@ BOOL isListLoadFail = NO;
         [param setValue:loginModel.token forKey:@"token"];
     }
     void (^success)(NSDictionary *) = ^(NSDictionary * _Nonnull response) {
-
         id dic = response[@"data"];
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
         }
-        //=0是用来审核的
+        netWorkTryTime = 10;
         isListLoadFail = NO;
         self.tableView.backgroundView = nil;
         self.live_type = [response[@"data"][@"live_type"] integerValue];
@@ -704,32 +696,43 @@ BOOL isListLoadFail = NO;
     };
     void (^ fail)(NSError *) = ^(NSError * _Nonnull error) {
         [[NSNotificationCenter defaultCenter] postNotificationName:ListRefreshComplete object:nil userInfo:nil];
+        isListLoadFail = YES;
         [self.tableView.mj_header endRefreshing];
         [self.tableView.mj_footer endRefreshing];
         NSInteger codeint = error.code;
         self.tableView.backgroundView = self.emptyBackView;
-        isListLoadFail = YES;
         if (codeint == (-999)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
         }else if (codeint == (-1001)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
         }else if (codeint == (-1009)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
         }else {
             //判断系统错误
             self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
-            self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
+            // self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
+            self.emptyLabel.text = @"网络异常";
+            if (netWorkTryTime < 2) {
+                netWorkTryTime += 1;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self refreshData];
+                });
+            }
         }
     };
+    
     if (self.isFirstLoad) {
         self.isFirstLoad = false;
         [KYApiHttpTool FirstGET:URL_MATCH_LIST withParams:param success:success failure:fail];
-        return;
+    } else {
+        [KYApiHttpTool GET:URL_MATCH_LIST withParams:param success:success failure:fail];
     }
-    [KYApiHttpTool GET:URL_MATCH_LIST withParams:param success:success failure:fail];
 }
 
 - (void)sortDataList:(NSArray *)dataList {

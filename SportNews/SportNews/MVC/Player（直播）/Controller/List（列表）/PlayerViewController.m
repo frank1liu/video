@@ -36,6 +36,7 @@ NSInteger gUnReadMsgCount = 0;
 
 BOOL isTalkRed = YES;
 BOOL isLoadFail = NO;
+static NSUInteger netWorkTryTime = 0;
 
 @interface PlayerViewController () <JXCategoryViewDelegate>
 
@@ -586,9 +587,9 @@ BOOL isLoadFail = NO;
 - (void)setupTableView {
     
     self.tableView.frame = CGRectMake(0, NavHeight, kScreenWidth, kScreenHeight);
+    WeakSelf
     MJRefreshHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [self getDomainName];
-        [self getDatas];
+        [weakSelf refreshData];
     }];
     self.tableView.mj_header = header;
     [self.view addSubview:self.tableView];
@@ -639,7 +640,6 @@ BOOL isLoadFail = NO;
     UIButton *refreshBtn = [[UIButton alloc] initWithFrame:backView.bounds];
     [refreshBtn addTarget:self action:@selector(refreshBtnAction) forControlEvents:UIControlEventTouchUpInside];
     [backView addSubview:refreshBtn];
-    
 }
 
 //下面的分享
@@ -923,6 +923,22 @@ BOOL isLoadFail = NO;
     return list;
 }
 
+// 重新刷新頁面
+- (void)refreshData {
+    [self getDomainName];
+    [self getDatas];
+}
+
+- (void)handleOtherSuccess:(nonnull NSDictionary *)response {
+    id dic = response[@"data"];
+    if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
+        return;
+    }
+    self.tableView.backgroundView = nil;
+    self.otherCategorysArray = [LiveListCategoryModel mj_objectArrayWithKeyValuesArray:response[@"data"]];
+    [self.myCategoryView reloadData];
+}
+
 - (void)getDatas {
     
     if (self.categorysArray.count > 0) {
@@ -937,6 +953,7 @@ BOOL isLoadFail = NO;
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
         }
+        netWorkTryTime = 10;
         isLoadFail = NO;
         self.tableView.backgroundView = nil;
         self.isFirstLoad = NO;
@@ -966,21 +983,31 @@ BOOL isLoadFail = NO;
         NSInteger codeint = error.code;
         self.tableView.backgroundView = self.emptyBackView;
         if (codeint == (-999)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
         }else if (codeint == (-1001)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
         }else if (codeint == (-1009)) {
+            netWorkTryTime = 10;
             self.emptyImageView.image = [UIImage imageNamed:@"暂无网络"];
             self.emptyLabel.text = @"网络不好，请刷新重试";
        }else {
             //判断系统错误
            self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
-           self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
+           // self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
+           self.emptyLabel.text = @"网络异常";
+           if (netWorkTryTime < 2) {
+               netWorkTryTime += 1;
+               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                   [self triggerMJRefresh];
+               });
+           }
         }
     };
-    
+
     void (^otherSuccess)(NSDictionary *) = ^(NSDictionary * _Nonnull response) {
         id dic = response[@"data"];
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
@@ -990,19 +1017,30 @@ BOOL isLoadFail = NO;
         self.otherCategorysArray = [LiveListCategoryModel mj_objectArrayWithKeyValuesArray:response[@"data"]];
         [self.myCategoryView reloadData];
     };
-    
+
     if (self.isFirstLoads) {
         self.isFirstLoads = false;
         [KYApiHttpTool FirstGET:URL_OTHER_CATEGORY_LIST withParams:@{} success:otherSuccess failure:^(NSError * _Nullable error) {
-            
+
         }];
         [KYApiHttpTool FirstGET:URL_CATEGORY_LIST withParams:param success:success failure:fail];
         return;
     }
     [KYApiHttpTool GET:URL_OTHER_CATEGORY_LIST withParams:@{} success:otherSuccess failure:^(NSError * _Nullable error) {
-        
+
     }];
     [KYApiHttpTool GET:URL_CATEGORY_LIST withParams:param success:success failure:fail];
+}
+
+- (void)triggerMJRefresh {
+    // 設置偏移量，模擬下拉效果
+    [self.tableView setContentOffset:CGPointMake(0, -60) animated:YES];
+
+    // 延遲一點時間再觸發刷新，確保視覺效果
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.emptyLabel.text = @"刷新中...";
+        [self.tableView.mj_header beginRefreshing];
+    });
 }
 
 //检查版本
