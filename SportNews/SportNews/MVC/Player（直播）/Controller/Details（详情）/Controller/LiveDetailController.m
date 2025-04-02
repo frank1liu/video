@@ -1626,7 +1626,6 @@ extern BOOL isTalkRed;
 }
 
 - (void)setupTouPing {
-    LivePlayerPingVC *ping = [LivePlayerPingVC new];
     NSString *url = self.playModel.videoURL;
     if (self.model.video_url.length > 0 && self.model.status.intValue != 0) {
         url = self.model.video_url;
@@ -1635,8 +1634,17 @@ extern BOOL isTalkRed;
         [KYRemindView showWithStatus:@"暂无投屏地址"];
         return;
     }
-    ping.url = url;
+    self.isClickPop = YES;
+    LivePlayerPingVC *ping = [LivePlayerPingVC new];
+    ping.parentVC = self;
+    ping.videoUrl = url;
+    // [SNPictureInPictureShared.picController.playerLayer.player pause];
+    // [ZFPlayerWindowShared.zfPlayer.manager pause];
+    [[_systemPlayerView manager] pause];
     [self.navigationController pushViewController:ping animated:true];
+//    ProjectorViewController *projector = [[ProjectorViewController alloc]initWithNibName:@"ProjectorViewController" bundle:nil];
+//    projector.videoURL = url;
+//    [self.navigationController pushViewController:projector animated:true];
 }
 
 //是否允许画中画 或者小视频

@@ -24,5 +24,7 @@
 #import "SNStatisticalModel.h"
 #import "JXPagingView/JXPagerView.h"
 #import "MJRefreshNormalHeader.h"
-
+#import "myouctrl.h"
+#import "BaseTableViewController.h"
+#import "LiveDetailController.h"
 

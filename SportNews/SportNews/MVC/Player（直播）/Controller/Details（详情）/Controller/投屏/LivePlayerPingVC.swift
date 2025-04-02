@@ -7,10 +7,16 @@
 
 import UIKit
 
+var gVC:LivePlayerPingVC? = nil
+
 class LivePlayerPingVC: QMUICommonViewController {
     
     let tableView = QMUITableView()
-    @objc var url: String?
+    @objc var parentVC:LiveDetailController? = nil;
+
+    @objc var videoUrl = ""
+    var allDevices: [DmrDeviceInfo] = []
+
     var devices = [CLUPnPDevice]() {
         didSet {
             tableView.reloadData()
@@ -24,11 +30,7 @@ class LivePlayerPingVC: QMUICommonViewController {
         
         navigationController?.navigationBar.tintColor = .black
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "刷新"), style: .done, target: self, action: #selector(refresh))
-        
-        MRDLNA.sharedMRDLNAManager()?.searchTime = 5
-        MRDLNA.sharedMRDLNAManager()?.delegate = self
-        MRDLNA.sharedMRDLNAManager()?.startSearch()
-        
+
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .none
@@ -40,35 +42,93 @@ class LivePlayerPingVC: QMUICommonViewController {
             $0?.top.equalTo()(self.view)
             $0?.bottom.equalTo()(self.view)
         }
+        gVC = self
+        Logger.shared.log(String(format: "app version: %@",Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "無法取得版本號"))
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
+        NotificationCenter.default.addObserver(
+                    self,
+                    selector: #selector(self.getDeviceInfo(nofi:)),
+                    name: NSNotification.Name("GETNEWDEVICE"),
+                    object: nil
+        )
+        if let bundleID = Bundle.main.bundleIdentifier, bundleID != "com.SportLives.Ball.ccc.adam" {
+            let alert = UIAlertController(title: "提示", message: "请在下载页选择方企业版可投屏", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in
+                self.navigationController?.popViewController(animated: true)
+            })
+            self.present(alert, animated: true, completion: nil)
+        }
+        Logger.shared.log("首頁-viewWillAppear-進入投屏")
     }
-    
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Logger.shared.log("首頁-viewDidAppear")
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2, execute: {
+            self.refresh()
+        })
+    }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
         navigationController?.setNavigationBarHidden(true, animated: true)
+        Logger.shared.log("首頁-viewWillDisappear")
+        print("海豚星空投屏 销毁")
+        if gIsPlaying {
+            Logger.shared.log("首頁-viewWillDisappear-正在播放，停止播放並離開")
+            self.close();
+        }
+        gVC = nil;
+        gIsRefreshed = false
+        parentVC?.isClickPop = false
+        MYOUCtrlPointExit();
+        Logger.shared.log("首頁-呼叫MYOUCtrlPointExit-停止投屏SDK")
     }
     
-    @objc func refresh() {
-        MRDLNA.sharedMRDLNAManager()?.startSearch()
-    }
-}
+    @objc public func refresh() {
+        let actionPlay : [String: () -> Void] = [ "播放" : { (
 
-extension LivePlayerPingVC: DLNADelegate {
-    func searchDLNAResult(_ devicesArray: [Any]!) {
-        if let arr = devicesArray as? [CLUPnPDevice] {
-            arr.forEach { device in
-                if !devices.contains(where: { $0.uuid == device.uuid }) {
-                    devices.append(device)
-                }
+        ) }]
+        let actionStop : [String: () -> Void] = [ "退出投屏" : { (
+
+        ) }]
+
+        let arrayActions = [actionPlay, actionStop]
+
+        UIViewController.showCustomAlertWith(VC: self,
+                                             message: "",
+                                             descMsg: "",
+                                             itemimage: nil,
+                                             videoURL: self.videoUrl,
+                                             actions: arrayActions)
+        Logger.shared.log("首頁-點擊首頁右上角refresh按鈕，開啟投屏操作視窗")
+    }
+
+    func close(){
+        if self.allDevices.count > 0, !self.allDevices[0].udn.isEmpty {
+            dpsCtrlPointStop(TV_SERVICE_AVTRANSPORT,
+                             self.allDevices[0].udn,
+                             0)
+            gIsPlaying = false
+            Logger.shared.log(String(format: "首頁-關閉投屏-dpsCtrlPointStop"))
+        }
+    }
+
+    @objc func getDeviceInfo(nofi: Notification) {
+        if let deviceInfo = nofi.object as? [DmrDeviceInfo] {
+            self.allDevices = deviceInfo
+            if self.allDevices.count > 0 {
+                Logger.shared.log(String(format: "首頁-getDeviceInfo"))
             }
+            tableView.reloadData()
         }
     }
 }
-
 
 extension LivePlayerPingVC: QMUITableViewDelegate, QMUITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -80,8 +140,8 @@ extension LivePlayerPingVC: QMUITableViewDelegate, QMUITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = DeviceCell(style: .default, reuseIdentifier: "Cell1")
-            cell.url = url
-            cell.setModels(devices: devices)
+            cell.videoUrl = videoUrl
+            cell.setModels(devices: allDevices)
             return cell
         } else {
             return UseCell(style: .default, reuseIdentifier: "Cell2")
@@ -104,9 +164,9 @@ extension LivePlayerPingVC: QMUITableViewDelegate, QMUITableViewDataSource {
 class DeviceCell: QMUITableViewCell {
     
     var stack: UIStackView?
-    var url: String?
-    var devices: [CLUPnPDevice]?
-    
+    var devices: [DmrDeviceInfo] = []
+    var videoUrl = ""
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -135,9 +195,10 @@ class DeviceCell: QMUITableViewCell {
         }
     }
     
-    func setModels(devices: [CLUPnPDevice]) {
+    func setModels(devices: [DmrDeviceInfo]) {
         self.devices = devices
-        if devices.isEmpty {
+        if devices.count == 0 {
+            Logger.shared.log("首頁-cell裝置數為0")
             let label = QMUILabel.buildPingLabel(text: "未发现可用设备，请点击右上角重新搜索！", textColor: Color333333, font: .systemFont(ofSize: 12), alignment: .center)
             contentView.addSubview(label)
             label.mas_makeConstraints {
@@ -147,12 +208,12 @@ class DeviceCell: QMUITableViewCell {
                 $0?.top.equalTo()(contentView)?.offset()(50)
             }
         } else {
-            stack = UIStackView(arrangedSubviews: devices.map {
-                let button = QMUIButton.buildPingButton(text: $0.friendlyName)
-                button.addTarget(self, action: #selector(choice(btn:)), for: .touchUpInside)
-                button.qmui_bindObject($0, forKey: "PlayDevice")
-                return button
-            })
+            let button = QMUIButton.buildPingButton(text: devices[0].name + "(" + devices[0].udn + ")")
+            Logger.shared.log(String(format: "首頁-設定cell按鈕文字"))
+            button.addTarget(self, action: #selector(choice(btn:)), for: .touchUpInside)
+            button.isUserInteractionEnabled = true
+            stack = UIStackView()
+            stack?.addArrangedSubview(button)
             stack!.axis = .vertical
             stack!.distribution = .fillEqually
             contentView.addSubview(stack!)
@@ -169,10 +230,9 @@ class DeviceCell: QMUITableViewCell {
         stack?.arrangedSubviews.forEach {
             ($0 as! QMUIButton).isSelected = false
         }
+        Logger.shared.log(String(format: "首頁-點擊choice按鈕, 按鈕文字"))
         btn.isSelected = true
-        MRDLNA.sharedMRDLNAManager()?.device = btn.qmui_getBoundObject(forKey: "PlayDevice") as? CLUPnPDevice
-        MRDLNA.sharedMRDLNAManager()?.startAfterStop()
-        MRDLNA.sharedMRDLNAManager()?.playTheURL(url!)
+        gVC?.refresh()
     }
     
     required init?(coder: NSCoder) {

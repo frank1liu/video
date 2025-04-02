@@ -809,15 +809,20 @@
 }
  
 - (void)setFblModels:(NSArray *)fblModels {
-    _fblModels = fblModels;
-    CGFloat height = 30 * _fblModels.count;
-    [_fblView mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.bottom.equalTo(self.fbl.mas_top);
-        make.centerX.equalTo(self.fbl.mas_centerX);
-        make.height.mas_equalTo(height);
-        make.width.mas_equalTo(80);
-    }];
-    [self buildFBL];
+    @try {
+        _fblModels = fblModels;
+        CGFloat height = 30 * _fblModels.count;
+        [_fblView mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.bottom.equalTo(self.fbl.mas_top);
+            make.centerX.equalTo(self.fbl.mas_centerX);
+            make.height.mas_equalTo(height);
+            make.width.mas_equalTo(80);
+        }];
+        [self buildFBL];
+    }
+    @catch (NSException *exception) {
+       NSLog(@"%@", exception.reason);
+    }
 }
 
 @end
