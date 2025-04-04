@@ -128,7 +128,7 @@ UIImage *gChangedImage = nil;
     }else if ([title isEqualToString:@"微信"]) {
         cell.arrowImageView.hidden = YES;
         cell.subRight.constant = 15;
-        cell.subTitleLabel.text = @"快直播";
+        cell.subTitleLabel.text = @"极直播";
     }else if ([title isEqualToString:@"用户ID"]) {
         cell.arrowImageView.hidden = YES;
         cell.subRight.constant = 15;

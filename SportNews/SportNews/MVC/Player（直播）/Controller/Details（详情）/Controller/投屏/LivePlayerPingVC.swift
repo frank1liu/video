@@ -254,7 +254,7 @@ class UseCell: QMUITableViewCell {
         t2.numberOfLines = 0
         let image1 = UIImageView(image: UIImage(named: "组合"))
         image1.contentMode = .center
-        let t3 = QMUILabel.buildPingLabel(text: "2、点击快直播手机播放器右上角按钮，即可投屏到电视。", textColor: Color333333, font: .systemFont(ofSize: 15, weight: UIFont.Weight.init(2)), alignment: .left)
+        let t3 = QMUILabel.buildPingLabel(text: "2、点击极直播手机播放器右上角按钮，即可投屏到电视。", textColor: Color333333, font: .systemFont(ofSize: 15, weight: UIFont.Weight.init(2)), alignment: .left)
         t3.numberOfLines = 0
         let t4 = QMUILabel.buildPingLabel(text: "如检测不到就可能是设备不支持，可到页面上方重新搜索设备。", textColor: Color979797, font: .systemFont(ofSize: 13), alignment: .left)
         t4.numberOfLines = 0

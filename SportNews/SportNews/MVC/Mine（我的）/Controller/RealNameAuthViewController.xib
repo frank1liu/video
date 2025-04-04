@@ -120,8 +120,8 @@
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BhX-jn-OSk">
                     <rect key="frame" x="13" y="779.5" width="387" height="57.5"/>
                     <string key="text">1、每个证件只能绑定一个账号；
-2、实名认证信息提交后无法修改，快直播将对您的资料进行严格保密；
-3、非中国大陆公民或实名认证遇到问题，请联系快直播在线客服，也可搜索微信公众号“说球帝”关注并联系我们</string>
+2、实名认证信息提交后无法修改，极直播将对您的资料进行严格保密；
+3、非中国大陆公民或实名认证遇到问题，请联系极直播在线客服，也可搜索微信公众号“说球帝”关注并联系我们</string>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>

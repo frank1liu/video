@@ -1037,7 +1037,7 @@ static NSString *cellIdentifier = @"MessageCell";
     NSString *nickName = [[NSUserDefaults standardUserDefaults] objectForKey:K_TouristsNickName];
     if (!nickName) {
         //在这里还没获取到 游客昵称的话就随机弄个
-        nickName = [NSString stringWithFormat:@"快直播游客%@",[CommonTools getRandomStringWithNum:4]];
+        nickName = [NSString stringWithFormat:@"极直播游客%@",[CommonTools getRandomStringWithNum:4]];
         [[NSUserDefaults standardUserDefaults] setValue:nickName forKey:K_TouristsNickName];
     }
     LoginUserModel *loginModel = [UserModelTool loginModel];

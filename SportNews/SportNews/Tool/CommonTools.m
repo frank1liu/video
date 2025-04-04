@@ -660,7 +660,7 @@
     NSString *nickName = [[NSUserDefaults standardUserDefaults] valueForKey:JPushNickName];
     if (!nickName) {
         //在这里还没获取到 游客昵称的话就随机弄个
-        nickName = [NSString stringWithFormat:@"快直播游客%@",[CommonTools getRandomStringWithNum:4]];
+        nickName = [NSString stringWithFormat:@"极直播游客%@",[CommonTools getRandomStringWithNum:4]];
         [[NSUserDefaults standardUserDefaults] setValue:nickName forKey:JPushNickName];
     }
     LoginUserModel *loginModel = [UserModelTool loginModel];
