@@ -165,4 +165,7 @@
 //取的聊天的敏感訊息
 #define URL_SensitiveWord @"liveStudio/room/sensitive/get"
 
+//取的聊天的敏感訊息
+#define URL_DynamicHost @"sys/getImProductHost"
+
 #endif /* MacroApi_h */ 

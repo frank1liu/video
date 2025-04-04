@@ -17,6 +17,7 @@ extern NSInteger gCategoryType;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeLabelWidth;
 
+@property (nonatomic, strong) NSString *dynamicURL;
 
 @end
 @implementation LiveContentBottomView
@@ -159,10 +160,24 @@ extern NSInteger gCategoryType;
 }
 
 - (void)setupDownloadView {
+//    [KYApiHttpTool GET:URL_DynamicHost withParams:@{@"version" : @""} success:^(NSDictionary * _Nonnull response) {
+//        NSString *urlString = response[@"data"];
+//        if (![urlString isEqualToString:@""] && ([urlString containsString:@"http"] || [urlString containsString:@"https"])) {
+//            self.dynamicURL = [NSString stringWithFormat:@"%@/?matchType=%ld&matchId=%ld", urlString, [self.model.type longValue], [self.model.ID longValue]];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openURL)];
+//                tap.numberOfTapsRequired = 1;
+//                [self.downloadBaseView addGestureRecognizer:tap];
+//            });
+//        }
+//    } failure:^(NSError * _Nullable error) {
+//
+//    }];
     self.downloadBaseView.backgroundColor = [UIColor colorWithHexString:@"#FBEBE2"];
     self.downloadBaseView.layer.cornerRadius = 18.0;
     self.downloadBaseView.clipsToBounds = YES;
     self.downloadBaseView.userInteractionEnabled = YES;
+
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openURL)];
     tap.numberOfTapsRequired = 1;
     [self.downloadBaseView addGestureRecognizer:tap];
@@ -170,9 +185,11 @@ extern NSInteger gCategoryType;
 
 - (void)openURL {
     // NSString *url = [NSString stringWithFormat:@"https://dl.nongzhiw.cn/?matchType=%ld&matchId=%ld", [self.model.type longValue], [self.model.ID longValue]];
-    NSString *url = @"https://apps.apple.com/tw/app/%E5%85%83%E5%8F%8B/id6444813360";
-    if( [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:url]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:@{} completionHandler:nil];
+    NSString *url = [NSString stringWithFormat:@"https://im.tzyhao.com/?matchType=%ld&matchId=%ld", [self.model.type longValue], [self.model.ID longValue]];
+    self.dynamicURL = url;
+    // NSString *url = @"https://apps.apple.com/tw/app/%E5%85%83%E5%8F%8B/id6444813360";
+    if( [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:self.dynamicURL]]) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.dynamicURL] options:@{} completionHandler:nil];
     }
 }
 
