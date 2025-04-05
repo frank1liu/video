@@ -24,6 +24,8 @@
 
 extern UIImage *gChangedImage;
 
+NSString *currentVersion = @"1.47";
+
 #define magin 100
 
 static CGFloat const animationTime = 0.4;
