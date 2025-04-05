@@ -371,8 +371,9 @@ static NSUInteger netWorkTryTime = 0;
     
     // [self checkVersion];
 
-    [self getDomainName];
-     
+    // 無用到
+    // [self getDomainName];
+
     [self setupLeftVc];
     
     [self setupEmptyView];

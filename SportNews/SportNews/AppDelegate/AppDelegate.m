@@ -39,7 +39,6 @@
 @property(nonatomic, assign) BOOL isSuccess;
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) DNSManager *dnsManager;
-@property (nonatomic, strong) NSString *availableDomain;
 @property (nonatomic) BOOL isReqSucDynUrl;
 @property (nonatomic, assign) BOOL hasFoundValidUrl;
 @property (nonatomic, assign) BOOL isChannelSet;
@@ -50,6 +49,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+
     self.dnsManager = [DNSManager shared];
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
     self.session = [NSURLSession sessionWithConfiguration:config];
@@ -58,9 +58,10 @@
     self.isChannelSet = NO;
     self.availableDomain = @"";
 
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getChannelName) name:@"NetworkAvailable" object:nil];
 
-    [self setAvailableDomain:application didFinishLaunchingWithOptions:launchOptions];
+    // [self setAvailableDomain:application didFinishLaunchingWithOptions:launchOptions];
 
     [self setupWindow];
 
@@ -281,7 +282,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"App-Prefs:root=WIFI"]options:@{} completionHandler:nil];
     }
 }
-
 
 //处理用户点击通知
 - (void)dealToUserClickNotification:(NSDictionary *)userInfo { 

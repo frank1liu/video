@@ -8,6 +8,7 @@
 #import "WelcomeViewController.h"
 #import "PlayerViewController.h"
 #import "MSNetwork.h"
+#import "SportNews-Swift.h"
 
 @interface WelcomeViewController ()
 
@@ -19,10 +20,27 @@
 @property (nonatomic,strong) NSTimer *timer;
 
 @property(nonatomic, assign) BOOL isSuccess;
+@property (nonatomic, strong) NSURLSession *session;
+@property (nonatomic, strong) DNSManager *dnsManager;
+@property (nonatomic,strong) AppDelegate *app;
+@property (nonatomic) BOOL isReqSucDynUrl;
+@property (nonatomic, assign) BOOL hasFoundValidUrl;
+@property (nonatomic, assign) BOOL hasSetDomain;
 
 @end
 
 @implementation WelcomeViewController
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getChannelName) name:@"NetworkAvailable" object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+
+}
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
@@ -34,9 +52,85 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    self.app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    self.dnsManager = [DNSManager shared];
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+    self.session = [NSURLSession sessionWithConfiguration:config];
+    self.isReqSucDynUrl = NO;
+    self.hasFoundValidUrl = NO;
+    self.hasSetDomain = NO;
     self.backView.hidden = YES;
-    [self getDomainName];
+    
+    [self setAvailableDomain];
+    // 無用到
+    // [self getDomainName];
+}
+
+- (void)networkAvailable {
+    if (self.hasSetDomain == NO) {
+        [self setAvailableDomain];
+    }
+}
+
+- (void) setAvailableDomain {
+    NSArray<NSString *> *urls = self.dnsManager.domains;
+
+    self.isReqSucDynUrl = YES;
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (NSString *url in urls) {
+            if (self.hasFoundValidUrl) break;
+
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+            [self.dnsManager getIPForDomain:url completion:^(NSString *resolvedIP, NSError *error) {
+                if (resolvedIP) {
+                    @try {
+                        NSString *path = [NSString stringWithFormat:@"https://%@/prod-api/", url];
+                        NSURL *urlss = [NSURL URLWithString:path];
+                        NSData *data = [[NSData alloc] initWithContentsOfURL:urlss];
+                        NSDictionary *d = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+                        if ([d[@"msg"] isEqualToString:@"ok"]) {
+                            if (!self.hasFoundValidUrl) {
+                                self.hasFoundValidUrl = YES;
+                                self.isReqSucDynUrl = NO;
+                                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                                [defaults setObject:url forKey:@"app_net_root_url"];
+                                [defaults synchronize];
+                                NSLog(@"%@", url);
+                                self.app.availableDomain = url;
+                                [self.app setChannelName];
+                                [self.app getChannelName];
+                                //极光
+                                // [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+                                // 云信
+                                [self.app setupNIM];
+                                self.hasSetDomain = YES;
+                            }
+                        }
+                        dispatch_semaphore_signal(semaphore);
+                    } @catch (NSException *exception) {
+                        NSLog(@"%@", exception.reason);
+                        dispatch_semaphore_signal(semaphore);
+                    }
+                } else {
+                    dispatch_semaphore_signal(semaphore);
+                }
+            }];
+            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        }
+        if (!self.hasFoundValidUrl){
+            self.hasSetDomain = YES;
+            self.app.availableDomain = urls[0];
+            [self.app setChannelName];
+            [self.app getChannelName];
+            //极光
+            // [self setupJPush:application didFinishLaunchingWithOptions:launchOptions];
+            // 云信
+            [self.app setupNIM];
+        }
+    });
+    [self endTimer:1.2];
 }
 
 - (void)getDomainName {
@@ -63,7 +157,11 @@
              
         }]; 
     }];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self endTimer:0.8];
+}
+
+- (void) endTimer:(CGFloat)deadline {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(deadline * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self countDown];
     });
 }
@@ -79,18 +177,7 @@
 }
 
 - (void)countDown {
-    [self timeOver];
-//    self.backView.hidden = NO;
-//    self.backView.layer.cornerRadius = self.backView.height/2;
-//    self.countDownTime = 3;
-//    self.timeLabel.text = @"跳过3s";
-//    if (self.timer) {
-//        [self.timer invalidate];
-//        self.timer = nil;
-//    }
-//    self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(countDownNumbers) userInfo:nil repeats:YES];
-//    [[NSRunLoop currentRunLoop]addTimer:self.timer forMode:NSDefaultRunLoopMode];
-    
+    [self timeOver];  
 }
 
 - (void)countDownNumbers {
