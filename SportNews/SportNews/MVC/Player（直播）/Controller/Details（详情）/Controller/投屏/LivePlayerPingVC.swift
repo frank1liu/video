@@ -44,11 +44,18 @@ class LivePlayerPingVC: QMUICommonViewController {
         }
         gVC = self
         Logger.shared.log(String(format: "app version: %@",Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "無法取得版本號"))
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2, execute: {
+            self.refresh()
+        })
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
+        self.navigationItem.hidesBackButton = true
+        let backButton = UIBarButtonItem(image: UIImage(named: "leftArrow"), style: .plain, target: self, action: #selector(customBack))
+        self.navigationItem.leftBarButtonItem = backButton
+
         NotificationCenter.default.addObserver(
                     self,
                     selector: #selector(self.getDeviceInfo(nofi:)),
@@ -56,7 +63,7 @@ class LivePlayerPingVC: QMUICommonViewController {
                     object: nil
         )
         if let bundleID = Bundle.main.bundleIdentifier, bundleID != "com.SportLives.Ball.ccc.adam" {
-            let alert = UIAlertController(title: "提示", message: "请在下载页选择方企业版可投屏", preferredStyle: .alert)
+            let alert = UIAlertController(title: "提示", message: "请在下载页选择企业版方可投屏！", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in
                 self.navigationController?.popViewController(animated: true)
             })
@@ -65,12 +72,13 @@ class LivePlayerPingVC: QMUICommonViewController {
         Logger.shared.log("首頁-viewWillAppear-進入投屏")
     }
 
+    @objc func customBack() {
+        self.navigationController?.popViewController(animated: true)
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         Logger.shared.log("首頁-viewDidAppear")
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2, execute: {
-            self.refresh()
-        })
     }
 
     override func viewWillDisappear(_ animated: Bool) {

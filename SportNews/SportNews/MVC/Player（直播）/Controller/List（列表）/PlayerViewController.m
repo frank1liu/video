@@ -24,7 +24,7 @@
 
 extern UIImage *gChangedImage;
 
-NSString *currentVersion = @"1.47";
+NSString *currentVersion = @"1.50";
 
 #define magin 100
 

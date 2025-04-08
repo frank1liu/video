@@ -17,7 +17,8 @@ extension UIViewController {
         alertVC.videoURL = videoURL
         //Present
         alertVC.modalTransitionStyle = .crossDissolve
-        alertVC.modalPresentationStyle = .overCurrentContext
+        alertVC.modalPresentationStyle = .overFullScreen
+        alertVC.view.backgroundColor = UIColor.lightGray.withAlphaComponent(0.3)
         VC.present(alertVC, animated: true, completion: nil)
     }
 }
