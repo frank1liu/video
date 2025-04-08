@@ -378,7 +378,12 @@ static NSString *cellIdentifier = @"MessageCell";
                             model.msgId = message.messageId;
                             NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
                             model.fromName = messageExt.roomNickname;
-                            int level = [message.remoteExt[@"level"] intValue];
+                            // int level = [message.remoteExt[@"level"] intValue];
+                            NSString *levelString = ((NIMMessageChatroomExtension *)message.messageExt).roomExt;
+                            NSLog(@"%@", levelString);
+                            NSDictionary *dicLevel = [CommonTools dictionaryWithJsonString:levelString];
+                            NSLog(@"dictionary level: %d", [dicLevel[@"level"] intValue]);
+                            int level = [dicLevel[@"level"] intValue];
                             if (level == 0) {
                                 model.level = 0;
                             } else {
@@ -468,7 +473,10 @@ static NSString *cellIdentifier = @"MessageCell";
         model.msgId = message.messageId;
         NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
         model.fromName = messageExt.roomNickname;
-        model.level = [message.remoteExt[@"level"] intValue];
+        // model.level = [message.remoteExt[@"level"] intValue];
+        NSString *levelString = ((NIMMessageChatroomExtension *)message.messageExt).roomExt;
+        NSDictionary *dicLevel = [CommonTools dictionaryWithJsonString:levelString];
+        model.level = [dicLevel[@"level"] intValue];
         if (message.messageType == NIMMessageTypeText) {
             model.contentType = 0;
             model.text = message.text;
