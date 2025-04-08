@@ -977,16 +977,20 @@ extern NSString *talkWebUrl;
             }];
             awayArray = mutAwayArray;
         }
-         
-        [awayArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            SNDatasFootHistoryRecordModel *model = obj;
-            NSString *homeName = self.model.ateam_name;
-            NSString *result = [CommonTools getScoreResult:model.scoreQuan isHome:[model.hName isEqualToString:homeName]];
-            NSString *halfResult = [CommonTools getScoreResult:model.scoreBan isHome:[model.hName isEqualToString:homeName]];
-            [self compareFoot:result halfResult:halfResult arr:arr add:4 home:[model.hName isEqualToString:homeName]];
-        }];
-        self.wfArray = arr;
-        
+
+        @try {
+            [awayArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                SNDatasFootHistoryRecordModel *model = obj;
+                NSString *homeName = self.model.ateam_name;
+                NSString *result = [CommonTools getScoreResult:model.scoreQuan isHome:[model.hName isEqualToString:homeName]];
+                NSString *halfResult = [CommonTools getScoreResult:model.scoreBan isHome:[model.hName isEqualToString:homeName]];
+                [self compareFoot:result halfResult:halfResult arr:arr add:4 home:[model.hName isEqualToString:homeName]];
+            }];
+            self.wfArray = arr;
+        }
+        @catch (NSException *exception) {
+           NSLog(@"%@", exception.reason);
+        }
     }else {
         NSArray *arr = @[
             @[],

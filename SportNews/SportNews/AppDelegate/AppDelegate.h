@@ -16,6 +16,8 @@
 
 @property (nonatomic, assign) BOOL allowOrentitaionRotation;
 
+@property (nonatomic, strong) NSString *availableDomain;
+
 //先检查云信是否登录
 - (void)checkYXIsLogined;
 
@@ -25,6 +27,10 @@
 
 //点击通知跳转对应详情
 - (void)jumpToDetailVc:(LiveListModel *)model;
+
+- (void)setChannelName;
+
+- (void)setupNIM;
 
 @end
 

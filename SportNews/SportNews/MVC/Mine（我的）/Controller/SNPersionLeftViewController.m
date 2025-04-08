@@ -12,6 +12,7 @@
 #import "LevelViewController.h"
 
 extern UIImage *gChangedImage;
+extern NSString *currentVersion;
 
 @interface SNPersionLeftViewController ()
 
@@ -33,7 +34,11 @@ extern UIImage *gChangedImage;
     [self setupSubViews];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginSuccessNotification) name:@"loginSuccess" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(ChangedIconNotification:) name:@"ChangedIconNotification" object:nil];
-    self.versionLabel.text = [NSString stringWithFormat:@"版本: %@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
+    if ([[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.SportLives.Ball.ccc.adam"]) {
+        self.versionLabel.text = [NSString stringWithFormat:@"版本: %@ (%@)", currentVersion, @"企业"];
+    } else {
+        self.versionLabel.text = [NSString stringWithFormat:@"版本: %@ (%@)", currentVersion, @"TF"];
+    }
 }
 
 - (void) viewWillAppear:(BOOL)animated {

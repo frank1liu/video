@@ -24,6 +24,8 @@
 
 extern UIImage *gChangedImage;
 
+NSString *currentVersion = @"1.50";
+
 #define magin 100
 
 static CGFloat const animationTime = 0.4;
@@ -371,8 +373,9 @@ static NSUInteger netWorkTryTime = 0;
     
     // [self checkVersion];
 
-    [self getDomainName];
-     
+    // 無用到
+    // [self getDomainName];
+
     [self setupLeftVc];
     
     [self setupEmptyView];
@@ -999,9 +1002,9 @@ static NSUInteger netWorkTryTime = 0;
            self.emptyImageView.image = [UIImage imageNamed:@"服务器维护中"];
            // self.emptyLabel.text = @"服务器维护或网络异常，下拉刷新尝试";
            self.emptyLabel.text = @"网络异常";
-           if (netWorkTryTime < 2) {
+           if (netWorkTryTime < 5) {
                netWorkTryTime += 1;
-               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                    [self triggerMJRefresh];
                });
            }
