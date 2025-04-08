@@ -98,7 +98,11 @@ class ProjectorViewController: UIViewController, UITableViewDelegate, UITableVie
         if isPlaying {
             self.close(sender: UIButton());
         }
+        #if targetEnvironment(simulator)
+
+        #else
         MYOUCtrlPointExit();
+        #endif
     }
 
     @objc func refreshTableView() {

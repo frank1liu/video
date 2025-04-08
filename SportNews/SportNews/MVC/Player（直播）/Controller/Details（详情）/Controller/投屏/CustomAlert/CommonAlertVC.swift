@@ -178,7 +178,11 @@ class CommonAlertVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.dismiss(animated: true) {
             self.view.removeFromSuperview()
             self.close()
+            #if targetEnvironment(simulator)
+
+            #else
             MYOUCtrlPointExit();
+            #endif
         }
         Logger.shared.log("彈窗-取消彈窗顯示")
     }
@@ -223,7 +227,13 @@ extension CommonAlertVC {
 extension CommonAlertVC {
     func refresh() {
         self.close()
+        #if targetEnvironment(simulator)
+
+        #else
         MYOUCtrlPointExit();
+        #endif
+
+
 //        if gIsRefreshed {
 //            self.refreshTableView()
 //            Logger.shared.log("彈窗-已經偵測過設備,直接執行refreshTableView，顯示設備")
@@ -257,6 +267,9 @@ extension CommonAlertVC {
                             ip.withUnsafeBufferPointer { cIp in
                                 let cIpPtr = cIp.baseAddress
                                 //注册平台信息
+                                #if targetEnvironment(simulator)
+
+                                #else
                                 MYOUCtrlSetInfo(UnsafeMutablePointer(mutating: appIDPtr), UnsafeMutablePointer( mutating:  secretPtr), UnsafeMutablePointer(mutating:  notUsePtr));
 
                                 //注册回调函数
@@ -295,6 +308,7 @@ extension CommonAlertVC {
                                 })
                                 self!.present(alert, animated: true, completion: nil)
                                 self!.hud?.hide(animated: true)
+                                #endif
                             }
                         }
                     }
@@ -308,11 +322,16 @@ extension CommonAlertVC {
         let uriMetaData = "object.item.videoItem"
 
         if let selDevice = self.selDevice, !selDevice.udn.isEmpty, gIsPlaying == false {
+            #if targetEnvironment(simulator)
+
+            #else
             dpsCtrlPointSetAVTransportURI(TV_SERVICE_AVTRANSPORT,
                                           selDevice.udn,
                                           0,
                                           videoUrl,
                                           uriMetaData)
+            #endif
+
             gIsPlaying = true
             Logger.shared.log("彈窗-呼叫dpsCtrlPointSetAVTransportURI-開始播放")
         }
@@ -320,18 +339,28 @@ extension CommonAlertVC {
 
     func pause(){
         if let selDevice = self.selDevice, !selDevice.udn.isEmpty {
+            #if targetEnvironment(simulator)
+
+            #else
             dpsCtrlPointPause(TV_SERVICE_AVTRANSPORT,
                               selDevice.udn,
                               0)
+            #endif
+
             Logger.shared.log("彈窗-呼叫dpsCtrlPointPause-暫停播放")
         }
     }
 
     func close(){
         if let selDevice = self.selDevice, !selDevice.udn.isEmpty, gIsPlaying == true {
+            #if targetEnvironment(simulator)
+
+            #else
             dpsCtrlPointStop(TV_SERVICE_AVTRANSPORT,
                              selDevice.udn,
                              0)
+            #endif
+
             gIsPlaying = false
             Logger.shared.log("彈窗-呼叫dpsCtrlPointStop-停止播放")
         }

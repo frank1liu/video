@@ -94,7 +94,11 @@ class LivePlayerPingVC: QMUICommonViewController {
         gVC = nil;
         gIsRefreshed = false
         parentVC?.isClickPop = false
+        #if targetEnvironment(simulator)
+
+        #else
         MYOUCtrlPointExit();
+        #endif
         Logger.shared.log("首頁-呼叫MYOUCtrlPointExit-停止投屏SDK")
     }
     
@@ -119,9 +123,13 @@ class LivePlayerPingVC: QMUICommonViewController {
 
     func close(){
         if self.allDevices.count > 0, !self.allDevices[0].udn.isEmpty {
+            #if targetEnvironment(simulator)
+
+            #else
             dpsCtrlPointStop(TV_SERVICE_AVTRANSPORT,
                              self.allDevices[0].udn,
                              0)
+            #endif
             gIsPlaying = false
             Logger.shared.log(String(format: "首頁-關閉投屏-dpsCtrlPointStop"))
         }
