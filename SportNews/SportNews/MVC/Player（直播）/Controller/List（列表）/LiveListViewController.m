@@ -505,7 +505,6 @@ static NSUInteger netWorkTryTime = 0;
     formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"];
 
     NSString *taipeiTime = [formatter stringFromDate:date];
-    // NSLog(@"台北時間：%@", taipeiTime);
     return taipeiTime;
 }
 

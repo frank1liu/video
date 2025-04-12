@@ -126,6 +126,7 @@
                 });
             }
             if (responseObject) {
+                NSLog(@"[Adam][GET] 回應：%@", responseObject);
                 if ([responseObject[@"code"] integerValue] != 0) {
                     if ([responseObject[@"code"] integerValue] == 909011) {
                         [UserModelTool save:nil];
