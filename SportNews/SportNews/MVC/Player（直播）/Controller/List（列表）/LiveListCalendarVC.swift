@@ -61,10 +61,10 @@ class LiveListCalendarVC: QMUICommonViewController {
 
     var date: Date = {
         let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents(in: TimeZone(identifier: "Asia/Taipei")!, from: Date())
+        var components = calendar.dateComponents(in: TimeZone(identifier: "Asia/Shanghai")!, from: Date())
         // 用台北時區組合成一個新的 Date
         if let taipeiDate = calendar.date(from: components) {
-            print("台北時區的 Date: \(taipeiDate)")
+            print("上海時區的 Date: \(taipeiDate)")
             return taipeiDate
         }
         return Date()
@@ -333,7 +333,7 @@ class LiveListCalendarVC: QMUICommonViewController {
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "Asia/Taipei") // 這裡可以改成其他亞洲時區
+        formatter.timeZone = TimeZone(identifier: "Asia/Shanghai") // 這裡可以改成其他亞洲時區
 
         let taipeiTime = formatter.string(from: date)
         // print("台北時間：\(taipeiTime)")

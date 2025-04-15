@@ -390,7 +390,10 @@ extern BOOL isTalkRed;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setupXiaoPing) name:@"xiaochuangkouNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerViewPlayFailed) name:@"ZFPlayerPlayStatePlayFailed" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerViewPlayAutoPause) name:@"ZFPlayerPlayStatePlayAutoPause" object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerViewPlayAutoPause) name:@"ZFPlayerPlayStatePlayAutoPause" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popTheVC) name:@"GameTimerEnd" object:nil];
+
+
     WeakSelf
     ZFPlayerWindowShared.backHandler = ^{
         //点击小视频 跳转到相应的详情页
@@ -436,8 +439,13 @@ extern BOOL isTalkRed;
         liveDetailVc.model = model;
         [weakSelf.navigationController pushViewController:liveDetailVc animated:YES];
     };
-    
-    
+}
+
+- (void)popTheVC {
+    [self.navigationController popViewControllerAnimated:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"PushLiveDetailAgain" object:nil];
+    });
 }
 
 - (void)setupTopHeaderView {
@@ -1013,7 +1021,7 @@ extern BOOL isTalkRed;
         @"type" : self.model.type,
         @"pid"  : @"4",
         @"langtype" : @"zh",
-        @"zoneId" : @"Asia/Taipei"
+        @"zoneId" : @"Asia/Shanghai"
     }.mutableCopy;
     LoginUserModel *loginModel = [UserModelTool loginModel];
     if (loginModel) {

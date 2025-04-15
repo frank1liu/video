@@ -378,17 +378,13 @@ static NSString *cellIdentifier = @"MessageCell";
                             model.msgId = message.messageId;
                             NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
                             model.fromName = messageExt.roomNickname;
-                            // int level = [message.remoteExt[@"level"] intValue];
-                            NSString *levelString = ((NIMMessageChatroomExtension *)message.messageExt).roomExt;
-                            NSLog(@"%@", levelString);
-                            NSDictionary *dicLevel = [CommonTools dictionaryWithJsonString:levelString];
-                            NSLog(@"dictionary level: %d", [dicLevel[@"level"] intValue]);
-                            int level = [dicLevel[@"level"] intValue];
-                            if (level == 0) {
-                                model.level = 0;
-                            } else {
-                                model.level = level;
-                            }
+                            model.level = [message.remoteExt[@"level"] intValue];
+//                            NSString *levelString = ((NIMMessageChatroomExtension *)message.messageExt).roomExt;
+//                            NSLog(@"%@", levelString);
+//                            NSDictionary *dicLevel = [CommonTools dictionaryWithJsonString:levelString];
+//                            NSLog(@"dictionary level: %d", [dicLevel[@"level"] intValue]);
+//                            int level = [dicLevel[@"level"] intValue];
+                            NSLog(@"[Adam][Adam] name = %@ level = %ld", model.fromName, (long)model.level);
                             if (message.messageType == NIMMessageTypeText) {
                                 if (message.remoteExt[@"giftName"] == nil && message.remoteExt[@"bubbleUrl"] == nil) {
                                     model.contentType = 0;
@@ -473,10 +469,7 @@ static NSString *cellIdentifier = @"MessageCell";
         model.msgId = message.messageId;
         NIMMessageChatroomExtension *messageExt = (NIMMessageChatroomExtension *)message.messageExt;
         model.fromName = messageExt.roomNickname;
-        // model.level = [message.remoteExt[@"level"] intValue];
-        NSString *levelString = ((NIMMessageChatroomExtension *)message.messageExt).roomExt;
-        NSDictionary *dicLevel = [CommonTools dictionaryWithJsonString:levelString];
-        model.level = [dicLevel[@"level"] intValue];
+        model.level = [message.remoteExt[@"level"] intValue];
         if (message.messageType == NIMMessageTypeText) {
             model.contentType = 0;
             model.text = message.text;
@@ -1111,7 +1104,9 @@ static NSString *cellIdentifier = @"MessageCell";
             if (cell == nil) {
                 cell = [[SNMessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
             }
-            NSLog(@"[Adam] level: %ld, %@", (long)message.level, message.text);
+            // NSLog(@"[Adam] level: %ld, %@", (long)message.level, message.text);
+            NSLog(@"cellForRow-[Adam][Adam] name = %@ level = %ld", message.text, (long)message.level);
+
             cell.selectionStyle = 0;
             cell.level = message.level;
 //            if (message.level == 0 ) {

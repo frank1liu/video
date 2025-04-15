@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, strong) NSNumber *ID;
 @property(nonatomic, strong) NSString *matchtime;
+@property(nonatomic, strong) NSString *matchtime_en;
 @property(nonatomic, strong) NSString *name;
 @property(nonatomic, strong) NSString *score;
 //比赛状态：0 开赛中  1 未开赛  2 比赛结束 3 比赛推迟 4 未确定的 5 已取消的

@@ -104,6 +104,7 @@ extern NSInteger gCategoryType;
         NSInteger time = [modelTime timeIntervalSince1970];
         NSInteger nowTime = [[NSDate date] timeIntervalSince1970];
         self.countDown = time - nowTime;
+        // self.countDown = 10;
         if (model.status.intValue == 1) {
             if (self.countDown > 0) {
                 self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(timerAction) userInfo:nil repeats:YES];
@@ -155,6 +156,16 @@ extern NSInteger gCategoryType;
         _mStr = [NSString stringWithFormat:@"%ld分",min];
     }else {
         _mStr = @"00分";
+    }
+    if ([_dStr isEqualToString:@"00天"] &&
+        [_hStr isEqualToString:@"00时"] &&
+        [_mStr isEqualToString:@"00分"] &&
+        second == 0) {
+        [self.timer invalidate];
+        self.timer = nil;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"GameTimerEnd" object:nil];
+        });
     }
     return [NSString stringWithFormat:@"%@%@%@%ld秒",_dStr, _hStr, _mStr, second];
 }

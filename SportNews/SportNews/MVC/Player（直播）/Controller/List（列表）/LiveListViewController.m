@@ -24,6 +24,7 @@
 NSInteger gCategoryType = 0;
 BOOL isListLoadFail = NO;
 static NSUInteger netWorkTryTime = 0;
+LiveListModel *gliveModel = nil;
 
 @interface LiveListViewController ()
 
@@ -153,6 +154,7 @@ static NSUInteger netWorkTryTime = 0;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(topMatch:) name:@"TopMatch" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(UnTopMatch:) name:@"UnTopMatch" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadDataAgain) name:@"NetworkAvailable" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pushTimeEndVC) name:@"PushLiveDetailAgain" object:nil];
 }
 
 - (void)loadDataAgain {
@@ -241,8 +243,10 @@ static NSUInteger netWorkTryTime = 0;
             model = [[weakSelf.datasArray firstObject] firstObject];
         }
         if (model != nil && model.matchtime != nil && model.matchtime.length > 10) {
-            [weakSelf.topView changeChoice:[model.matchtime substringToIndex:10]];
-            self->_calendarChoice = [model.matchtime substringToIndex:10];
+            // [weakSelf.topView changeChoice:[model.matchtime substringToIndex:10]];
+            // self->_calendarChoice = [model.matchtime substringToIndex:10];
+            [weakSelf.topView changeChoice:[weakSelf getTodayString]];
+            self->_calendarChoice = [weakSelf getTodayString];
         }
     };
     [self.view addSubview:self.topView];
@@ -502,9 +506,10 @@ static NSUInteger netWorkTryTime = 0;
 
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     formatter.dateFormat = @"yyyy-MM-dd";
-    formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"];
+    formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Shanghai"];
 
     NSString *taipeiTime = [formatter stringFromDate:date];
+    // NSLog(@"台北時間：%@", taipeiTime);
     return taipeiTime;
 }
 
@@ -535,6 +540,8 @@ static NSUInteger netWorkTryTime = 0;
     NSMutableDictionary *param = nil;
     gCategoryType = type.integerValue;
 
+    // NSString *zoneID = [NSTimeZone localTimeZone].name;
+
     if ([type intValue] == 3) {
         param = @{
             @"type" : @"4",
@@ -547,8 +554,8 @@ static NSUInteger netWorkTryTime = 0;
             @"status" : @"2",
             @"zhuboType" : @"0",
             @"starttime" : [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
-            @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
-            @"zoneId" : @"Asia/Taipei",
+            // @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
+            @"zoneId" : @"Asia/Shanghai",
             @"langtype" : @"zh",
             @"isnew" : @"1"
         }.mutableCopy;
@@ -562,8 +569,8 @@ static NSUInteger netWorkTryTime = 0;
             @"ps" : ps,
             @"pid" : @"4",
             @"starttime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
-            @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
-            @"zoneId" : @"Asia/Taipei",
+            // @"endTime" :  [self.startTime isEqualToString:@""] ? [self getTodayString] : self.startTime,
+            @"zoneId" : @"Asia/Shanghai",
             @"langtype" : @"zh",
             @"zhuboType" : [type intValue] == -1 ? @"1" : @"0"  // 只有熱門-全部才要設為1
         }.mutableCopy;
@@ -587,6 +594,7 @@ static NSUInteger netWorkTryTime = 0;
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
         }
+        NSLog(@"%@", [NSString stringWithFormat:@"[Adam]-match list:%@", dic]);
         netWorkTryTime = 10;
         isListLoadFail = NO;
         self.tableView.backgroundView = nil;
@@ -668,7 +676,9 @@ static NSUInteger netWorkTryTime = 0;
                 model = [[self.datasArray firstObject] firstObject];
             }
             if (model != nil && model.matchtime != nil && model.matchtime.length > 10) {
-                [self.topView changeChoiceNotAnimated:[model.matchtime substringToIndex:10]];
+                // [self.topView changeChoiceNotAnimated:[model.matchtime substringToIndex:10]];
+                // 4-12修改 凌晨的比賽
+                [self.topView changeChoiceNotAnimated:self.startTime];
             }
         }
 
@@ -682,7 +692,9 @@ static NSUInteger netWorkTryTime = 0;
                     /// 第一个比赛日期和当前日期不一致
                     ![[LiveListCalendarVC getCurrentString] isEqualToString:[model.matchtime substringToIndex:10]]
                     ) {
-                    self.isTodayHaveMatch = false;
+                    // 4-12修改 凌晨的比賽
+                    // self.isTodayHaveMatch = false;
+                    self.isTodayHaveMatch = true;
                 } else {
                     self.isTodayHaveMatch = true;
                 }
@@ -725,7 +737,7 @@ static NSUInteger netWorkTryTime = 0;
             }
         }
     };
-    
+
     if (self.isFirstLoad) {
         self.isFirstLoad = false;
         [KYApiHttpTool FirstGET:URL_MATCH_LIST withParams:param success:success failure:fail];
@@ -775,6 +787,7 @@ static NSUInteger netWorkTryTime = 0;
     } else {
         [self.datasArray addObjectsFromArray:[self sortDataListAgainWithTopMatch:dataArray]];
     }
+    NSLog(@"test");
 }
 
 - (void)originalSortDataList:(NSArray *)dataList {
@@ -849,6 +862,8 @@ static NSUInteger netWorkTryTime = 0;
             return (NSComparisonResult)NSOrderedAscending;
         } else if ([s1.zd_level intValue] < [s2.zd_level intValue]) {
             return (NSComparisonResult)NSOrderedDescending;
+        } else {
+            return (NSComparisonResult)NSOrderedSame;
         }
 
         return NSOrderedSame;
@@ -856,6 +871,9 @@ static NSUInteger netWorkTryTime = 0;
 
     [rcAry addObjectsFromArray:sorted];
     [rcAry addObjectsFromArray:ary2];
+    if (dataArray.count > 1) {
+        [rcAry addObjectsFromArray:dataArray[1]];
+    }
     [dataList addObject:rcAry];
     return  dataList;
 }
@@ -886,6 +904,8 @@ static NSUInteger netWorkTryTime = 0;
             return (NSComparisonResult)NSOrderedAscending;
         } else if ([s1.zd_level intValue] < [s2.zd_level intValue]) {
             return (NSComparisonResult)NSOrderedDescending;
+        }else {
+            return (NSComparisonResult)NSOrderedSame;
         }
 
         return NSOrderedSame;
@@ -1162,8 +1182,10 @@ static NSUInteger netWorkTryTime = 0;
         }
     }else if (section == 1) {
         if (self.noTopListArray.count > 0) {
-            LiveListModel *listModel = self.noTopListArray.firstObject;
-            NSString *week = [self getCurrentTimeAndWeekDay:listModel.matchtime];
+            // 4-12修改 凌晨的比賽
+            // LiveListModel *listModel = self.noTopListArray.firstObject;
+            // NSString *week = [self getCurrentTimeAndWeekDay:listModel.matchtime];
+            NSString *week = [self getCurrentTimeAndWeekDay:[self getTodayString]];
             return [self setupSectionHeaderView:week];
         }
     }else {
@@ -1174,9 +1196,11 @@ static NSUInteger netWorkTryTime = 0;
             }
         }
         if (self.datasArray.count > 0) {
-            NSArray *modelsArray = self.datasArray[section-2];
-            LiveListModel *listModel = modelsArray.firstObject;
-            NSString *week = [self getCurrentTimeAndWeekDay:listModel.matchtime];
+            // NSArray *modelsArray = self.datasArray[section-2];
+            // 4-12修改 凌晨的比賽
+            // LiveListModel *listModel = modelsArray.firstObject;
+            // NSString *week = [self getCurrentTimeAndWeekDay:listModel.matchtime];
+            NSString *week = [self getCurrentTimeAndWeekDay:[self getTodayString]];
             return [self setupSectionHeaderView:week];
         }
     }
@@ -1237,8 +1261,15 @@ static NSUInteger netWorkTryTime = 0;
     }else {
         LiveDetailController *vc = [[LiveDetailController alloc] init];
         vc.model = listModel;
+        gliveModel = listModel;
         [self.navigationController pushViewController:vc animated:YES];
     }
+}
+
+- (void)pushTimeEndVC {
+    LiveDetailController *vc = [[LiveDetailController alloc] init];
+    vc.model = gliveModel;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (UIView *)listView {
@@ -1589,7 +1620,9 @@ static NSUInteger netWorkTryTime = 0;
         NSArray *dataList = self.datasArray[nowSection-2];
         LiveListModel *model = dataList.firstObject;
         if (model.matchtime.length > 10) {
-            NSString *time = [model.matchtime substringToIndex:10];
+            // 4-12修改 凌晨的比賽
+            // NSString *time = [model.matchtime substringToIndex:10];
+            NSString *time = (self.startTime != nil && ![self.startTime isEqualToString:@""]) ? self.startTime : [self getTodayString];
             if (![self.calendarChoice isEqualToString:time]) {
                 _calendarChoice = time;
                 [self.topView changeChoice:_calendarChoice];
@@ -1605,7 +1638,10 @@ static NSUInteger netWorkTryTime = 0;
             model = self.noTopListArray.firstObject;
         }
         if (model.matchtime.length > 10) {
-            NSString *time = [model.matchtime substringToIndex:10];
+            // 4-12修改 凌晨的比賽
+            // NSString *time = [model.matchtime substringToIndex:10];
+            NSString *time = (self.startTime != nil && ![self.startTime isEqualToString:@""]) ? self.startTime : [self getTodayString];
+            // NSString *time = [self getTodayString];
             if (![self.calendarChoice isEqualToString:time]) {
                 _calendarChoice = time;
                 [self.topView changeChoice:_calendarChoice];
@@ -1627,7 +1663,9 @@ static NSUInteger netWorkTryTime = 0;
                 model = self.noTopListArray.firstObject;
             }
             if (model.matchtime.length > 10) {
-                NSInteger choice = [[[model.matchtime substringToIndex:10] stringByReplacingOccurrencesOfString:@"-" withString:@""] integerValue];
+                // 4-12修改 凌晨的比賽
+                // NSInteger choice = [[[model.matchtime substringToIndex:10] stringByReplacingOccurrencesOfString:@"-" withString:@""] integerValue];
+                NSInteger choice = [[(self.startTime != nil && ![self.startTime isEqualToString:@""]) ? self.startTime : [self getTodayString] stringByReplacingOccurrencesOfString:@"-" withString:@""]integerValue];
                 NSInteger today = [[[LiveListCalendarVC getCurrentString] stringByReplacingOccurrencesOfString:@"-" withString:@""] integerValue];
                 if (choice > today) {
                     self.todayBtn.selected = NO;
@@ -1678,7 +1716,7 @@ static NSUInteger netWorkTryTime = 0;
     NSString *dateString = [self getTodayString];
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     formatter.dateFormat = @"yyyy-MM-dd"; // 根據你的字串格式設定
-    // formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Taipei"]; // 設定時區 (可選)
+    // formatter.timeZone = [NSTimeZone timeZoneWithName:@"Asia/Shanghai"]; // 設定時區 (可選)
 
     NSDate *date = [formatter dateFromString:dateString];
     NSDate *choice = date;
@@ -1719,7 +1757,7 @@ static NSUInteger netWorkTryTime = 0;
         self.timeStatus = 0;
         NSDate *date = [NSDate new];
         NSDateFormatter *formatter = [NSDateFormatter new];
-        [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Taipei"]];
+        [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
         formatter.dateFormat = @"yyyy-MM-dd";
         NSString *todayStr = [formatter stringFromDate:date];
         [self.topView changeChoice:todayStr];
@@ -1728,7 +1766,7 @@ static NSUInteger netWorkTryTime = 0;
     [self.topView changeChoice:calendarChoice];
     NSDate *date = [NSDate new];
     NSDateFormatter *formatter = [NSDateFormatter new];
-    [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Taipei"]];
+    [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
     formatter.dateFormat = @"yyyy-MM-dd";
     NSString *todayStr = [formatter stringFromDate:date];
     NSInteger choice = [[calendarChoice stringByReplacingOccurrencesOfString:@"-" withString:@""] integerValue];
@@ -1820,4 +1858,6 @@ static NSUInteger netWorkTryTime = 0;
 
 
 @end
+
+
 
