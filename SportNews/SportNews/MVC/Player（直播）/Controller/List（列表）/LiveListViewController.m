@@ -591,6 +591,7 @@ LiveListModel *gliveModel = nil;
     }
     void (^success)(NSDictionary *) = ^(NSDictionary * _Nonnull response) {
         id dic = response[@"data"];
+        // NSLog(@"%@", dic);
         if (dic == nil || [dic isKindOfClass:[NSNull class]]) {
             return;
         }
@@ -702,7 +703,11 @@ LiveListModel *gliveModel = nil;
                 self.isTodayHaveMatch = true;
             }
         }
-        self.pn = [response[@"data"][@"currentPage"] integerValue] + 1;
+        if (self.pn >= [response[@"data"][@"totalPage"] integerValue]) {
+            [self.tableView.mj_footer endRefreshingWithNoMoreData];
+        }else {
+            self.pn = [response[@"data"][@"currentPage"] integerValue] + 1;
+        }
         // self.pn++;
     };
     void (^ fail)(NSError *) = ^(NSError * _Nonnull error) {
